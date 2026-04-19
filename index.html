@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ignacio Morales — CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav" id="nav">
+    <div class="nav__inner">
+      <a href="#hero" class="nav__logo">IM</a>
+      <nav class="nav__links" id="navLinks">
+        <a href="#about">About</a>
+        <a href="#experience">Experience</a>
+        <a href="#education">Education</a>
+        <a href="#skills">Skills</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <button class="nav__hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- HERO -->
+    <section class="hero" id="hero">
+      <div class="hero__bg"></div>
+      <div class="hero__content">
+        <div class="hero__avatar">IM</div>
+        <h1 class="hero__name">Ignacio Morales</h1>
+        <p class="hero__title">Senior Software Engineer &amp; Tech Lead</p>
+        <p class="hero__location">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          Santiago, Chile
+        </p>
+        <div class="hero__links">
+          <a href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener" class="hero__link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            LinkedIn
+          </a>
+          <a href="https://github.com/ignaciomoralesm" target="_blank" rel="noopener" class="hero__link">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            GitHub
+          </a>
+          <a href="mailto:ignacio@example.com" class="hero__link">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Email
+          </a>
+        </div>
+      </div>
+      <div class="hero__scroll-hint">
+        <span>Scroll down</span>
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section" id="about">
+      <div class="container">
+        <h2 class="section__title section__title--indigo reveal">About Me</h2>
+        <div class="about__grid reveal">
+          <div class="about__text">
+            <p>I'm a Senior Software Engineer and Tech Lead with over 8 years of experience building scalable web applications and leading high-performing engineering teams. Passionate about clean architecture, developer experience, and turning complex problems into elegant solutions.</p>
+            <p>My background spans full-stack development with a strong focus on backend systems, cloud infrastructure, and API design. I thrive in fast-paced environments where technical excellence and product thinking go hand in hand.</p>
+            <p>Outside of code, I enjoy mentoring junior engineers, contributing to open-source projects, and staying at the forefront of emerging technologies in the software industry.</p>
+          </div>
+          <div class="about__stats">
+            <div class="stat-card">
+              <span class="stat-card__number">8+</span>
+              <span class="stat-card__label">Years Experience</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__number">30+</span>
+              <span class="stat-card__label">Projects Shipped</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__number">5+</span>
+              <span class="stat-card__label">Teams Led</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card__number">3</span>
+              <span class="stat-card__label">Languages</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EXPERIENCE -->
+    <section class="section section--alt" id="experience">
+      <div class="container">
+        <h2 class="section__title section__title--pink reveal">Experience</h2>
+        <div class="timeline">
+
+          <article class="timeline__item reveal">
+            <div class="timeline__dot timeline__dot--pink"></div>
+            <div class="timeline__card">
+              <div class="timeline__header">
+                <div>
+                  <h3 class="timeline__role">Tech Lead & Senior Software Engineer</h3>
+                  <p class="timeline__company">Acme Corp</p>
+                </div>
+                <span class="timeline__date">2022 — Present</span>
+              </div>
+              <ul class="timeline__bullets">
+                <li>Led a cross-functional team of 8 engineers to deliver a platform serving 2M+ users.</li>
+                <li>Architected a microservices migration reducing deployment time by 60% and improving system reliability to 99.9% uptime.</li>
+                <li>Defined technical roadmap, conducted code reviews, and established engineering best practices across the org.</li>
+                <li>Mentored 4 junior engineers, 2 of whom were promoted within 18 months.</li>
+              </ul>
+              <div class="timeline__tags">
+                <span class="tag tag--indigo">Node.js</span>
+                <span class="tag tag--pink">TypeScript</span>
+                <span class="tag tag--amber">AWS</span>
+                <span class="tag tag--emerald">PostgreSQL</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="timeline__item reveal">
+            <div class="timeline__dot timeline__dot--amber"></div>
+            <div class="timeline__card">
+              <div class="timeline__header">
+                <div>
+                  <h3 class="timeline__role">Full Stack Engineer</h3>
+                  <p class="timeline__company">Startup XYZ</p>
+                </div>
+                <span class="timeline__date">2019 — 2022</span>
+              </div>
+              <ul class="timeline__bullets">
+                <li>Built the core product from 0 to 1, enabling the company to close its Series A funding round.</li>
+                <li>Designed and implemented a real-time notification system handling 500K events/day using Redis and WebSockets.</li>
+                <li>Improved API response times by 45% through query optimization and caching strategies.</li>
+              </ul>
+              <div class="timeline__tags">
+                <span class="tag tag--indigo">React</span>
+                <span class="tag tag--pink">Python</span>
+                <span class="tag tag--amber">Redis</span>
+                <span class="tag tag--emerald">Docker</span>
+              </div>
+            </div>
+          </article>
+
+          <article class="timeline__item reveal">
+            <div class="timeline__dot timeline__dot--emerald"></div>
+            <div class="timeline__card">
+              <div class="timeline__header">
+                <div>
+                  <h3 class="timeline__role">Software Engineer</h3>
+                  <p class="timeline__company">Tech Consulting Group</p>
+                </div>
+                <span class="timeline__date">2017 — 2019</span>
+              </div>
+              <ul class="timeline__bullets">
+                <li>Delivered web applications for 10+ enterprise clients in the financial and retail sectors.</li>
+                <li>Integrated third-party payment gateways and government APIs, processing $5M+ in transactions.</li>
+                <li>Maintained CI/CD pipelines and contributed to internal tooling that reduced onboarding time by 30%.</li>
+              </ul>
+              <div class="timeline__tags">
+                <span class="tag tag--indigo">Java</span>
+                <span class="tag tag--pink">Spring Boot</span>
+                <span class="tag tag--amber">MySQL</span>
+                <span class="tag tag--emerald">Angular</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION -->
+    <section class="section" id="education">
+      <div class="container">
+        <h2 class="section__title section__title--amber reveal">Education</h2>
+        <div class="edu__grid">
+
+          <article class="edu__card reveal">
+            <div class="edu__icon edu__icon--indigo">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            <div>
+              <h3 class="edu__degree">B.Sc. Computer Science &amp; Engineering</h3>
+              <p class="edu__school">Universidad de Chile</p>
+              <p class="edu__year">2013 — 2018</p>
+              <p class="edu__detail">Graduated with honors. Thesis on distributed systems and consensus algorithms.</p>
+            </div>
+          </article>
+
+          <article class="edu__card reveal">
+            <div class="edu__icon edu__icon--pink">
+              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <div>
+              <h3 class="edu__degree">Cloud Architecture Professional Certificate</h3>
+              <p class="edu__school">Google Cloud</p>
+              <p class="edu__year">2021</p>
+              <p class="edu__detail">Specialization in scalable cloud-native application design and infrastructure automation.</p>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="section section--alt" id="skills">
+      <div class="container">
+        <h2 class="section__title section__title--emerald reveal">Skills</h2>
+        <div class="skills__grid">
+
+          <div class="skills__group reveal">
+            <h3 class="skills__category skills__category--indigo">Languages</h3>
+            <div class="skills__tags">
+              <span class="tag tag--indigo">TypeScript</span>
+              <span class="tag tag--indigo">JavaScript</span>
+              <span class="tag tag--indigo">Python</span>
+              <span class="tag tag--indigo">Java</span>
+              <span class="tag tag--indigo">Go</span>
+              <span class="tag tag--indigo">SQL</span>
+            </div>
+          </div>
+
+          <div class="skills__group reveal">
+            <h3 class="skills__category skills__category--pink">Frameworks &amp; Libraries</h3>
+            <div class="skills__tags">
+              <span class="tag tag--pink">React</span>
+              <span class="tag tag--pink">Node.js</span>
+              <span class="tag tag--pink">Next.js</span>
+              <span class="tag tag--pink">FastAPI</span>
+              <span class="tag tag--pink">Spring Boot</span>
+              <span class="tag tag--pink">GraphQL</span>
+            </div>
+          </div>
+
+          <div class="skills__group reveal">
+            <h3 class="skills__category skills__category--amber">Cloud &amp; Infrastructure</h3>
+            <div class="skills__tags">
+              <span class="tag tag--amber">AWS</span>
+              <span class="tag tag--amber">Google Cloud</span>
+              <span class="tag tag--amber">Docker</span>
+              <span class="tag tag--amber">Kubernetes</span>
+              <span class="tag tag--amber">Terraform</span>
+              <span class="tag tag--amber">CI/CD</span>
+            </div>
+          </div>
+
+          <div class="skills__group reveal">
+            <h3 class="skills__category skills__category--emerald">Databases &amp; Tools</h3>
+            <div class="skills__tags">
+              <span class="tag tag--emerald">PostgreSQL</span>
+              <span class="tag tag--emerald">MongoDB</span>
+              <span class="tag tag--emerald">Redis</span>
+              <span class="tag tag--emerald">Git</span>
+              <span class="tag tag--emerald">Linux</span>
+              <span class="tag tag--emerald">Kafka</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="langs reveal">
+          <h3 class="skills__category skills__category--indigo">Human Languages</h3>
+          <div class="langs__list">
+            <div class="lang__item">
+              <span class="lang__name">Spanish</span>
+              <div class="lang__bar"><div class="lang__fill lang__fill--full"></div></div>
+              <span class="lang__level">Native</span>
+            </div>
+            <div class="lang__item">
+              <span class="lang__name">English</span>
+              <div class="lang__bar"><div class="lang__fill lang__fill--high"></div></div>
+              <span class="lang__level">Professional</span>
+            </div>
+            <div class="lang__item">
+              <span class="lang__name">Portuguese</span>
+              <div class="lang__bar"><div class="lang__fill lang__fill--mid"></div></div>
+              <span class="lang__level">Conversational</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section" id="contact">
+      <div class="container">
+        <h2 class="section__title section__title--indigo reveal">Get In Touch</h2>
+        <p class="contact__lead reveal">I'm open to new opportunities, collaborations, and interesting conversations. Feel free to reach out!</p>
+        <div class="contact__cards reveal">
+          <a href="mailto:ignacio@example.com" class="contact__card">
+            <div class="contact__icon contact__icon--indigo">
+              <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            </div>
+            <span class="contact__label">ignacio@example.com</span>
+            <span class="contact__sublabel">Email</span>
+          </a>
+          <a href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener" class="contact__card">
+            <div class="contact__icon contact__icon--pink">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+            </div>
+            <span class="contact__label">ignaciomoralesm</span>
+            <span class="contact__sublabel">LinkedIn</span>
+          </a>
+          <a href="https://github.com/ignaciomoralesm" target="_blank" rel="noopener" class="contact__card">
+            <div class="contact__icon contact__icon--amber">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+            </div>
+            <span class="contact__label">ignaciomoralesm</span>
+            <span class="contact__sublabel">GitHub</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>Built with ❤️ by Ignacio Morales · <a href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">LinkedIn</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
