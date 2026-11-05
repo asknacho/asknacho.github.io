@@ -12,6 +12,18 @@ const ART_W = 1586;
 const ART_H = 992;
 type Box = [number, number, number, number];
 
+/** How far the family moves right on phones, in art pixels. */
+const PHONE_SHIFT = 532;
+/** Left edge of the phone window; the Sagrada Família lands between the heart and the baby's bubble. */
+const PHONE_VIEW_X = 562;
+/** Pieces the phone layout moves or patches; cut by tools/extract_phone.py. */
+const PHONE_PIECES: Record<'guitar' | 'keyboard' | 'bubble' | 'bubbleFix', Box> = {
+  guitar: [110, 311, 117, 213],
+  keyboard: [399, 374, 92, 154],
+  bubble: [848, 335, 99, 90],
+  bubbleFix: [836, 323, 123, 114],
+};
+
 const readEnabled = () => {
   try {
     return localStorage.getItem(STORAGE_KEY) !== 'off';
@@ -140,17 +152,20 @@ export function Scene() {
         <>
           <div className="slice slice--static" style={sliceStyle([225, 6, 560, 84])} />
           <div className="slice slice--static" style={sliceStyle([570, 108, 830, 200])} />
-          <Stage view={[0, 170, 960, 395]}>
+          {/* The family steps over to the city: same art, same pixels, shifted a whole number of them. */}
+          <Stage view={[PHONE_VIEW_X, 170, 960, 395]}>
             <img className="stage__art" src={BACKGROUND_URL} alt="" />
-            <img className="sprite" style={place([596, 165, 372, 142])} src={asset('sprites/no-title.png')} alt="" />
-            <Effects running={running} />
-            {layers}
-            {SCENE_SPOTS.map(spot)}
-          </Stage>
-          <Stage view={[960, 306, 626, 244]}>
-            <img className="stage__art" src={BACKGROUND_URL} alt="" />
+            <img className="sprite" style={place([596, 165, 800, 142])} src={asset('sprites/no-title-wide.png')} alt="" />
+            <img className="sprite" style={place(PHONE_PIECES.bubbleFix)} src={asset('sprites/bubble-fix.png')} alt="" />
             <Effects running={running} />
             {spot(CITY_SPOT)}
+            <div className="shifted" style={{ left: `${(PHONE_SHIFT / ART_W) * 100}%` }}>
+              <img className="sprite" style={place(PHONE_PIECES.guitar)} src={asset('sprites/guitar.png')} alt="" />
+              <img className="sprite" style={place(PHONE_PIECES.keyboard)} src={asset('sprites/keyboard.png')} alt="" />
+              <img className="sprite" style={place(PHONE_PIECES.bubble)} src={asset('sprites/bubble.png')} alt="" />
+              {layers}
+              {SCENE_SPOTS.map(spot)}
+            </div>
           </Stage>
           <div className="cards">{CARD_SPOTS.map(slice)}</div>
           <div className="strip">{STRIP_SPOTS.map(slice)}</div>
