@@ -1,0 +1,12 @@
+{
+  "id": "male",
+  "image": "sprites/male.png",
+  "frameWidth": 209,
+  "frameHeight": 358,
+  "frames": 16,
+  "durationMs": 1920,
+  "x": 218,
+  "y": 171,
+  "sceneWidth": 1586,
+  "sceneHeight": 992
+}
