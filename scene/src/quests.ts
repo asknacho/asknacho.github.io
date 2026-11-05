@@ -8,7 +8,7 @@ export interface Quest {
 }
 
 const RECRUIT: [string, string] = ['Recruit Nacho →', 'https://www.linkedin.com/in/ignaciomoralesm'];
-const GITHUB: [string, string] = ['GitHub →', 'https://github.com/ignaciomoralesm'];
+const GITHUB: [string, string] = ['GitHub →', 'https://github.com/asknacho'];
 const SCOREPACE: [string, string] = ['Play Scorepace →', 'https://scorepace.com'];
 
 export const QUESTS = {
