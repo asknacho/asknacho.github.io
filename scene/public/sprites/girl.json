@@ -1,0 +1,18 @@
+{
+  "id": "girl",
+  "image": "sprites/girl.png",
+  "frameWidth": 151,
+  "frameHeight": 131,
+  "frames": 16,
+  "durationMs": 3400,
+  "x": 658,
+  "y": 386,
+  "sceneWidth": 1586,
+  "sceneHeight": 992,
+  "blink": {
+    "row": 1,
+    "minGapMs": 3000,
+    "maxGapMs": 6000,
+    "closedMs": 140
+  }
+}

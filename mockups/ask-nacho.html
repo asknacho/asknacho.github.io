@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ask Nacho</title>
+<meta name="description" content="Ignacio 'Nacho' Morales, senior software engineer and friendly side-quest enthusiast in Barcelona." />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@800&family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --bg:#17151d; --ink:#f6e3bc; --gold:#e0ae62; --gold2:#f7d48a; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; min-height:100%; background:var(--bg); color:var(--ink); }
+  body { display:flex; justify-content:center; align-items:center; min-height:100vh; font-family:'Pixelify Sans',monospace; }
+  .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  #page { width:min(100vw, calc(100vh * 1586 / 992)); max-width:1586px; position:relative; }
+  .s { display:block; width:100%; background-image:url(assets/ask-nacho.webp); background-repeat:no-repeat; }
+  button.s, a.s { all:unset; display:block; box-sizing:border-box; background-image:url(assets/ask-nacho.webp); background-repeat:no-repeat; cursor:pointer; transition:filter .12s, transform .12s; }
+  button.s:hover, a.s:hover { filter:brightness(1.14); }
+  button.s:focus-visible { outline:2px solid #fff; outline-offset:-4px; }
+  button.s.on { filter:brightness(1.18); }
+  #scene { position:relative; overflow:hidden; }
+  #art { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+  #fx { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; mix-blend-mode:screen; }
+  .hot { position:absolute; all:unset; position:absolute; cursor:pointer; border-radius:40%; }
+  .hot:hover { background:radial-gradient(closest-side, rgba(255,226,160,.16), transparent); }
+  .hot:focus-visible { outline:2px dashed var(--gold2); }
+  #cards, #strip { display:flex; width:100%; }
+  #cards > *, #strip > * { min-width:0; }
+  #hide { display:none; position:absolute; right:0; top:0; width:48%; height:42%; background:url(assets/ask-nacho.webp) no-repeat 100% 13% / 809% auto; -webkit-mask-image:linear-gradient(90deg,transparent,#000 22%),linear-gradient(#000 70%,transparent); -webkit-mask-composite:source-in; mask-image:linear-gradient(90deg,transparent,#000 22%),linear-gradient(#000 70%,transparent); mask-composite:intersect; }
+  #mhead { display:none; }
+  #win { position:absolute; z-index:5; left:44%; right:1.6%; top:calc(10% + 8px); margin:0; padding:14px 18px 16px; color:var(--ink); background:#1f1b24; border:3px solid var(--gold); outline:2px solid #5e3e20; outline-offset:-7px; box-shadow:0 10px 0 rgba(0,0,0,.35); }
+  #win h2 { font:800 clamp(20px,2.3vw,30px) Bitter,Georgia,serif; margin:0; color:var(--gold2); padding-right:30px; }
+  #win .cls { margin:2px 0 8px; color:#c9b48e; font-size:16px; }
+  #win .bio { font-size:18px; line-height:1.2; margin:0 0 10px; }
+  .stat { display:grid; grid-template-columns:96px 1fr 30px; gap:8px; align-items:center; font-size:16px; }
+  .meter { height:10px; background:#0c0a10; box-shadow:0 0 0 2px #6a4a28; }
+  .meter i { display:block; height:100%; background:repeating-linear-gradient(90deg,#8fd16a 0 6px,#6cb350 6px 8px); }
+  .meter.low i { background:repeating-linear-gradient(90deg,#ec7a5c 0 6px,#c5533f 6px 8px); }
+  .weak { margin:8px 0 0; font-size:16px; } .weak b { color:#f49a7c; font-weight:600; }
+  .links { display:flex; flex-wrap:wrap; gap:12px; margin-top:12px; }
+  .links a { font-weight:600; font-size:17px; color:#2a1608; text-decoration:none; background:linear-gradient(#f7d48a,#d99a3e); padding:6px 12px; border-radius:5px; box-shadow:0 0 0 2px #6a4016; }
+  .links a:hover { filter:brightness(1.12); }
+  #x { all:unset; position:absolute; top:8px; right:12px; font-size:22px; cursor:pointer; color:var(--gold2); padding:2px 8px; }
+  #x:focus-visible { outline:2px solid #fff; }
+  @media (max-width:720px) {
+    body { align-items:flex-start; }
+    #page { width:100%; }
+    #mhead { display:block; }
+    #hide { display:block; }
+    #cards { flex-wrap:wrap; }
+    #cards > * { width:50%; }
+    #strip { display:grid; grid-template-columns:repeat(12,1fr); gap:6px; padding:6px; }
+    #strip > * { grid-column:span 4; }
+    #strip > :nth-child(n+4) { grid-column:span 12; }
+    #win { position:fixed; left:8px; right:8px; top:auto; bottom:8px; max-height:70vh; overflow:auto; }
+  }
+</style>
+</head>
+<body>
+<h1 class="sr">Ask Nacho to level up your idea. Ignacio Morales, senior software engineer and friendly side-quest enthusiast in Barcelona.</h1>
+<main id="page">
+  <div class="s" data-s="0,0,1586,97" data-m="225,6,560,84" role="img" aria-label="Ask Nacho. Barcelona, engineer, maker."></div>
+  <div class="s" id="mhead" data-s="570,108,830,200" data-m="570,108,830,200" role="img" aria-label="Ask Nacho to level up your idea. Senior software engineer, friendly side-quest enthusiast."></div>
+  <section class="s" id="scene" data-s="0,97,1586,468" data-m="0,170,960,395" role="img" aria-label="Nacho with a guitar and keyboard, beside his wife, daughter and sleeping baby boy, on a hill above Barcelona at dusk.">
+    <canvas id="art" aria-hidden="true"></canvas>
+    <canvas id="fx"></canvas>
+    <div id="hide"></div>
+    <button class="hot" data-d="hero" data-h="220,175,210,350" aria-label="About Nacho"></button>
+    <button class="hot" data-d="family" data-h="495,320,300,200" aria-label="The family"></button>
+    <button class="hot" data-d="baby" data-h="800,330,170,190" aria-label="The baby boy"></button>
+    <button class="hot" data-d="barcelona" data-h="1090,310,480,240" aria-label="Barcelona"></button>
+    <dialog id="win" aria-labelledby="wt"><button id="x" aria-label="Close">×</button><div id="wb"></div></dialog>
+  </section>
+  <div id="cards">
+    <button class="s" data-d="code" data-s="0,565,406,255" data-m="10,566,402,246" aria-label="Code: builds useful things"></button>
+    <button class="s" data-d="scorepace" data-s="406,565,389,255" data-m="408,566,386,246" aria-label="Scorepace: made to help me learn piano"></button>
+    <button class="s" data-d="music" data-s="795,565,381,255" data-m="796,566,380,246" aria-label="Music: guitar and piano practice"></button>
+    <button class="s" data-d="family" data-s="1176,565,410,255" data-m="1178,566,398,246" aria-label="Offline party: wife, daughter and baby boy soon"></button>
+  </div>
+  <div id="strip">
+    <button class="s" data-d="barcelona" data-s="0,820,248,172" data-m="50,862,195,70" aria-label="Barcelona"></button>
+    <button class="s" data-d="football" data-s="248,820,204,172" data-m="262,862,175,70" aria-label="Football"></button>
+    <button class="s" data-d="pizza" data-s="452,820,184,172" data-m="466,862,160,70" aria-label="Pizza"></button>
+    <button class="s" data-d="challenge" data-s="636,820,478,172" data-m="645,862,450,70" aria-label="Help people challenge themselves"></button>
+    <button class="s" data-d="projects" data-s="1114,820,472,172" data-m="1135,852,415,92" aria-label="Explore the projects"></button>
+  </div>
+</main>
+<script>
+const LI = ['Recruit Nacho →', 'https://www.linkedin.com/in/ignaciomoralesm'];
+const GH = ['GitHub →', 'https://github.com/asknacho'];
+const SP = ['Play Scorepace →', 'https://scorepace.com'];
+const D = {
+  hero: { t: 'Hola, I\'m Nacho', c: 'Class: Tech Lead, Bard, Dad', b: 'Ignacio Morales. Senior software engineer in Barcelona who loves pizza, coding and helping people challenge themselves.', s: [['Code', 92], ['Curls', 99], ['Sleep', 12]], w: '"Quick question?"', l: [LI, GH] },
+  code: { t: 'Code', c: 'Class: Senior Software Engineer', b: '8+ years shipping. Led 8 engineers on a platform for 2M+ users. Cut deploy times by 60%.', s: [['Code', 92], ['Lead', 88], ['Meetings', 21]], w: '"Quick question?"', l: [LI, GH] },
+  scorepace: { t: 'Scorepace', c: 'Class: Side Quest', b: 'I built scorepace.com to help myself learn piano, rather than simply practising.', s: [['Useful', 90], ['Piano', 16], ['Excuses', 88]], w: 'Actually practising', l: [SP] },
+  music: { t: 'Music', c: 'Class: Guitarist, Apprentice Pianist', b: 'I play guitar and I am learning piano. The neighbours are being very brave.', s: [['Guitar', 74], ['Piano', 16], ['Rhythm', 60]], w: 'Left hand', l: [SP] },
+  family: { t: 'Offline Party', c: 'Class: Paladin of the Household', b: 'A beautiful wife, a beautiful daughter, and a baby boy joining the party soon.', s: [['Love', 99], ['Patience', 70], ['Sleep', 12]], w: 'One more episode', l: [] },
+  baby: { t: 'New Party Member', c: 'Class: Unknown (baby boy)', b: 'Joining soon. Patch notes unavailable. Release date set by the customer.', s: [['Cuteness', 99], ['Volume', 95], ['Party Sleep', 2]], w: 'Nothing yet', l: [] },
+  barcelona: { t: 'Barcelona', c: 'Class: Resident', b: 'Home base. The cathedral and my side projects share a release schedule.', s: [['Sun', 90], ['Views', 95], ['Parking', 3]], w: 'Tourists at 5pm', l: [] },
+  football: { t: 'Football', c: 'Class: Armchair Scholar', b: 'I live in Barcelona and like football, which here counts as a personality.', s: [['Opinions', 99], ['Tactics', 80], ['Cardio', 19]], w: 'Extra time on a school night', l: [] },
+  pizza: { t: 'Pizza', c: 'Class: Evaluator, Grade S', b: 'Taken with the seriousness others reserve for system design.', s: [['Cheese', 97], ['Dough', 66], ['Restraint', 8]], w: 'Pineapple', l: [] },
+  challenge: { t: 'Challenge Yourself', c: 'Class: Coach', b: 'I love helping people challenge themselves. Was that really your best attempt?', s: [['Courage', 90], ['Honesty', 94], ['Chill', 30]], w: 'People saying "I can\'t"', l: [LI] },
+  projects: { t: 'The Projects', c: 'Quest log', b: 'Scorepace is the current side quest. Everything else lives on GitHub.', s: [['Curiosity', 95], ['Finished', 40], ['Started', 99]], w: 'One more side project', l: [SP, GH] },
+};
+
+const IW = 1586, IH = 992, phone = matchMedia('(max-width:720px)');
+const page = document.getElementById('page'), win = document.getElementById('win'), wb = document.getElementById('wb');
+
+function layout() {
+  const key = phone.matches ? 'm' : 's';
+  let view;
+  document.querySelectorAll('[data-s]').forEach(el => {
+    const [x, y, w, h] = el.dataset[key].split(',').map(Number);
+    el.style.aspectRatio = `${w} / ${h}`;
+    el.style.backgroundSize = `${IW / w * 100}% auto`;
+    el.style.backgroundPosition = `${w === IW ? 0 : x / (IW - w) * 100}% ${y / (IH - h) * 100}%`;
+    if (!phone.matches && el.parentElement.matches('#cards, #strip')) el.style.flex = `${w} ${w} 0`; else if (el.parentElement.matches('#cards, #strip')) el.style.flex = '';
+    if (el.id === 'scene') view = [x, y, w, h];
+  });
+  document.querySelectorAll('.hot').forEach(el => {
+    const [x, y, w, h] = el.dataset.h.split(',').map(Number);
+    const off = x >= view[0] + view[2];
+    el.style.display = off ? 'none' : 'block';
+    el.style.left = (x - view[0]) / view[2] * 100 + '%';
+    el.style.top = (y - view[1]) / view[3] * 100 + '%';
+    el.style.width = w / view[2] * 100 + '%';
+    el.style.height = h / view[3] * 100 + '%';
+  });
+  sizeFx();
+}
+
+let lastBtn;
+function openD(id, btn) {
+  const d = D[id];
+  if (win.dataset.id === id && win.open) return closeD();
+  win.dataset.id = id;
+  wb.innerHTML = `<h2 id="wt">${d.t}</h2><p class="cls">${d.c}</p><p class="bio">${d.b}</p>` +
+    d.s.map(([n, v]) => `<div class="stat"><span>${n}</span><div class="meter ${v < 25 ? 'low' : ''}"><i style="width:${v}%"></i></div><span>${v}</span></div>`).join('') +
+    `<p class="weak"><b>Weak to:</b> ${d.w}</p>` +
+    (d.l.length ? `<div class="links">${d.l.map(([t, h]) => `<a href="${h}" target="_blank" rel="noopener">${t}</a>`).join('')}</div>` : '');
+  document.querySelectorAll('button.on').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on'); lastBtn = btn;
+  win.show();
+}
+function closeD() {
+  win.close(); win.dataset.id = '';
+  document.querySelectorAll('button.on').forEach(b => b.classList.remove('on'));
+  lastBtn && lastBtn.focus();
+}
+document.querySelectorAll('[data-d]').forEach(b => b.addEventListener('click', e => { e.stopPropagation(); openD(b.dataset.d, b); }));
+document.getElementById('x').onclick = closeD;
+win.addEventListener('click', e => e.stopPropagation());
+document.addEventListener('click', () => win.open && closeD());
+addEventListener('keydown', e => { if (e.key === 'Escape' && win.open) { e.preventDefault(); closeD(); } });
+
+// Puppet rig: every part moves by warping the artwork's own pixels. Coordinates are image pixels.
+const FRAG = `precision highp float;
+varying vec2 uv; uniform sampler2D img; uniform vec4 view; uniform float t;
+const vec2 SIZE = vec2(1586., 992.);
+float ell(vec2 p, vec2 c, vec2 r) { return smoothstep(1., .3, length((p - c) / r)); }
+vec2 spin(vec2 p, vec2 pivot, float a) { vec2 r = p - pivot; return a * vec2(-r.y, r.x); }
+vec2 pulse(vec2 p, vec2 c, float a) { return -(p - c) * a; }
+void main() {
+  vec2 p = view.xy + uv * view.zw, d = vec2(0.);
+  float m;
+
+  m = ell(p, vec2(325., 350.), vec2(118., 215.));
+  d.y += m * clamp((522. - p.y) / 300., 0., 1.) * sin(t * 1.7) * 4.5;
+  m = ell(p, vec2(338., 245.), vec2(100., 92.));
+  d += m * spin(p, vec2(338., 318.), .03 * sin(t * .9));
+  d.y += m * max(0., sin(t * 3.4)) * 1.5 * sin(t * .45);
+  m = ell(p, vec2(442., 226.), vec2(42., 48.));
+  d += m * pulse(p, vec2(415., 250.), .1 * sin(t * 3.));
+
+  m = ell(p, vec2(590., 445.), vec2(85., 72.));
+  d.y += m * clamp((515. - p.y) / 120., 0., 1.) * sin(t * 1.5 + 1.) * 3.;
+  m = ell(p, vec2(592., 375.), vec2(84., 72.));
+  d += m * spin(p, vec2(592., 428.), .038 * sin(t * .8 + 1.));
+
+  m = ell(p, vec2(745., 442.), vec2(66., 56.));
+  d += m * spin(p, vec2(762., 492.), .05 * sin(t * 1.25 + 2.));
+
+  m = ell(p, vec2(868., 478.), vec2(84., 50.));
+  d += m * pulse(p, vec2(868., 510.), .022 * sin(t * 1.15));
+
+  m = ell(p, vec2(690., 356.), vec2(46., 46.));
+  d.y += m * sin(t * 1.5) * 6.; d += m * pulse(p, vec2(690., 356.), .06 * sin(t * 3.));
+  m = ell(p, vec2(895., 372.), vec2(62., 52.));
+  d.y += m * sin(t * 1.2 + 1.) * 5.;
+  m = ell(p, vec2(942., 428.), vec2(36., 30.));
+  d += m * vec2(sin(t * 1.4) * 3., sin(t * 1.9) * 4.);
+
+  m = smoothstep(235., 60., p.y) * smoothstep(570., 300., p.x);
+  d.x += m * sin(t * .8 + p.x * .012 + p.y * .03) * 4.;
+  d.y += m * sin(t * 1.1 + p.x * .02) * 1.5;
+  m = smoothstep(495., 525., p.y) * smoothstep(565., 545., p.y);
+  d.x += m * sin(t * 1.6 + p.x * .035) * 3.;
+  m = smoothstep(950., 1040., p.x) * smoothstep(470., 495., p.y) * smoothstep(565., 540., p.y);
+  d.x += m * sin(t * 1. + p.x * .02) * 1.5;
+  m = smoothstep(965., 1000., p.x) * smoothstep(1270., 1220., p.x) * smoothstep(392., 400., p.y) * smoothstep(432., 424., p.y);
+  d.x += m * sin(t * 2.6 + p.y * 1.1) * 2.5;
+  m = smoothstep(1395., 1430., p.x) * smoothstep(100., 125., p.y) * smoothstep(290., 265., p.y);
+  d.x += m * sin(t * .3) * 7.;
+
+  gl_FragColor = texture2D(img, (p + d) / SIZE);
+}`;
+const art = document.getElementById('art');
+const gl = art.getContext('webgl', { antialias: false, alpha: true });
+let tU, viewU, ready = false, artView;
+function sizeArt(view) {
+  artView = view;
+  if (!gl) return;
+  const dpr = Math.min(devicePixelRatio || 1, 2);
+  art.width = Math.round(art.clientWidth * dpr); art.height = Math.round(art.clientHeight * dpr);
+  gl.viewport(0, 0, art.width, art.height);
+  if (ready) gl.uniform4fv(viewU, view);
+}
+function drawArt(t) {
+  if (!ready) return;
+  gl.uniform1f(tU, t); gl.drawArrays(gl.TRIANGLES, 0, 3);
+}
+function initArt(image) {
+  const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+  const pr = gl.createProgram();
+  gl.attachShader(pr, sh(gl.VERTEX_SHADER, 'attribute vec2 a; varying vec2 uv; void main(){ uv = vec2(a.x * .5 + .5, .5 - a.y * .5); gl_Position = vec4(a, 0., 1.); }'));
+  gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return;
+  gl.useProgram(pr);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const a = gl.getAttribLocation(pr, 'a'); gl.enableVertexAttribArray(a); gl.vertexAttribPointer(a, 2, gl.FLOAT, false, 0, 0);
+  gl.bindTexture(gl.TEXTURE_2D, gl.createTexture());
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  tU = gl.getUniformLocation(pr, 't'); viewU = gl.getUniformLocation(pr, 'view');
+  ready = true; gl.uniform4fv(viewU, artView);
+}
+
+const fx = document.getElementById('fx'), g = fx.getContext('2d');
+let VW = 0, VH = 0, vx = 0, vy = 0, sc = 1;
+function sizeFx() {
+  const [x, y, w, h] = document.getElementById('scene').dataset[phone.matches ? 'm' : 's'].split(',').map(Number);
+  VW = fx.width = fx.clientWidth; VH = fx.height = fx.clientHeight; vx = x; vy = y; sc = VW / w;
+  sizeArt([x, y, w, h]);
+}
+const ip = (x, y) => [(x - vx) * sc, (y - vy) * sc];
+const R = (a, b) => a + Math.random() * (b - a);
+const flies = Array.from({ length: 24 }, () => ({ x: R(40, 1540), y: R(380, 545), p: R(0, 6.3), s: R(.4, 1) }));
+const dust = Array.from({ length: 14 }, () => ({ x: R(0, 1586), y: R(200, 560), v: R(.15, .4), p: R(0, 6.3) }));
+const twinkles = [[592, 180], [1272, 213], [430, 195], [1500, 120], [120, 250], [980, 340]];
+function blob(x, y, r, col, a) {
+  const G = g.createRadialGradient(x, y, 0, x, y, r);
+  G.addColorStop(0, `rgba(${col},${a})`); G.addColorStop(1, `rgba(${col},0)`);
+  g.fillStyle = G; g.fillRect(x - r, y - r, r * 2, r * 2);
+}
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function frame(ms) {
+  const t = ms / 1000;
+  drawArt(t);
+  g.clearRect(0, 0, VW, VH);
+  const px = Math.max(2, 3 * sc);
+  const [sx, sy] = ip(1330, 370);
+  blob(sx, sy, 220 * sc, '255,176,96', .1 + Math.sin(t * .7) * .025);
+  for (const [x, y] of twinkles) { const a = Math.sin(t * 1.6 + x) * .5 + .5, [X, Y] = ip(x, y); blob(X, Y, 16 * sc, '255,236,170', a * .55); }
+  for (const f of flies) {
+    const a = Math.sin(t * f.s * 1.7 + f.p);
+    if (a < 0) continue;
+    const [X, Y] = ip(f.x + Math.sin(t * .4 + f.p) * 34, f.y + Math.cos(t * .33 + f.p) * 18);
+    blob(X, Y, 11 * sc, '236,240,130', a * .5);
+    g.fillStyle = `rgba(255,255,190,${a})`; g.fillRect(Math.round(X), Math.round(Y), px, px);
+  }
+  g.fillStyle = 'rgba(196,212,120,.55)';
+  for (const d of dust) {
+    d.x += d.v * .9; d.y += d.v * .35; if (d.x > 1600 || d.y > 570) { d.x = R(-60, 700); d.y = R(120, 300); }
+    const [X, Y] = ip(d.x + Math.sin(t + d.p) * 12, d.y); g.fillRect(Math.round(X), Math.round(Y), px * 1.6, px * .8);
+  }
+  if (!still) requestAnimationFrame(frame);
+}
+phone.addEventListener('change', layout);
+addEventListener('resize', layout);
+layout();
+if (gl && !still) { const im = new Image(); im.onload = () => initArt(im); im.src = 'assets/ask-nacho.webp'; }
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

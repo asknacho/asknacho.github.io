@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nacho 95</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
+<style>
+  @font-face { font-family:'MSS'; src:url('https://unpkg.com/98.css@0.1.21/dist/ms_sans_serif.woff2') format('woff2'); font-weight:400; }
+  @font-face { font-family:'MSS'; src:url('https://unpkg.com/98.css@0.1.21/dist/ms_sans_serif_bold.woff2') format('woff2'); font-weight:700; }
+  :root { --face:#c0c0c0; --hi:#fff; --lo:#808080; --dk:#000; --title:#000080; --desk:#008080; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; height:100%; overflow:hidden; background:var(--desk); }
+  body { font-family:'MSS',Tahoma,Geneva,sans-serif; font-size:12px; color:#000; -webkit-font-smoothing:none; user-select:none; }
+  .out { box-shadow:inset -1px -1px var(--dk), inset 1px 1px var(--hi), inset -2px -2px var(--lo), inset 2px 2px #dfdfdf; }
+  .in { box-shadow:inset -1px -1px var(--hi), inset 1px 1px var(--lo), inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a; }
+  button { font:inherit; background:var(--face); border:0; padding:5px 12px; min-height:23px; cursor:pointer; box-shadow:inset -1px -1px var(--dk), inset 1px 1px var(--hi), inset -2px -2px var(--lo), inset 2px 2px #dfdfdf; color:#000; }
+  button:active { box-shadow:inset -1px -1px var(--hi), inset 1px 1px var(--dk), inset -2px -2px #dfdfdf, inset 2px 2px var(--lo); }
+  #desk { position:fixed; inset:0 0 30px 0; overflow:hidden; }
+  #wall { position:absolute; right:3%; bottom:0; height:92%; pointer-events:none; display:flex; align-items:flex-end; }
+  #wall canvas { height:100%; image-rendering:pixelated; }
+  #brand { position:absolute; right:4%; top:5%; text-align:right; font-family:'Press Start 2P',monospace; pointer-events:none; color:#fff; font-size:clamp(26px,5.4vw,76px); line-height:1.05; text-shadow:4px 4px 0 #004848; }
+  #brand small { display:block; font-family:'MSS',sans-serif; font-size:16px; line-height:1.3; margin-top:10px; text-shadow:1px 1px 0 #004848; }
+  #icons { position:absolute; top:10px; left:8px; bottom:6px; display:grid; grid-template-rows:repeat(auto-fill,82px); grid-auto-flow:column; grid-auto-columns:92px; gap:0; }
+  .ic { all:unset; width:92px; height:80px; text-align:center; cursor:pointer; color:#fff; display:flex; flex-direction:column; align-items:center; gap:4px; padding-top:4px; }
+  .ic img { width:40px; height:40px; image-rendering:pixelated; }
+  .ic span { padding:1px 3px; line-height:13px; }
+  .ic:focus span, .ic:hover span { background:var(--title); outline:1px dotted #ff0; }
+  .win { position:absolute; background:var(--face); padding:3px; display:flex; flex-direction:column; max-width:100vw; max-height:calc(100vh - 30px); }
+  .tb { background:var(--lo); color:#ddd; padding:3px 3px 3px 4px; display:flex; align-items:center; gap:4px; font-weight:700; height:20px; cursor:move; touch-action:none; }
+  .win.focus .tb { background:linear-gradient(90deg,#000080,#1084d0); color:#fff; }
+  .tb img { width:16px; height:16px; image-rendering:pixelated; }
+  .tb b { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .tb button { width:16px; height:14px; min-height:14px; padding:0; font-size:9px; line-height:10px; font-weight:700; }
+  .mn { display:flex; gap:12px; padding:3px 6px; }
+  .mn u { text-decoration:underline; }
+  .body { flex:1; overflow:auto; min-height:0; }
+  .paper { background:#fff; margin:2px; padding:12px 14px; font-size:13px; line-height:1.45; letter-spacing:.2px; user-select:text; flex:1; overflow:auto; }
+  .paper h2 { font-family:'MSS'; font-size:20px; margin:0 0 6px; }
+  .paper h3 { font-size:14px; margin:14px 0 2px; }
+  .paper ul { margin:4px 0 8px; padding-left:18px; }
+  .paper p { margin:0 0 8px; }
+  .pad { padding:12px; line-height:1.4; }
+  .quick { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px; margin-top:8px; }
+  .quick button { text-align:left; display:flex; gap:6px; align-items:center; padding:5px 6px; }
+  .quick img { width:20px; height:20px; image-rendering:pixelated; }
+  #task { position:fixed; left:0; right:0; bottom:0; height:30px; background:var(--face); box-shadow:inset 0 1px var(--hi), inset 0 2px #dfdfdf; display:flex; align-items:center; gap:3px; padding:3px 3px 0; z-index:9000; }
+  #start { font-weight:700; display:flex; gap:4px; align-items:center; padding:2px 6px; height:23px; }
+  #start img { width:16px; image-rendering:pixelated; }
+  #tasks { flex:1; display:flex; gap:3px; min-width:0; overflow:hidden; }
+  #tasks button { flex:0 1 150px; min-width:0; text-align:left; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; height:23px; padding:2px 6px; }
+  #tasks button.on { font-weight:700; background:repeating-conic-gradient(#fff 0 25%, #c0c0c0 0 50%) 0 0/2px 2px; box-shadow:inset -1px -1px var(--hi), inset 1px 1px var(--dk), inset -2px -2px #dfdfdf, inset 2px 2px var(--lo); }
+  #clock { padding:0 8px; height:23px; display:flex; align-items:center; }
+  #menu { position:fixed; left:2px; bottom:28px; width:230px; background:var(--face); padding:3px; display:none; z-index:9100; }
+  #menu.on { display:flex; }
+  #menu .side { width:26px; background:linear-gradient(0deg,#000080,#1084d0); color:#fff; font-weight:700; writing-mode:vertical-rl; transform:rotate(180deg); padding:8px 4px; font-size:17px; }
+  #menu .list { flex:1; }
+  #menu .list button { all:unset; display:flex; gap:10px; align-items:center; padding:5px 8px; width:100%; box-sizing:border-box; cursor:pointer; }
+  #menu .list button:hover { background:var(--title); color:#fff; }
+  #menu .list img { width:24px; height:24px; image-rendering:pixelated; }
+  #menu hr { border:0; border-top:1px solid var(--lo); border-bottom:1px solid #fff; margin:3px 0; }
+  .progress { height:22px; margin:10px 0; padding:3px; display:flex; gap:2px; overflow:hidden; background:#fff; }
+  .progress i { width:12px; flex:none; background:var(--title); }
+  .wiz { display:flex; gap:12px; padding:12px; }
+  .wiz .pic { width:110px; flex:none; background:linear-gradient(180deg,#000080,#1084d0); display:flex; align-items:flex-end; justify-content:center; padding:8px; }
+  .wiz canvas { width:80px; image-rendering:pixelated; }
+  .row { display:flex; justify-content:flex-end; gap:6px; padding:0 12px 12px; }
+  .keys { position:relative; height:130px; margin:8px 0; display:flex; touch-action:none; }
+  .key { flex:1; background:#fff; border:1px solid #000; border-top:0; min-height:130px; padding:0; box-shadow:none; display:flex; align-items:flex-end; justify-content:center; padding-bottom:4px; color:#666; }
+  .key.lit,.blk.lit { background:#ffd840; }
+  .blk { position:absolute; top:0; width:6.4%; height:80px; background:#000; z-index:1; min-height:0; padding:0; box-shadow:none; }
+  .sweep { display:inline-block; padding:6px; background:var(--face); }
+  .sbar { display:flex; justify-content:space-between; align-items:center; padding:4px 6px; margin-bottom:6px; }
+  .led { font-family:'Press Start 2P',monospace; font-size:13px; background:#000; color:#f00; padding:4px; min-width:50px; text-align:right; }
+  .face { width:30px; height:30px; padding:0; font-size:15px; }
+  .grid { display:grid; grid-template-columns:repeat(9,24px); }
+  .cell { width:24px; height:24px; padding:0; min-height:0; font-weight:700; }
+  .cell.open { box-shadow:none; background:#c0c0c0; border-left:1px solid #808080; border-top:1px solid #808080; }
+  .cell img { width:18px; height:18px; image-rendering:pixelated; display:block; margin:auto; }
+  .paint { display:flex; gap:4px; padding:4px; flex:1; min-height:0; }
+  .tools { display:grid; grid-template-columns:repeat(2,20px); gap:1px; align-content:start; }
+  .tools button { width:20px; height:20px; min-height:0; padding:0; font-size:11px; }
+  .can { flex:1; background:#808080; padding:4px; overflow:auto; }
+  .can canvas { display:block; background:#fff; image-rendering:pixelated; width:100%; max-width:440px; }
+  .pal { display:flex; flex-wrap:wrap; width:190px; margin:0 4px 4px; }
+  .pal i { width:15px; height:15px; border:1px solid #808080; }
+  .list { user-select:text; }
+  .rows { background:#fff; margin:2px; flex:1; overflow:auto; }
+  .rows div { display:grid; grid-template-columns:1.3fr 1.5fr; gap:8px; padding:3px 6px; }
+  .rows .th { background:var(--face); font-weight:400; box-shadow:inset -1px -1px var(--lo), inset 1px 1px #fff; }
+  .addr { display:flex; align-items:center; gap:6px; padding:3px 6px; }
+  .addr .in { flex:1; background:#fff; padding:3px 5px; }
+  #scape { display:block; width:100%; image-rendering:pixelated; }
+  #slicey { position:fixed; right:14px; bottom:42px; z-index:8000; width:230px; display:none; }
+  #slicey.on { display:block; }
+  #slicey .bub { background:#ffffcc; border:1px solid #000; padding:8px; line-height:1.4; position:relative; box-shadow:2px 2px 0 rgba(0,0,0,.4); }
+  #slicey .bub::after { content:''; position:absolute; right:30px; bottom:-8px; border:8px solid transparent; border-bottom:0; border-top-color:#000; }
+  #slicey img { width:72px; display:block; margin:10px 10px 0 auto; image-rendering:pixelated; }
+  #slicey .bub button { margin-top:6px; margin-right:4px; padding:3px 8px; }
+  #off { position:fixed; inset:0; z-index:9999; background:#000; color:#f08020; display:none; align-items:center; justify-content:center; text-align:center; font-family:'Press Start 2P',monospace; font-size:clamp(14px,2.4vw,28px); line-height:1.7; padding:16px; cursor:pointer; }
+  @media (max-width:720px) {
+    #brand { display:none; }
+    #wall, #slicey { display:none !important; }
+    .win { left:4px !important; width:calc(100% - 8px) !important; top:auto !important; bottom:4px; max-width:none; max-height:calc(100% - 8px); }
+    #icons { right:0; grid-auto-flow:row; grid-template-columns:repeat(auto-fill,minmax(84px,1fr)); grid-template-rows:none; grid-auto-rows:82px; grid-auto-columns:auto; }
+    .ic { width:auto; }
+  }
+</style>
+</head>
+<body>
+<div id="desk">
+  <div id="brand">NACHO 95<small>Ignacio Morales · Tech Lead · Barcelona</small></div>
+  <div id="wall"></div>
+  <div id="icons"></div>
+</div>
+<div id="slicey">
+  <div class="bub">
+    <div>It looks like you are trying to hire a tech lead. Would you like help?</div>
+    <button id="sy">Yes, open CV</button><button id="sn">Don't show this</button>
+  </div>
+  <img id="sliceyImg" alt="Slicey, a helpful slice of pizza" />
+</div>
+<div id="menu" class="out">
+  <div class="side">Nacho<span style="font-weight:400">95</span></div>
+  <div class="list" id="mlist"></div>
+</div>
+<div id="task">
+  <button id="start"><img id="startImg" alt="" />Start</button>
+  <div id="tasks"></div>
+  <div id="clock" class="in"></div>
+</div>
+<div id="off">It's now safe to close this tab.<br><br>(Please do hire me first.)</div>
+
+<script src="sprites.js"></script>
+<script>
+const ICONS = {
+  txt: ['..llllllllll....', '..lwwwwwwwwll...', '..lwkkkkkwwwll..', '..lwwwwwwwwwwl..', '..lwkkkkkkkkwl..', '..lwwwwwwwwwwl..', '..lwkkkkkkkkwl..', '..lwwwwwwwwwwl..', '..lwkkkkkwwwwl..', '..lwwwwwwwwwwl..', '..lwkkkkkkkkwl..', '..lwwwwwwwwwwl..', '..lllllllllll...'],
+  doc: ['..llllllllll....', '..lwwwwwwwwll...', '..lwttttwwwwll..', '..lwttttwwwwwl..', '..lwwwwwwwwwwl..', '..lwkkkkkkkkwl..', '..lwwwwwwwwwwl..', '..lwkkkkkkkkwl..', '..lwwwwwwwwwwl..', '..lwkkkkkkwwwl..', '..lwwwwwwwwwwl..', '..lllllllllll...'],
+  pc: ['..kkkkkkkkkkk...', '.kaaaaaaaaaaak..', '.kakkkkkkkkkak..', '.kakxxxTTTTkak..', '.kakxxTTTTTkak..', '.kakTTTTTTTkak..', '.kakkkkkkkkkak..', '.kaaaaaaaaaaak..', '..kkkkkkkkkkk...', '.....kaaak......', '...kkkkkkkkk....', '..kaaaaaaaaak...', '..kAAAAAAAAAk...', '..kkkkkkkkkkk...'],
+  bin: ['...aaaaaaaa.....', '..alllllllla....', '.kkkkkkkkkkkk...', '..kalalalalk....', '..kalalalalk....', '..kalalalalk....', '..kalalalalk....', '..kalalalalk....', '..kalalalalk....', '...kkkkkkkk.....'],
+  globe: ['....kkkkkk......', '..kkttdddtkk....', '.kttddddtttdk...', '.ktttddttttdk...', 'ktttttddtttddk..', 'kttttttddtdddk..', 'kddttttttddddk..', 'kdddtttttddtdk..', '.kddtttttttttk..', '.ktdttttttttk...', '..kkttttttkk....', '....kkkkkk......'],
+  flagw: ['krrrrgggg.......', 'krrrrgggg.......', 'krrrrgggg.......', 'ktttyyyyy.......', 'ktttyyyyy.......', 'ktttyyyyy.......', 'k...............', 'k...............'],
+  zap: ['......kyyyk.....', '.....kyyyk......', '....kyyyk.......', '...kyyyyyyk.....', '..kkkkyyyk......', '.....kyyk.......', '....kyyk........', '....kyk.........', '...kyk..........', '...kk...........'],
+  mail: ['kkkkkkkkkkkkkk..', 'kylllllllllylk..', 'kllyllllllyllk..', 'klllyllllylllk..', 'kllllykkyllllk..', 'klllllllllllllk.', 'kkkkkkkkkkkkkk..'],
+  keys: ['kkkkkkkkkkkkkkkk', 'kwkwkwwkwkwkwwwk', 'kwkwkwwkwkwkwwwk', 'kwkwkwwkwkwkwwwk', 'kwwwwwwwwwwwwwwk', 'kwwkwwkwwkwwkwwk', 'kwwkwwkwwkwwkwwk', 'kkkkkkkkkkkkkkkk'],
+  paint: ['....kkkkkk......', '..kkyyrrttkk....', '.kyyyrrrtttk....', '.kyyrrrrttttk...', 'kggyyrrkkttvk...', 'kgggyykwwktvvk..', 'kgggggkwwkvvk...', '.kgggggkkvvvk...', '.kggggvvvvvk....', '..kkgvvvvkk.....', '....kkkkk.......'],
+};
+const svg = k => SPR.dataURL(k);
+const pic = { pizza: svg(SPRITES.pizza), kid: svg(SPRITES.kid), ball: svg(SPRITES.ball), laptop: svg(SPRITES.laptop) };
+
+const P = (html, cls = 'paper') => `<div class="${cls}">${html}</div>`;
+const MENU = l => `<div class="mn">${l.map(x => `<span><u>${x[0]}</u>${x.slice(1)}</span>`).join('')}</div>`;
+
+const APPS = {
+  about: { title: 'README_FIRST.txt - Notepad', short: 'README_FIRST.txt', icon: svg(ICONS.txt), w: 500, h: 400, x: 216, y: 34,
+    body: () => MENU(['File', 'Edit', 'Search', 'Help']) + P(`
+      <h2>Hola. I'm Nacho.</h2>
+      <p>Tech lead and senior software engineer in Barcelona. Husband, dad of a beautiful daughter, and very soon of a baby boy. Guitar player, piano apprentice, pizza enthusiast, and a person who will gently ask if you can do one more rep.</p>
+      <p><b>Double-click anything on the desktop, or try these:</b></p>
+      <div class="quick" id="quick"></div>`) },
+  cv: { title: 'CV.doc - WordPad', short: 'CV.doc', icon: svg(ICONS.doc), w: 560, h: 500, x: 210, y: 40,
+    body: () => MENU(['File', 'Edit', 'View', 'Insert', 'Format', 'Help']) + P(`
+      <h2>Ignacio Morales</h2><p>Tech Lead · Senior Software Engineer · 8+ years</p>
+      <h3>Tech Lead &amp; Senior Software Engineer, 2022 to now</h3>
+      <ul><li>Led 8 engineers on a platform serving 2M+ users</li><li>Microservices migration: 60% faster deploys, 99.9% uptime</li><li>Mentored 4 engineers, 2 promoted within 18 months</li></ul>
+      <h3>Full Stack Engineer, 2019 to 2022</h3>
+      <ul><li>Built the core product from 0 to 1, through a Series A</li><li>Real-time notifications at 500K events per day</li></ul>
+      <h3>Software Engineer, 2017 to 2019</h3>
+      <ul><li>Web apps for 10+ enterprise clients</li></ul>
+      <h3>Stack</h3><p>TypeScript, Python, Go, React, Node.js, AWS, GCP, Kubernetes, PostgreSQL, Kafka.</p>
+      <p><a href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://github.com/ignaciomoralesm" target="_blank" rel="noopener">GitHub</a></p>`) },
+  piano: { title: 'scorepace.exe', short: 'scorepace.exe', icon: svg(ICONS.keys), w: 440, h: 300, x: 300, y: 90,
+    body: () => P(`<b>Piano practice, by an actual beginner.</b> I built <a href="https://scorepace.com" target="_blank" rel="noopener">scorepace.com</a> to help myself learn. Also play guitar. Press keys A to K, or click.
+      <div class="keys" id="keys"></div>`, 'pad'), open: pianoApp },
+  family: { title: 'Family.bmp - Paint', short: 'Family.bmp', icon: svg(ICONS.paint), w: 520, h: 440, x: 180, y: 70,
+    body: () => MENU(['File', 'Edit', 'View', 'Image', 'Options', 'Help']) +
+      `<div class="paint"><div class="tools">${['✎', '▭', '◯', '╱', 'A', '▒', '◐', '✂'].map(t => `<button tabindex="-1">${t}</button>`).join('')}</div>
+       <div class="can in"><canvas id="fam" width="112" height="64"></canvas></div></div>
+       <div class="pal">${['#000', '#808080', '#800000', '#808000', '#008000', '#008080', '#000080', '#800080', '#fff', '#c0c0c0', '#f00', '#ff0', '#0f0', '#0ff', '#00f', '#f0f'].map(c => `<i style="background:${c}"></i>`).join('')}</div>`,
+    open: famApp },
+  baby: { title: 'Baby Boy 1.0 Setup', short: 'Baby Boy Setup', icon: svg(SPRITES.kid), w: 430, h: 300, x: 340, y: 130,
+    body: () => `<div class="wiz"><div class="pic" id="wizpic"></div><div>
+       <b>Installing Baby Boy 1.0</b>
+       <p>Setup will remove: <code>Sleep.dll</code>, <code>FreeTime.sys</code>, <code>QuietRestaurant.exe</code>.</p>
+       <div class="progress in" id="bar"></div>
+       <div id="wizt">Estimated time remaining: any day now</div></div></div>
+       <div class="row"><button disabled>&lt; Back</button><button id="nxt">Next &gt;</button><button id="can">Cancel</button></div>`,
+    open: babyApp },
+  sweep: { title: 'Pizzasweeper', short: 'Pizzasweeper', icon: svg(SPRITES.pineapple), w: 244, h: 330, x: 660, y: 110,
+    body: () => `<div class="sweep"><div class="sbar in"><span class="led" id="left">010</span><button class="face" id="face">:)</button><span class="led" id="time">000</span></div><div class="grid in" id="grid"></div><div style="padding-top:6px">Reveal the pizza. Avoid the pineapple.</div></div>`,
+    open: sweepApp },
+  bcn: { title: 'Barcelona.htm - Internet Nacho', short: 'Barcelona.htm', icon: svg(ICONS.globe), w: 520, h: 420, x: 260, y: 60,
+    body: () => MENU(['File', 'Edit', 'View', 'Go', 'Favorites', 'Help']) + `<div class="addr">Address <div class="in">http://www.barcelona.home/nacho/index.htm</div></div>
+      <div class="paper" style="padding:0"><canvas id="scape" width="240" height="96"></canvas><div style="padding:10px 14px">
+      <h2>Under construction since 1882</h2>
+      <p>I live in Barcelona, the only city where the cathedral and my side projects share a release schedule.</p>
+      <p>Football: yes. Weekends: scheduled around it. Pizza: nearby, always.</p></div></div>`, open: scapeApp },
+  challenge: { title: 'challenge.exe', short: 'challenge.exe', icon: svg(ICONS.zap), w: 340, h: 170, x: 400, y: 200,
+    body: () => `<div class="pad"><b>Was that really your best attempt?</b><p>I love helping people challenge themselves. This dialog box has no other features.</p></div><div class="row" style="position:relative;min-height:36px"><button id="yes">Yes</button><button id="again">One more try</button></div>`,
+    open: chalApp },
+  bin: { title: 'Recycle Bin', short: 'Recycle Bin', icon: svg(ICONS.bin), w: 420, h: 280, x: 240, y: 170,
+    body: () => MENU(['File', 'Edit', 'View', 'Help']) + `<div class="rows in"><div class="th"><span>Name</span><span>Original location</span></div>
+      ${[['sleep_schedule.txt', 'C:\\Life\\Before_Kids'], ['pineapple_pizza.bmp', 'C:\\Never'], ['one_quick_meeting.ics', 'C:\\Lies'], ['final_FINAL_v7.doc', 'C:\\Work'], ['perfect_pitch.wav', 'C:\\Piano\\Wishes']].map(([a, b]) => `<div><span>${a}</span><span>${b}</span></div>`).join('')}</div>`,
+  },
+  mail: { title: 'Ask Nacho', short: 'Ask Nacho', icon: svg(ICONS.mail), w: 340, h: 190, x: 420, y: 140,
+    body: () => `<div class="pad"><b>Open to good problems and interesting conversations.</b><p>Hiring, collaborating, or need someone to tell you that you can do one more?</p>
+      <p><a href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">Message me on LinkedIn</a><br><a href="https://github.com/ignaciomoralesm" target="_blank" rel="noopener">Read my code on GitHub</a></p></div>` },
+};
+
+const DESK = [['about', 'README_FIRST.txt'], ['cv', 'CV.doc'], ['piano', 'scorepace.exe'], ['family', 'Family.bmp'], ['baby', 'baby_boy_setup.exe'], ['sweep', 'Pizzasweeper'], ['bcn', 'Barcelona.htm'], ['challenge', 'challenge.exe'], ['mail', 'Ask Nacho'], ['bin', 'Recycle Bin']];
+
+const desk = document.getElementById('desk'), icons = document.getElementById('icons'), tasks = document.getElementById('tasks');
+const open = {};
+let z = 10;
+
+function iconBtn([id, label]) {
+  const b = document.createElement('button'); b.className = 'ic';
+  const i = new Image(); i.src = APPS[id].icon; i.alt = '';
+  const s = document.createElement('span'); s.textContent = label;
+  b.append(i, s);
+  b.addEventListener('dblclick', () => launch(id));
+  b.addEventListener('keydown', e => e.key === 'Enter' && launch(id));
+  b.addEventListener('click', () => { if (matchMedia('(pointer:coarse)').matches) launch(id); });
+  return b;
+}
+DESK.forEach(d => icons.append(iconBtn(d)));
+
+function focus(id) {
+  Object.values(open).forEach(o => { o.el.classList.remove('focus'); o.task.classList.remove('on'); });
+  const o = open[id]; o.el.style.display = 'flex'; o.el.classList.add('focus'); o.el.style.zIndex = ++z; o.task.classList.add('on');
+}
+
+function close(id) { const o = open[id]; if (!o) return; o.cleanup && o.cleanup(); o.el.remove(); o.task.remove(); delete open[id]; }
+
+function launch(id) {
+  document.getElementById('menu').classList.remove('on');
+  if (open[id]) return focus(id);
+  const a = APPS[id], el = document.createElement('div');
+  el.className = 'win out';
+  const vw = innerWidth, vh = innerHeight - 30;
+  const w = Math.min(a.w, vw - 8), h = Math.min(a.h, vh - 8);
+  el.style.cssText = `left:${Math.max(0, Math.min(a.x, vw - w))}px;top:${Math.max(0, Math.min(a.y, vh - h))}px;width:${w}px;height:${h}px`;
+  el.innerHTML = `<div class="tb"><img src="${a.icon}" alt=""><b>${a.title}</b><button data-a="min" aria-label="Minimize">_</button><button data-a="max" aria-label="Maximize">□</button><button data-a="x" aria-label="Close">×</button></div><div class="body" style="display:flex;flex-direction:column">${a.body()}</div>`;
+  desk.append(el);
+  const t = document.createElement('button'); t.textContent = a.short;
+  t.onclick = () => (t.classList.contains('on') ? (el.style.display = 'none', t.classList.remove('on')) : focus(id));
+  tasks.append(t);
+  open[id] = { el, task: t };
+  el.addEventListener('pointerdown', () => focus(id));
+  el.querySelector('[data-a=x]').onclick = () => close(id);
+  el.querySelector('[data-a=min]').onclick = e => { e.stopPropagation(); el.style.display = 'none'; t.classList.remove('on'); };
+  el.querySelector('[data-a=max]').onclick = () => {
+    const o = open[id];
+    if (o.prev) { el.style.cssText += ';' + o.prev; o.prev = null; }
+    else { o.prev = `left:${el.style.left};top:${el.style.top};width:${el.style.width};height:${el.style.height}`; el.style.left = 0; el.style.top = 0; el.style.width = '100%'; el.style.height = '100%'; }
+  };
+  const tb = el.querySelector('.tb');
+  tb.addEventListener('pointerdown', e => {
+    if (e.target.closest('button')) return;
+    const sx = e.clientX - el.offsetLeft, sy = e.clientY - el.offsetTop;
+    tb.setPointerCapture(e.pointerId);
+    const mv = m => { el.style.left = m.clientX - sx + 'px'; el.style.top = Math.max(0, m.clientY - sy) + 'px'; };
+    tb.addEventListener('pointermove', mv);
+    tb.addEventListener('pointerup', () => tb.removeEventListener('pointermove', mv), { once: true });
+  });
+  focus(id);
+  if (a.open) open[id].cleanup = a.open(el);
+}
+
+let audio;
+function tone(f, d = .35, type = 'triangle') {
+  audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.16, audio.currentTime);
+  g.gain.exponentialRampToValueAtTime(.001, audio.currentTime + d);
+  o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + d);
+}
+
+function pianoApp(el) {
+  const box = el.querySelector('#keys');
+  const WH = [['a', 261.63], ['s', 293.66], ['d', 329.63], ['f', 349.23], ['g', 392], ['h', 440], ['j', 493.88], ['k', 523.25]];
+  const BL = [['w', 277.18, 0], ['e', 311.13, 1], ['t', 369.99, 3], ['y', 415.3, 4], ['u', 466.16, 5]];
+  const map = {};
+  const add = (k, f, cls) => {
+    const b = document.createElement('button'); b.className = cls; b.tabIndex = -1;
+    if (cls === 'key') b.textContent = k.toUpperCase();
+    const hit = () => { tone(f); b.classList.add('lit'); setTimeout(() => b.classList.remove('lit'), 160); };
+    b.addEventListener('pointerdown', hit); map[k] = hit; return b;
+  };
+  WH.forEach(([k, f]) => box.append(add(k, f, 'key')));
+  BL.forEach(([k, f, i]) => { const b = add(k, f, 'blk'); b.style.left = `calc(${(i + 1) * 12.5}% - 3.2%)`; box.append(b); });
+  const onKey = e => { if (!e.repeat && map[e.key] && open.piano?.el.classList.contains('focus')) map[e.key](); };
+  addEventListener('keydown', onKey);
+  return () => removeEventListener('keydown', onKey);
+}
+
+function famApp(el) {
+  const c = el.querySelector('#fam'), g = c.getContext('2d');
+  g.fillStyle = '#9cd8f8'; g.fillRect(0, 0, 112, 44); g.fillStyle = '#60b850'; g.fillRect(0, 44, 112, 20);
+  g.fillStyle = '#f8d858'; g.fillRect(92, 6, 10, 10);
+  SPR.draw(g, SPRITES.front('stand'), 22, 26); SPR.draw(g, SPRITES.wife, 40, 26); SPR.draw(g, SPRITES.kid, 58, 34);
+  g.fillStyle = '#d0d0d8'; g.fillRect(74, 44, 18, 12);
+  g.fillStyle = '#000'; g.font = '8px MSS, sans-serif'; g.fillText('?', 81, 53);
+  [[28, 18], [46, 18], [60, 24]].forEach(([x, y]) => SPR.draw(g, SPRITES.heart, x, y));
+}
+
+function babyApp(el) {
+  el.querySelector('#wizpic').append(SPR.canvas(SPRITES.kid));
+  const bar = el.querySelector('#bar'), text = el.querySelector('#wizt');
+  const N = 23;
+  let n = 0;
+  const iv = setInterval(() => {
+    if (n < N) { bar.append(document.createElement('i')); n++; }
+    else { text.textContent = '99%. Stuck. This is normal. Do not turn off your parents.'; clearInterval(iv); }
+  }, 130);
+  el.querySelector('#nxt').onclick = () => text.textContent = 'Next is not available. Only the customer decides the release date.';
+  el.querySelector('#can').onclick = () => text.textContent = 'Cancel is not a supported operation. Please consult your wife.';
+  return () => clearInterval(iv);
+}
+
+function sweepApp(el) {
+  const S = 9, MINES = 10, gridEl = el.querySelector('#grid'), left = el.querySelector('#left'), face = el.querySelector('#face'), time = el.querySelector('#time');
+  let cells, over, started, timer, secs, flags;
+  const nb = i => { const x = i % S, y = i / S | 0, o = []; for (let a = -1; a < 2; a++) for (let b = -1; b < 2; b++) { const u = x + a, v = y + b; if ((a || b) && u >= 0 && v >= 0 && u < S && v < S) o.push(v * S + u); } return o; };
+  const pad = n => String(n).padStart(3, '0');
+  const NUM = ['', '#0000ff', '#008000', '#ff0000', '#000080', '#800000', '#008080', '#000', '#808080'];
+  function reset() {
+    clearInterval(timer); over = started = false; secs = flags = 0; time.textContent = '000'; left.textContent = pad(MINES); face.textContent = ':)';
+    gridEl.innerHTML = ''; cells = [];
+    for (let i = 0; i < S * S; i++) {
+      const b = document.createElement('button'); b.className = 'cell'; b.tabIndex = -1;
+      b.onclick = () => reveal(i);
+      b.oncontextmenu = e => { e.preventDefault(); flag(i); };
+      gridEl.append(b); cells.push({ b, m: false, o: false, f: false });
+    }
+  }
+  function lay(safe) {
+    const ban = new Set([safe, ...nb(safe)]);
+    let n = 0;
+    while (n < MINES) { const r = Math.random() * S * S | 0; if (!ban.has(r) && !cells[r].m) { cells[r].m = true; n++; } }
+  }
+  function flag(i) { const c = cells[i]; if (over || c.o) return; c.f = !c.f; c.b.textContent = c.f ? '!' : ''; flags += c.f ? 1 : -1; left.textContent = pad(MINES - flags); }
+  function img(src) { const m = new Image(); m.src = src; m.alt = ''; return m; }
+  function reveal(i) {
+    const c = cells[i];
+    if (over || c.o || c.f) return;
+    if (!started) { started = true; lay(i); timer = setInterval(() => time.textContent = pad(++secs), 1000); }
+    c.o = true; c.b.classList.add('open');
+    if (c.m) {
+      over = true; clearInterval(timer); face.textContent = 'X('; c.b.style.background = '#f00';
+      cells.forEach(x => { if (x.m) { x.b.classList.add('open'); x.b.replaceChildren(img(pic.pine)); } });
+      return;
+    }
+    const n = nb(i).filter(j => cells[j].m).length;
+    if (n) { c.b.textContent = n; c.b.style.color = NUM[n]; } else { c.b.append(img(pic.pizza)); nb(i).forEach(reveal); }
+    if (cells.every(x => x.m || x.o)) { over = true; clearInterval(timer); face.textContent = 'B)'; left.textContent = 'YUM'; }
+  }
+  face.onclick = reset;
+  reset();
+  return () => clearInterval(timer);
+}
+pic.pine = svg(SPRITES.pineapple);
+
+function scapeApp(el) {
+  const c = el.querySelector('#scape'), g = c.getContext('2d');
+  const bands = ['#3898e8', '#58b0f0', '#88ccf8', '#b8e4fc', '#f8e8b0'];
+  bands.forEach((col, i) => { g.fillStyle = col; g.fillRect(0, i * 12, 240, 12); });
+  g.fillStyle = '#f8d858'; g.fillRect(190, 8, 16, 16);
+  g.fillStyle = '#c8ac80';
+  [[60, 26, 6], [70, 14, 7], [81, 18, 7], [92, 30, 6]].forEach(([x, y, w]) => { g.fillRect(x, y, w, 60); g.fillStyle = '#d83838'; g.fillRect(x + 2, y - 3, 3, 3); g.fillStyle = '#c8ac80'; });
+  g.fillRect(56, 54, 46, 26);
+  g.fillStyle = '#9c8058';
+  [24, 112, 134, 150, 172, 200].forEach((x, i) => g.fillRect(x, 50 + i * 3 % 13, 16, 40));
+  g.fillStyle = '#f0dc9c'; g.fillRect(0, 76, 240, 8);
+  g.fillStyle = '#2868c8'; g.fillRect(0, 84, 240, 12);
+  g.fillStyle = '#88ccf8'; for (let i = 0; i < 18; i++) g.fillRect(i * 14 + (i % 3), 87 + i % 3 * 3, 7, 1);
+}
+
+function chalApp(el) {
+  const yes = el.querySelector('#yes'), again = el.querySelector('#again'), msg = el.querySelector('p');
+  let n = 0;
+  const lines = ['Interesting. Try again?', 'Nearly. Your form was better on the second one.', 'That is the spirit. One more.', 'Fine. That was your best. Today.'];
+  again.onclick = () => { msg.textContent = lines[Math.min(n++, 3)]; };
+  yes.addEventListener('pointerenter', () => {
+    yes.style.position = 'absolute'; yes.style.left = 12 + Math.random() * 180 + 'px'; yes.style.top = Math.random() * 10 + 'px';
+  });
+  yes.onclick = () => msg.textContent = 'Are you sure, though?';
+}
+
+const mlist = document.getElementById('mlist');
+const MENUITEMS = [['cv', 'My CV'], ['piano', 'Piano'], ['family', 'The Family'], ['baby', 'Baby Boy Setup'], ['sweep', 'Pizzasweeper'], ['mail', 'Ask Nacho']];
+MENUITEMS.forEach(([id, l]) => {
+  const b = document.createElement('button'); const i = new Image(); i.src = APPS[id].icon; i.alt = '';
+  b.append(i, l); b.onclick = () => launch(id); mlist.append(b);
+});
+mlist.append(document.createElement('hr'));
+const off = document.createElement('button'); off.textContent = 'Shut Down...'; off.onclick = () => { document.getElementById('menu').classList.remove('on'); document.getElementById('off').style.display = 'flex'; };
+mlist.append(off);
+document.getElementById('off').onclick = e => e.currentTarget.style.display = 'none';
+
+document.getElementById('start').onclick = e => { e.stopPropagation(); document.getElementById('menu').classList.toggle('on'); };
+addEventListener('click', e => { if (!e.target.closest('#menu')) document.getElementById('menu').classList.remove('on'); });
+document.getElementById('startImg').src = svg(ICONS.flagw);
+document.getElementById('sliceyImg').src = pic.pizza;
+
+const wall = document.getElementById('wall');
+wall.append(SPR.pose('dev'));
+
+const tick = () => document.getElementById('clock').textContent = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+tick(); setInterval(tick, 20000);
+
+const sl = document.getElementById('slicey');
+setTimeout(() => sl.classList.add('on'), 4000);
+document.getElementById('sy').onclick = () => { sl.classList.remove('on'); launch('cv'); };
+document.getElementById('sn').onclick = () => {
+  sl.querySelector('.bub div').textContent = 'Ok. I will ask again if you try to leave.';
+  setTimeout(() => sl.classList.remove('on'), 2000);
+};
+
+launch('about');
+const quick = document.getElementById('quick');
+[['cv', 'Read my CV'], ['piano', 'Play my piano'], ['baby', 'Install baby boy'], ['family', 'See the family'], ['sweep', 'Pizzasweeper'], ['mail', 'Contact me']].forEach(([id, l]) => {
+  const b = document.createElement('button'); const i = new Image(); i.src = APPS[id].icon; i.alt = '';
+  b.append(i, l); b.onclick = () => launch(id); quick.append(b);
+});
+</script>
+</body>
+</html>

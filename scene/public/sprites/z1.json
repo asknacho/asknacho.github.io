@@ -1,0 +1,13 @@
+{
+  "id": "z1",
+  "image": "sprites/z1.png",
+  "frameWidth": 34,
+  "frameHeight": 57,
+  "frames": 24,
+  "durationMs": 3600,
+  "x": 911,
+  "y": 395,
+  "sceneWidth": 1586,
+  "sceneHeight": 992,
+  "phaseMs": 0
+}

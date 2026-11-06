@@ -1,0 +1,18 @@
+{
+  "grid": {
+    "width": 576,
+    "height": 360
+  },
+  "sea": {
+    "x": 480,
+    "y": 404,
+    "width": 816,
+    "height": 62
+  },
+  "noTitle": {
+    "x": 596,
+    "y": 165,
+    "width": 372,
+    "height": 142
+  }
+}

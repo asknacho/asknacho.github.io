@@ -1,0 +1,12 @@
+{
+  "id": "heart",
+  "image": "sprites/heart.png",
+  "frameWidth": 70,
+  "frameHeight": 74,
+  "frames": 16,
+  "durationMs": 3000,
+  "x": 657,
+  "y": 314,
+  "sceneWidth": 1586,
+  "sceneHeight": 992
+}

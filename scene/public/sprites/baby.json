@@ -1,0 +1,12 @@
+{
+  "id": "baby",
+  "image": "sprites/baby.png",
+  "frameWidth": 156,
+  "frameHeight": 96,
+  "frames": 16,
+  "durationMs": 3000,
+  "x": 796,
+  "y": 421,
+  "sceneWidth": 1586,
+  "sceneHeight": 992
+}

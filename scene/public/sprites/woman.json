@@ -1,0 +1,12 @@
+{
+  "id": "woman",
+  "image": "sprites/woman.png",
+  "frameWidth": 198,
+  "frameHeight": 207,
+  "frames": 16,
+  "durationMs": 3000,
+  "x": 481,
+  "y": 318,
+  "sceneWidth": 1586,
+  "sceneHeight": 992
+}

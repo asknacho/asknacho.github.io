@@ -1,0 +1,300 @@
+:root {
+  --ink: #f4e6c8;
+  --night: #15121d;
+  --panel: #221d2e;
+  --line: #4a4160;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--night);
+  color: var(--ink);
+  font: 15px/1.45 ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Every layer is placed in percentages of the art, so scaling never moves anything. */
+.stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1586 / 992;
+  overflow: hidden;
+}
+
+.stage__art {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+}
+
+.sprite {
+  position: absolute;
+  display: block;
+  image-rendering: pixelated;
+}
+
+.sprite--isolated {
+  position: static;
+  height: 100%;
+  max-width: 100%;
+  margin: auto;
+}
+
+.page {
+  position: relative;
+  width: min(100vw, calc(100vh * 1586 / 992));
+  min-width: min(100vw, 720px);
+  max-width: 1586px;
+  margin: 0 auto;
+  font-family: 'Pixelify Sans', ui-monospace, monospace;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.window {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+.stage--cropped {
+  position: absolute;
+  aspect-ratio: auto;
+  overflow: visible;
+}
+
+.spot {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: none;
+  cursor: pointer;
+}
+
+.spot:hover { background: radial-gradient(closest-side, rgba(255, 226, 160, .15), transparent); }
+.spot--on { background: rgba(255, 226, 160, .1); }
+.spot:focus-visible { outline: 2px dashed #f7d48a; outline-offset: -2px; }
+
+.slice {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background-repeat: no-repeat;
+  image-rendering: pixelated;
+  cursor: pointer;
+}
+
+.slice--static { cursor: default; }
+.slice--on, .slice:hover:not(.slice--static) { filter: brightness(1.14); }
+.slice:focus-visible { outline: 2px solid #fff; outline-offset: -3px; }
+
+.cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 6px;
+}
+
+.strip > :nth-child(n + 4) { grid-column: span 3; }
+
+.quest {
+  position: absolute;
+  z-index: 5;
+  left: 44%;
+  right: 1.6%;
+  top: 11%;
+  width: auto;
+  margin: 0;
+  padding: 14px 18px 16px;
+  color: var(--ink);
+  background: #1f1b24;
+  border: 3px solid #e0ae62;
+  outline: 2px solid #5e3e20;
+  outline-offset: -7px;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, .35);
+}
+
+.quest h2 {
+  margin: 0;
+  padding-right: 30px;
+  font: 800 clamp(20px, 2.3vw, 30px) Bitter, Georgia, serif;
+  color: #f7d48a;
+}
+
+.quest__kind { margin: 2px 0 8px; color: #c9b48e; font-size: 16px; }
+.quest__bio { margin: 0 0 10px; font-size: 18px; line-height: 1.2; }
+.quest__weak { margin: 8px 0 0; font-size: 16px; }
+.quest__weak b { color: #f49a7c; font-weight: 600; }
+
+.quest__close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  padding: 2px 8px;
+  border: 0;
+  background: none;
+  color: #f7d48a;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.quest__close:focus-visible { outline: 2px solid #fff; }
+
+.stat {
+  display: grid;
+  grid-template-columns: 96px 1fr 30px;
+  gap: 8px;
+  align-items: center;
+  font-size: 16px;
+}
+
+.meter { height: 10px; background: #0c0a10; box-shadow: 0 0 0 2px #6a4a28; }
+.meter i { display: block; height: 100%; background: repeating-linear-gradient(90deg, #8fd16a 0 6px, #6cb350 6px 8px); }
+.meter--low i { background: repeating-linear-gradient(90deg, #ec7a5c 0 6px, #c5533f 6px 8px); }
+
+.quest__links { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+
+.quest__links a {
+  padding: 6px 12px;
+  border-radius: 5px;
+  font-size: 17px;
+  font-weight: 600;
+  color: #2a1608;
+  text-decoration: none;
+  background: linear-gradient(#f7d48a, #d99a3e);
+  box-shadow: 0 0 0 2px #6a4016;
+}
+
+.quest__links a:hover { filter: brightness(1.12); }
+
+@media (max-width: 720px) {
+  .page { width: 100%; min-width: 0; }
+  .motion-toggle { position: static; display: block; margin: 8px auto 16px; font-size: 15px; padding: 6px 12px; }
+
+  .quest {
+    position: fixed;
+    left: 8px;
+    right: 8px;
+    top: auto;
+    bottom: 8px;
+    max-height: 70vh;
+    overflow: auto;
+  }
+}
+
+.motion-toggle,
+.bench button,
+.bench select {
+  color: var(--ink);
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+
+.bench button,
+.bench select {
+  font: inherit;
+  padding: 6px 12px;
+}
+
+.motion-toggle { padding: 1px 8px; }
+
+/* Sits in the dark margin under the art's bottom frame. */
+.motion-toggle {
+  position: absolute;
+  z-index: 4;
+  right: 2.5%;
+  bottom: .3%;
+  font-family: 'Pixelify Sans', ui-monospace, monospace;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.motion-toggle:disabled { cursor: default; opacity: .7; }
+
+.bench {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.bench__loading { padding: 16px; }
+
+.bench__head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 8px 0 12px;
+  background: var(--night);
+}
+
+.bench h1 { margin: 0 0 8px; font-size: 20px; }
+
+.bench__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.bench__controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bench__controls span { font-variant-numeric: tabular-nums; min-width: 96px; }
+
+.bench__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.panel h2 { margin: 0 0 4px; font-size: 15px; }
+.panel p { margin: 0 0 8px; opacity: .75; font-size: 13px; }
+
+.bench__img {
+  display: block;
+  width: 100%;
+  image-rendering: pixelated;
+}
+
+.bench__section { margin: 24px 0 8px; font-size: 17px; }
+
+.bench__sprites {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: 16px;
+}
+
+.checker {
+  display: flex;
+  height: 260px;
+  padding: 8px;
+  background: repeating-conic-gradient(#8e4f8e 0 25%, #4f8e8e 0 50%) 0 0 / 32px 32px;
+}
+
+/* Phone: the family and what they carry, moved as one group. */
+.shifted {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+}

@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ask Nacho</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bitter:wght@800&family=Pixelify+Sans:wght@400;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --k:3; --ink:#f6e3bc; --mute:#c9b48e; --gold:#e0ae62; --gold2:#f7d48a; --panel:#1d1a22; --bg:#14121a; }
+  * { box-sizing:border-box; }
+  html,body { margin:0; background:var(--bg); color:var(--ink); overflow-x:clip; }
+  body { font-family:'Pixelify Sans',monospace; font-size:17px; line-height:1.25; }
+  .sr { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+  canvas { image-rendering:pixelated; display:block; }
+  main { max-width:1600px; margin:auto; padding:6px 10px; display:flex; flex-direction:column; gap:5px; }
+  .frame { border:calc(var(--px)*4) solid transparent; border-image-slice:8; border-image-repeat:stretch; image-rendering:pixelated; --px:2px; }
+  .bar { background:var(--panel); display:flex; align-items:center; gap:18px; padding:0 10px; }
+  .bar .sub { font-size:20px; letter-spacing:.04em; }
+  .bar .sp { flex:1; }
+  .bar a { color:var(--gold2); font-size:18px; }
+  #stage { position:relative; overflow:hidden; height:calc(var(--k)*150px); background:#2a2748; }
+  #scene,#light,#vig { position:absolute; inset:0; width:100%; height:100%; }
+  #light { image-rendering:auto; mix-blend-mode:screen; pointer-events:none; }
+  #vig { pointer-events:none; background:radial-gradient(ellipse at 45% 45%, transparent 55%, rgba(14,8,28,.6) 100%); }
+  #hero-copy { position:absolute; top:calc(var(--k)*3px); left:calc(var(--k)*178px); right:8px; display:flex; flex-direction:column; align-items:center; gap:calc(var(--k)*3px); pointer-events:none; }
+  .pill { background:linear-gradient(#f2dcae,#d8b980); color:#2a1c14; padding:5px 18px; font-weight:600; font-size:20px; border-radius:6px; box-shadow:0 0 0 2px #6a4a28, 0 0 0 4px #e0ae62, 0 4px 0 4px rgba(0,0,0,.35); text-align:center; }
+  .label { display:flex; justify-content:center; padding:2px 0 0; }
+  #cards { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:7px; }
+  .card { all:unset; box-sizing:border-box; cursor:pointer; text-align:center; padding:0 3px 2px; display:flex; flex-direction:column; align-items:center; gap:2px; position:relative; transition:transform .08s steps(2); min-width:0; }
+  .card canvas.ic { width:64px; height:48px; }
+  .card canvas.tt { margin:0 auto; max-width:100%; }
+  .card small { font-size:15px; color:var(--ink); line-height:1.05; }
+  .card:hover { transform:translateY(-2px); }
+  .card.on { transform:translateY(-4px); filter:brightness(1.18); box-shadow:0 0 22px rgba(247,212,138,.5); }
+  .card:focus-visible { outline:2px solid #fff; outline-offset:2px; }
+  #detail { background:var(--panel); display:grid; grid-template-columns:1.25fr .9fr 1.15fr auto; gap:20px; padding:0 8px; align-items:center; }
+  #detail h2 { margin:0; }
+  #cls { color:var(--gold2); margin:1px 0; font-size:16px; }
+  #bio { margin:0; font-size:16px; line-height:1.15; }
+  .stat { display:grid; grid-template-columns:82px 1fr 28px; gap:8px; align-items:center; font-size:16px; }
+  .meter { height:11px; background:#0c0a10; box-shadow:0 0 0 2px #6a4a28; }
+  .meter i { display:block; height:100%; background:repeating-linear-gradient(90deg,#8fd16a 0 6px,#6cb350 6px 8px); transition:width .25s steps(6); }
+  .meter.low i { background:repeating-linear-gradient(90deg,#ec7a5c 0 6px,#c5533f 6px 8px); }
+  #techs { list-style:none; padding:0; margin:0 0 2px; font-size:16px; line-height:1.15; }
+  #techs li::before { content:'✦ '; color:var(--gold2); }
+  #weak { margin:0; font-size:16px; } #weak b { color:#f49a7c; font-weight:600; }
+  .cta { font-family:'Pixelify Sans'; font-size:19px; font-weight:600; color:#2a1608; text-decoration:none; background:linear-gradient(#f7d48a,#d99a3e); padding:7px 14px; border-radius:6px; box-shadow:0 0 0 2px #6a4016, 0 0 0 4px #f7d48a, 0 5px 0 4px #3a2410; white-space:nowrap; display:inline-block; }
+  .cta:hover { filter:brightness(1.12); }
+  #links { display:flex; flex-direction:column; gap:10px; align-items:stretch; text-align:center; padding:0 6px; }
+  #links .alt { background:none; color:var(--gold2); box-shadow:inset 0 0 0 2px var(--gold); padding:4px 12px; font-size:16px; }
+  @media (max-width:1100px) {
+    #cards { grid-template-columns:repeat(4,minmax(0,1fr)); }
+    #detail { grid-template-columns:1fr 1fr; }
+  }
+  @media (max-width:720px) {
+    main { padding:6px; }
+    .bar { flex-wrap:wrap; gap:4px 12px; justify-content:center; text-align:center; }
+    .bar .sp, .bar a { display:none; }
+    .bar .sub { font-size:17px; }
+    #hero-copy { position:static; padding:12px 8px 0; }
+    #copywrap { background:#1d1a22; }
+    #cards { grid-template-columns:repeat(2,minmax(0,1fr)); }
+    #detail { grid-template-columns:1fr; gap:12px; }
+    .pill { font-size:17px; padding:5px 10px; }
+  }
+</style>
+</head>
+<body>
+<h1 class="sr">Ask Nacho: Ignacio Morales, tech lead in Barcelona. Choose your Nacho.</h1>
+<main>
+  <header class="frame bar">
+    <div id="logo"></div>
+    <div class="sub">Barcelona · engineer · maker</div>
+    <div class="sp"></div>
+    <a href="https://github.com/ignaciomoralesm" target="_blank" rel="noopener">GitHub</a>
+    <a href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">LinkedIn</a>
+  </header>
+  <div id="copywrap"></div>
+  <section class="frame" id="stage" aria-label="A pixel art scene of Nacho and his family on a hill above Barcelona at dusk">
+    <canvas id="scene"></canvas>
+    <canvas id="light"></canvas>
+    <div id="vig"></div>
+    <div id="hero-copy">
+      <div id="headline"></div>
+      <div class="pill">Senior software engineer · friendly side-quest enthusiast</div>
+    </div>
+  </section>
+  <div class="label" id="label"></div>
+  <div id="cards" role="group" aria-label="Choose your Nacho"></div>
+  <section class="frame" id="detail" aria-live="polite">
+    <div><h2 id="name"></h2><p id="cls"></p><p id="bio"></p></div>
+    <div id="stats"></div>
+    <div><ul id="techs"></ul><p id="weak"></p></div>
+    <div id="links"></div>
+  </section>
+</main>
+
+<script>
+const hex = h => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+const clamp = (v, a, b) => v < a ? a : v > b ? b : v;
+const lerp = (a, b, t) => a + (b - a) * t;
+const mix = (a, b, t) => [lerp(a[0], b[0], t), lerp(a[1], b[1], t), lerp(a[2], b[2], t)];
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => v / 16 - .47);
+const rng = seed => { let s = seed; return () => (s = s * 16807 % 2147483647) / 2147483647; };
+
+const R = {
+  skin: ['#8e4e3a', '#bb7050', '#de9e70', '#f3c292', '#ffdfb4'],
+  skinW: ['#7c4434', '#a8634a', '#d09068', '#ecb88a', '#fbd6ac'],
+  hair: ['#170e0c', '#281814', '#3c241a', '#583626', '#7c5438'],
+  hairW: ['#26120e', '#3e2016', '#5c3220', '#7c4a2c', '#a4703e'],
+  hairG: ['#20100c', '#38201a', '#583424', '#7a4c30', '#a06c44'],
+  denim: ['#1b2642', '#293a62', '#3a5586', '#5678aa', '#84a2c6'],
+  tee: ['#121016', '#1e1a24', '#2c2734', '#403848', '#5a5064'],
+  maroon: ['#361220', '#561c2c', '#7a2a3a', '#a04048', '#c65e58'],
+  olive: ['#28281a', '#404226', '#585c30', '#767a3e', '#9a9a54'],
+  wood: ['#46260f', '#6a3a1a', '#945828', '#bf8238', '#e6b05a'],
+  white: ['#7e7e98', '#a8a8bc', '#ccccd8', '#ececea', '#ffffff'],
+  orange: ['#6c2a12', '#a44616', '#d6661e', '#f08c30', '#fdbc5c'],
+  blue: ['#16265a', '#223a7e', '#3260ae', '#4e88d0', '#7eb4ea'],
+  mustard: ['#6a4412', '#9a6a1a', '#c8942a', '#e8bc48', '#f8dc80'],
+  dark: ['#14121a', '#201c28', '#2e2a38', '#403a4c', '#585062'],
+  scarf: ['#80622c', '#ae8842', '#d8b464', '#efd28e', '#fff0c4'],
+  moss: ['#26381e', '#3a5428', '#527034', '#6e8c42', '#90a858'],
+  pink: ['#7a3a50', '#a85468', '#d07a88', '#ec9ea6', '#fcc8c4'],
+  swaddle: ['#27436e', '#3a6090', '#5484b4', '#7ea8d0', '#b4d0e8'],
+  red: ['#6c1c20', '#9c2a2c', '#c84038', '#e8604c', '#fa9070'],
+  cheese: ['#a8701c', '#d0962a', '#eab844', '#f8d468', '#ffec9c'],
+  crust: ['#7c4818', '#a86a28', '#cc8c3c', '#e4ae5c', '#f4cc84'],
+  rock: ['#2e2a38', '#484454', '#686270', '#88828c', '#a8a2a8'],
+  gold: ['#7a4a1c', '#b47a2c', '#dca848', '#f4cc74', '#fff0ac'],
+  leaf: ['#16271f', '#20392a', '#2e4f30', '#44683a', '#688644', '#94a450'],
+  bush: ['#141f26', '#1c2f2e', '#2a4436', '#3e5c3c'],
+  cloud: ['#4c4270', '#7a5680', '#b47a8c', '#e4a496', '#f8caa8'],
+  bark: ['#22140f', '#3a2216', '#583420', '#7c4c2c', '#a06c3c'],
+};
+for (const k in R) R[k] = R[k].map(hex);
+
+const LIGHT = [-.46, -.62, .63];
+
+class Sc {
+  constructor(w, h) { this.w = w; this.h = h; this.d = new Array(w * h).fill(null); }
+  set(x, y, c) { x |= 0; y |= 0; if (x >= 0 && y >= 0 && x < this.w && y < this.h) this.d[y * this.w + x] = c; }
+  get(x, y) { return (x < 0 || y < 0 || x >= this.w || y >= this.h) ? null : this.d[y * this.w + x]; }
+  shade(x, y, nx, ny, nz, ramp, dith, L = LIGHT, ambient = .34) {
+    const l = (nx * L[0] + ny * L[1] + nz * L[2] + ambient) / (1 + ambient);
+    const i = Math.floor(clamp(l, 0, .999) * ramp.length + BAYER[(y & 3) * 4 + (x & 3)] * dith);
+    this.set(x, y, ramp[clamp(i, 0, ramp.length - 1)]);
+  }
+  blob(cx, cy, rx, ry, ramp, { dith = .3, L, clip } = {}) {
+    for (let y = Math.floor(cy - ry); y <= cy + ry; y++) for (let x = Math.floor(cx - rx); x <= cx + rx; x++) {
+      const nx = (x + .5 - cx) / rx, ny = (y + .5 - cy) / ry, d = nx * nx + ny * ny;
+      if (d > 1 || (clip && !clip(x, y))) continue;
+      this.shade(x, y, nx, ny, Math.sqrt(1 - d), ramp, dith, L);
+    }
+  }
+  cap(x1, y1, x2, y2, r1, r2, ramp, { dith = .3 } = {}) {
+    const dx = x2 - x1, dy = y2 - y1, len = dx * dx + dy * dy || 1, rm = Math.max(r1, r2) + 1;
+    for (let y = Math.floor(Math.min(y1, y2) - rm); y <= Math.max(y1, y2) + rm; y++) for (let x = Math.floor(Math.min(x1, x2) - rm); x <= Math.max(x1, x2) + rm; x++) {
+      const t = clamp(((x + .5 - x1) * dx + (y + .5 - y1) * dy) / len, 0, 1), r = lerp(r1, r2, t);
+      const nx = (x + .5 - (x1 + dx * t)) / r, ny = (y + .5 - (y1 + dy * t)) / r, d = nx * nx + ny * ny;
+      if (d > 1) continue;
+      this.shade(x, y, nx, ny, Math.sqrt(1 - d), ramp, dith);
+    }
+  }
+  rect(x, y, w, h, c) { for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) this.set(x + i, y + j, Array.isArray(c[0]) ? c[0] : c); }
+  line(x1, y1, x2, y2, c) { const n = Math.max(Math.abs(x2 - x1), Math.abs(y2 - y1), 1); for (let i = 0; i <= n; i++) this.set(lerp(x1, x2, i / n), lerp(y1, y2, i / n), c); }
+  rim(col = [255, 176, 112], amt = .55) {
+    const o = this.d.slice();
+    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++) {
+      const c = o[y * this.w + x];
+      if (c && !o[y * this.w + x + 1 + 0] && x < this.w - 1) this.d[y * this.w + x] = mix(c, col, amt);
+    }
+    return this;
+  }
+  outline(col = [30, 18, 28]) {
+    const o = this.d.slice(), at = (x, y) => (x < 0 || y < 0 || x >= this.w || y >= this.h) ? null : o[y * this.w + x];
+    for (let y = 0; y < this.h; y++) for (let x = 0; x < this.w; x++)
+      if (!at(x, y) && (at(x + 1, y) || at(x - 1, y) || at(x, y + 1) || at(x, y - 1))) this.d[y * this.w + x] = col;
+    return this;
+  }
+  canvas() {
+    const c = document.createElement('canvas'); c.width = this.w; c.height = this.h;
+    const g = c.getContext('2d'), im = g.createImageData(this.w, this.h);
+    this.d.forEach((p, i) => { if (p) { im.data[i * 4] = p[0]; im.data[i * 4 + 1] = p[1]; im.data[i * 4 + 2] = p[2]; im.data[i * 4 + 3] = 255; } });
+    g.putImageData(im, 0, 0); return c;
+  }
+}
+
+const P = {
+  laptop(s, x, y) {
+    s.rect(x, y, 26, 18, [52, 50, 64]); s.rect(x + 2, y + 2, 22, 14, [22, 30, 44]);
+    [[4, 5, 9, [120, 220, 150]], [6, 8, 13, [116, 200, 240]], [4, 11, 7, [244, 200, 110]]].forEach(([a, b, w, c]) => s.line(x + a, y + b, x + a + w, y + b, c));
+    s.rect(x - 2, y + 18, 30, 3, [170, 170, 186]); s.rect(x - 2, y + 20, 30, 1, [96, 96, 116]);
+  },
+  guitar(s, x, y, hx, hy) {
+    s.cap(x + 10, y - 9, hx, hy, 1.8, 1.8, R.bark);
+    s.cap(hx, hy, hx + 3, hy - 4, 2.4, 2.2, R.wood);
+    s.blob(x, y, 13, 11, R.wood); s.blob(x + 9, y - 8, 9, 8, R.wood);
+    s.blob(x + 5, y - 4, 3.4, 3.4, [[34, 18, 12]], { dith: 0 });
+    s.cap(x - 3, y + 3, x, y + 1, 1.2, 1.2, R.bark);
+    s.line(x - 1, y + 2, hx, hy, [240, 228, 200]);
+  },
+  pizza(s, cx, cy, rx, ry) {
+    s.blob(cx, cy, rx, ry, R.crust); s.blob(cx - .5, cy - .5, rx - 3, ry - 2.4, R.cheese, { dith: .7 });
+    [[-.45, -.2], [.3, -.35], [-.1, .35], [.5, .3], [-.55, .35]].forEach(([a, b]) => s.blob(cx + a * rx, cy + b * ry, 2.6, 2, R.red, { dith: 0 }));
+  },
+  ball(s, cx, cy, r) {
+    s.blob(cx, cy, r, r, R.white);
+    s.blob(cx - 1, cy - 1, r * .34, r * .32, R.dark, { dith: 0 });
+    [[.72, -.3], [-.75, -.5], [.3, .75], [-.65, .55]].forEach(([a, b]) => s.blob(cx + a * r, cy + b * r, r * .24, r * .22, R.dark, { dith: 0 }));
+  },
+  bottle(s, x, y) {
+    s.cap(x, y + 6, x, y + 16, 4.4, 4.4, R.white); s.rect(x - 3, y + 11, 6, 8, hex('#bcdcf2'));
+    s.rect(x - 5, y + 4, 10, 3, hex('#78b8e0')); s.cap(x, y, x, y + 3, 1.6, 2.6, R.mustard, { dith: 0 });
+  },
+  mug(s, x, y) {
+    s.cap(x + 7, y + 3, x + 10, y + 7, 1.2, 1.2, R.white, { dith: 0 }); s.cap(x + 10, y + 7, x + 6, y + 10, 1.2, 1.2, R.white, { dith: 0 });
+    for (let j = 0; j < 13; j++) for (let i = -6; i <= 6; i++) s.set(x + i, y + j, R.white[clamp(4 - Math.abs(i + 2) / 2 | 0, 1, 4)]);
+    s.rect(x - 5, y, 11, 2, hex('#4a2c1c')); s.rect(x - 6, y + 5, 13, 2, hex('#d6661e'));
+  },
+};
+
+function plusOneFlag(s, x, y) {
+  s.cap(x, y, x, y + 76, 1.4, 1.4, R.wood);
+  for (let j = 0; j < 14; j++) for (let i = 0; i < 26; i++) s.set(x + 2 + i, y + 2 + j + Math.sin(i / 4) * 1.2, i % 8 < 7 ? [214, 62, 56] : [176, 46, 48]);
+  const w = [250, 240, 214];
+  s.rect(x + 7, y + 8, 7, 2, w); s.rect(x + 9, y + 6, 2, 6, w); s.rect(x + 19, y + 5, 2, 9, w); s.rect(x + 17, y + 6, 2, 1, w); s.rect(x + 17, y + 13, 6, 1, w);
+}
+
+// The rig: same Nacho, re-dressed per class. Feet at y=108, centred on x=60.
+function drawNacho(id) {
+  const s = new Sc(130, 112), cx = 60;
+  const o = {
+    dev: { top: R.tee, sleeve: R.maroon, legs: R.denim, pack: true, arms: [[34, 64, 44, 74], [75, 68, 88, 66]] },
+    bard: { top: R.moss, sleeve: R.moss, legs: R.denim, arms: [[38, 66, 52, 70], [80, 60, 91, 47]] },
+    dad: { top: R.mustard, sleeve: R.mustard, legs: R.denim, arms: [[43, 72, 38, 62], [76, 72, 88, 60]] },
+    striker: { top: R.orange, sleeve: R.orange, shorts: true, legs: R.white, arms: [[34, 64, 44, 74], [86, 64, 76, 74]] },
+    chef: { top: R.white, sleeve: R.white, legs: R.dark, arms: [[34, 64, 44, 74], [76, 62, 90, 54]] },
+    coach: { top: R.blue, sleeve: R.blue, legs: R.blue, arms: [[34, 64, 44, 74], [76, 64, 86, 62]] },
+  }[id];
+
+  if (o.pack) { s.blob(cx - 18, 66, 10, 16, R.olive); s.cap(cx - 26, 52, cx - 11, 52, 4, 4, R.scarf); }
+  if (id === 'coach') plusOneFlag(s, 88, 30);
+  if (id === 'chef') { s.cap(82, 102, 104, 50, 1.5, 1.5, R.wood); }
+
+  if (o.shorts) {
+    [[-8, -11], [8, 11]].forEach(([a, b]) => { s.cap(cx + a, 84, cx + b, 92, 5, 4.5, R.skin); s.cap(cx + b, 93, cx + b, 101, 4.6, 4.2, R.orange); });
+    s.blob(cx - 8, 80, 9, 8, R.white); s.blob(cx + 8, 80, 9, 8, R.white);
+  } else {
+    s.cap(cx - 8, 80, cx - 11, 100, 7, 6, o.legs); s.cap(cx + 8, 80, cx + 11, 100, 7, 6, o.legs);
+    if (o.legs === R.denim) [-11, 11].forEach(a => s.rect(cx + a - 6, 98, 12, 2, hex('#a8bcd4')));
+  }
+  [-1, 1].forEach(d => {
+    s.blob(cx + d * 13, 104, 9, 4.6, id === 'striker' ? R.dark : R.dark);
+    s.rect(cx + d * 13 - 8, 106, 17, 2, hex('#e8e4dc'));
+    s.rect(cx + d * 13 - 2, 101, 6, 1, hex('#e8e4dc'));
+  });
+
+  s.blob(cx, 76, 15, 8, o.shorts ? R.white : o.legs);
+  s.blob(cx, 62, 16, 20, o.top); s.blob(cx, 72, 15.5, 8, o.top);
+  if (!o.shorts && id !== 'chef') { s.rect(cx - 13, 78, 26, 2, hex('#5a3418')); s.rect(cx - 2, 78, 4, 2, hex('#e0ae62')); }
+
+  if (id === 'dev') {
+    const w = [232, 232, 222];
+    [[-9, 62, -6, 59], [-9, 62, -6, 65], [9, 62, 6, 59], [9, 62, 6, 65], [2, 58, -2, 67]].forEach(([a, b, c, d]) => s.line(cx + a, b, cx + c, d, w));
+    s.line(cx - 12, 47, cx - 13, 78, hex('#6c6c38')); s.line(cx + 12, 47, cx + 13, 78, hex('#6c6c38'));
+  }
+  if (id === 'striker') { const w = [255, 246, 224]; s.rect(cx - 7, 56, 2, 11, w); s.rect(cx - 2, 56, 7, 11, w); s.rect(cx, 58, 3, 7, hex('#d6661e')); }
+  if (id === 'coach') { [-11, 11].forEach(a => s.line(cx + a, 48, cx + a * 1.1, 80, hex('#f0f0f0'))); s.line(cx, 46, cx, 80, hex('#16265a')); s.line(cx, 44, cx - 7, 58, [240, 240, 240]); s.blob(cx - 7, 61, 3, 2.2, R.mustard, { dith: 0 }); }
+  if (id === 'chef') { for (let i = 0; i < 3; i++) { s.set(cx - 4, 56 + i * 7, hex('#7e7e98')); s.set(cx + 4, 56 + i * 7, hex('#7e7e98')); } s.blob(cx, 48, 11, 5, R.red); }
+  if (id === 'dad') { s.blob(cx + 13, 47, 8, 5, R.white); s.blob(cx + 15, 56, 5.5, 9, R.white); for (let i = 0; i < 4; i++) s.set(cx + 13 + i, 54 + i * 2, hex('#e8a0a0')); }
+
+  const arm = (sx, [ex, ey, hx, hy], front) => {
+    s.cap(sx, 50, ex, ey, 6, 5, o.sleeve);
+    if (id === 'dev' || id === 'dad' && false) s.cap(ex, ey, hx, hy, 4.4, 4, R.skin); else s.cap(ex, ey, hx, hy, o.sleeve === R.tee ? 4 : 4.6, 4, o.sleeve === R.white || o.sleeve === R.orange ? R.skin : o.sleeve);
+    s.blob(hx, hy, 4.2, 4, R.skin);
+  };
+
+  if (id === 'chef') { P.pizza(s, 106, 46, 19, 9); }
+  arm(cx - 16, o.arms[0]); arm(cx + 16, o.arms[1]);
+  if (id === 'bard') { P.guitar(s, 58, 72, 96, 42); s.blob(50, 72, 4.2, 4, R.skin); s.blob(90, 47, 4, 3.8, R.skin); }
+  if (id === 'dev') P.laptop(s, 83, 48);
+  if (id === 'dad') { P.mug(s, 32, 50); P.bottle(s, 92, 40); }
+  if (id === 'striker') { P.ball(s, 94, 101, 7); }
+
+  s.blob(cx, 30, 16.5, 16.5, R.skin, { dith: .15 });
+  [-1, 1].forEach(d => s.blob(cx + d * 16, 33, 3.2, 4.2, R.skin, { dith: 0 }));
+
+  const curl = (x, y, r, ramp = R.hair) => s.blob(x, y, r, r, ramp, { dith: .15 });
+  const rnd = rng(77);
+  s.blob(cx, 40, 15, 11, R.hair, { clip: (x, y) => y > 33 + Math.abs(x - cx) * -.05 });
+  for (let i = 0; i < 26; i++) { const a = .12 + i / 25 * 2.9, r = 13.5 + rnd() * 2; curl(cx + Math.cos(a) * r, 36 + Math.sin(a) * r * .9, 2.6 + rnd() * 1.4); }
+  s.blob(cx - 4.5, 36.5, 4.4, 2.1, R.hair, { dith: 0 }); s.blob(cx + 4.5, 36.5, 4.4, 2.1, R.hair, { dith: 0 });
+  s.line(cx - 5, 40, cx - 3, 42, [24, 12, 12]); s.line(cx + 5, 40, cx + 3, 42, [24, 12, 12]);
+  s.rect(cx - 3, 41, 7, 2, [250, 244, 232]); s.line(cx - 3, 43, cx + 3, 43, [90, 30, 30]);
+
+  s.blob(cx, 34, 2.8, 2.6, R.skin, { dith: 0 });
+  [-1, 1].forEach(d => {
+    s.line(cx + d * 10, 29, cx + d * 7.5, 26.5, [26, 14, 14]); s.line(cx + d * 7.5, 26.5, cx + d * 4.5, 29, [26, 14, 14]);
+    s.line(cx + d * 10.5, 23, cx + d * 4, 22.5, [36, 20, 16]); s.line(cx + d * 10.5, 22, cx + d * 4, 21.5, [36, 20, 16]);
+    s.rect(cx + d * 9 - 1, 33, 3, 1, hex('#ee9a84'));
+    if (id === 'dad') { s.line(cx + d * 10, 31, cx + d * 5, 31, hex('#a8705c')); }
+  });
+
+  s.blob(cx, 14, 17.5, 8.5, R.hair);
+  for (let i = 0; i < 34; i++) {
+    const a = Math.PI * (.98 + i / 33 * 1.04), r = 14.5 + rnd() * 2.6;
+    curl(cx + Math.cos(a) * (r + 2.5), 20 + Math.sin(a) * r * .84, 2.9 + rnd() * 1.9);
+  }
+  for (let i = 0; i < 12; i++) curl(cx - 15 + i * 2.7, 16 + rnd() * 1.6 + Math.abs(i - 5.5) * .35, 2 + rnd() * 1.1);
+  for (let i = 0; i < 10; i++) curl(cx - 11 + rnd() * 22, 8 + rnd() * 6, 2.2 + rnd() * 1.4, R.hairG);
+  [[-18.5, 25], [18.5, 25], [-20, 19], [20, 19]].forEach(([a, b]) => curl(cx + a, b, 3));
+  [[-9, 2, -13, -2], [6, 1, 9, -3], [18, 8, 23, 5]].forEach(([a, b, c, d]) => s.cap(cx + a, b + 4, cx + c, d + 5, 1.8, .8, R.hair, { dith: 0 }));
+
+  if (id === 'chef') {
+    s.blob(cx, 7, 19, 11, R.white); s.blob(cx - 11, 8, 8, 8, R.white); s.blob(cx + 11, 8, 8, 8, R.white);
+    s.cap(cx - 15, 17, cx + 15, 17, 3.2, 3.2, R.white);
+  }
+  if (id === 'dev' || id === 'bard') s.blob(cx - 6, 2, 0, 0, R.hair);
+  return s.rim().outline();
+}
+
+function drawWife() {
+  const s = new Sc(84, 76), cx = 36;
+  s.cap(14, 62, 8, 70, 7, 6, R.olive);
+  s.blob(16, 56, 10, 9, R.wood); s.blob(16, 56, 5, 4.6, R.bark, { dith: .2 });
+  s.cap(40, 62, 66, 66, 8, 6.5, R.dark); s.cap(38, 66, 56, 70, 7, 5, R.dark);
+  s.blob(70, 68, 6, 4, R.white);
+  s.blob(cx, 52, 13, 15, R.moss); s.blob(cx, 63, 14, 8, R.moss);
+  s.cap(cx + 8, 48, cx + 22, 60, 4.8, 4, R.moss); s.blob(cx + 24, 62, 3.4, 3.4, R.skinW);
+  s.cap(cx - 10, 46, cx + 10, 46, 7, 7, R.scarf); s.blob(cx, 44, 12, 5.6, R.scarf); s.blob(cx - 2, 54, 5, 6, R.scarf);
+  s.blob(cx + 2, 28, 13, 13, R.skinW, { dith: .15 });
+  [[-4, 28], [7, 28]].forEach(([a, b]) => { s.line(cx + a - 3, b + 1, cx + a, b - 1, [30, 16, 14]); s.line(cx + a, b - 1, cx + a + 3, b + 1, [30, 16, 14]); });
+  s.line(cx - 1, 35, cx + 2, 36, [150, 50, 50]); s.line(cx + 2, 36, cx + 5, 35, [150, 50, 50]);
+  s.rect(cx - 8, 32, 3, 1, hex('#ee9a84')); s.rect(cx + 9, 32, 3, 1, hex('#ee9a84'));
+  const rnd = rng(31), c = (x, y, r) => s.blob(x, y, r, r, R.hairW, { dith: .15 });
+  for (let i = 0; i < 38; i++) { const a = Math.PI * (.85 + i / 37 * 1.35), r = 12.5 + rnd() * 2.4; c(cx + 2 + Math.cos(a) * r, 25 + Math.sin(a) * r * .95, 3.2 + rnd() * 2.2); }
+  for (let i = 0; i < 8; i++) c(cx - 8 + i * 3.4, 15 + rnd() * 2, 2.6 + rnd());
+  for (let i = 0; i < 10; i++) c(cx - 11 - rnd() * 3, 28 + i * 2.2, 2.8 + rnd() * 1.6);
+  for (let i = 0; i < 12; i++) c(cx + rnd() * 9, 7 + rnd() * 7, 2.2 + rnd() * 1.5);
+  return s.rim().outline();
+}
+
+function drawKid() {
+  const s = new Sc(62, 48);
+  s.cap(30, 34, 52, 38, 6, 4.5, R.dark); s.cap(52, 38, 57, 26, 3.4, 3, R.dark); s.blob(58, 23, 3.2, 4, R.white);
+  s.cap(46, 37, 55, 40, 3.4, 3, R.dark);
+  s.blob(22, 33, 13, 8, R.pink); s.blob(31, 34, 9, 7, R.pink);
+  s.cap(18, 34, 13, 37, 3.8, 3.4, R.pink); s.blob(14, 26, 3.6, 3.6, R.skinW);
+  s.blob(15, 21, 12, 11, R.skinW, { dith: .15 });
+  [[-5, 20], [5, 20]].forEach(([a, b]) => { s.line(15 + a - 2, b + 1, 15 + a, b - 1, [30, 16, 14]); s.line(15 + a, b - 1, 15 + a + 2, b + 1, [30, 16, 14]); });
+  s.line(12, 26, 15, 27, [150, 50, 50]); s.line(15, 27, 18, 26, [150, 50, 50]);
+  s.rect(7, 24, 2, 1, hex('#ee9a84')); s.rect(21, 24, 2, 1, hex('#ee9a84'));
+  const rnd = rng(11), c = (x, y, r) => s.blob(x, y, r, r, R.hairG, { dith: .15 });
+  for (let i = 0; i < 30; i++) { const a = Math.PI * (.95 + i / 29 * 1.15), r = 11 + rnd() * 2; c(15 + Math.cos(a) * r, 19 + Math.sin(a) * r, 2.6 + rnd() * 1.6); }
+  for (let i = 0; i < 10; i++) c(28 + rnd() * 3, 15 + i * 1.8, 3 + rnd() * 1.6);
+  s.blob(23, 8, 3.5, 2.6, R.pink, { dith: 0 }); s.blob(30, 9, 3.5, 2.6, R.pink, { dith: 0 }); s.blob(26.5, 9, 1.8, 1.8, R.red, { dith: 0 });
+  return s.rim().outline();
+}
+
+function drawBaby() {
+  const s = new Sc(46, 32);
+  s.blob(26, 19, 18, 11, R.swaddle); s.blob(16, 19, 12, 11, R.swaddle);
+  s.blob(13, 18, 10.5, 9.5, R.skinW, { dith: .15 });
+  s.blob(11, 10, 12, 6.5, R.swaddle); s.blob(4, 15, 4.5, 7, R.swaddle);
+  [[9, 18], [16, 18]].forEach(([a, b]) => { s.line(a - 2, b, a, b + 1, [40, 22, 20]); s.line(a, b + 1, a + 2, b, [40, 22, 20]); });
+  s.rect(12, 22, 2, 1, hex('#c8705c'));
+  s.line(28, 11, 32, 27, hex('#3a6090')); s.line(36, 12, 39, 25, hex('#3a6090'));
+  return s.rim().outline();
+}
+
+function bubble(paint) {
+  const s = new Sc(30, 28); s.blob(15, 12, 13, 11, [[250, 243, 225]], { dith: 0 }); paint(s);
+  s.blob(7, 23, 3, 2.4, [[250, 243, 225]], { dith: 0 });
+  return s.outline([58, 36, 34]).canvas();
+}
+
+const HEART = bubble(s => { s.blob(11, 9, 4.2, 4, R.red, { dith: .2 }); s.blob(18, 9, 4.2, 4, R.red, { dith: .2 }); for (let j = 0; j < 7; j++) s.line(15 - 7 + j, 11 + j, 15 + 6 - j, 11 + j, R.red[2]); });
+const BOTTLE = bubble(s => { P.bottle(s, 15, 3); });
+const QMARK = bubble(s => { const c = [214, 90, 60]; s.rect(11, 5, 8, 2, c); s.rect(18, 6, 2, 5, c); s.rect(14, 11, 5, 2, c); s.rect(14, 12, 2, 3, c); s.rect(14, 17, 2, 2, c); });
+
+const W = 720, H = 150;
+const crest = x => 122 + Math.sin(x / 70) * 1.6 + Math.sin(x / 23 + 1) * .9 + (x > 330 ? (x - 330) * .012 : 0);
+
+function layer(paint) { const c = document.createElement('canvas'); c.width = W; c.height = H; paint(c.getContext('2d'), c); return c; }
+
+const SKY = layer(g => {
+  const stops = [[0, '#191838'], [.18, '#262552'], [.34, '#3c3468'], [.46, '#5e4678'], [.56, '#8a5a80'], [.64, '#c07c80'], [.72, '#ee9e78'], [.8, '#f8c88a']].map(([t, c]) => [t, hex(c)]);
+  const at = t => { for (let i = 1; i < stops.length; i++) if (t <= stops[i][0]) return mix(stops[i - 1][1], stops[i][1], (t - stops[i - 1][0]) / (stops[i][0] - stops[i - 1][0])); return stops[stops.length - 1][1]; };
+  const BANDS = 34;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const t = clamp(y / H + (BAYER[(y & 3) * 4 + (x & 3)]) / BANDS, 0, 1), q = Math.round(t * BANDS) / BANDS, c = at(q);
+    g.fillStyle = `rgb(${c[0] | 0},${c[1] | 0},${c[2] | 0})`; g.fillRect(x, y, 1, 1);
+  }
+  g.fillStyle = 'rgba(255,226,170,.9)'; g.beginPath(); g.arc(306, 92, 17, 0, 7); g.fill();
+  g.fillStyle = '#fff4d0'; g.beginPath(); g.arc(306, 92, 12, 0, 7); g.fill();
+});
+
+const STARS = (() => { const r = rng(5), a = []; for (let i = 0; i < 130; i++) a.push([r() * W | 0, r() * 62 | 0, r(), r() > .85]); return a; })();
+
+function cloudLayer(seed, n, y0, y1, scale) {
+  const s = new Sc(W, H), r = rng(seed), L = [.32, -.55, .77];
+  for (let i = 0; i < n; i++) {
+    const cx = r() * W, cy = y0 + r() * (y1 - y0), wid = (24 + r() * 42) * scale;
+    for (let j = 0; j < 12; j++) { const t = j / 11 * 2 - 1; s.blob(cx + t * wid, cy + Math.abs(t) * 2.4 - r() * 2.5, (7 + (1 - Math.abs(t)) * 7 * r()) * scale * 1.1, (2.4 + (1 - Math.abs(t)) * 3.6) * scale, R.cloud, { dith: .9, L }); }
+  }
+  return s.canvas();
+}
+const CLOUD_FAR = cloudLayer(9, 12, 38, 72, .7), CLOUD_NEAR = cloudLayer(23, 7, 30, 62, 1);
+
+const hillY = x => 74 - Math.max(0, 40 - Math.abs(x - 410) * .34) * .66 + Math.sin(x / 19) * 1.7 + Math.sin(x / 7) * .5 + (x < 330 ? (330 - x) * .1 : 0);
+
+const CITY_LIT = [];
+const LAND = layer(g => {
+  const s = new Sc(W, H), r = rng(3);
+  for (let x = 170; x < W; x++) {
+    const top = hillY(x);
+    for (let y = top | 0; y < 104; y++) {
+      const t = (y - top) / 40, n = BAYER[(y & 3) * 4 + (x & 3)];
+      const c = mix(mix(hex('#3d5f58'), hex('#1f3c4a'), clamp(t + n * .4, 0, 1)), hex('#a8706c'), .14);
+      s.set(x, y, r() > .93 ? mix(c, [0, 0, 0], .25) : c);
+    }
+  }
+  for (let y = 86; y < 104; y++) for (let x = 170; x < W; x++) {
+    const n = BAYER[(y & 3) * 4 + (x & 3)], c = mix(hex('#e8a07c'), hex('#3e5c92'), clamp((y - 84) / 12 + n * .3, 0, 1));
+    if (hillY(x) > 86 || x < 330) s.set(x, y, c);
+  }
+  const blockC = ['#e2c8a0', '#d4b48a', '#c89c78', '#e8d4b2', '#bc8c70'].map(hex);
+  const roof = ['#b85c3c', '#a44c34', '#c8704a', '#94442e'].map(hex);
+  const lit = [];
+  for (let row = 0; row < 7; row++) {
+    let x = 190 + r() * 10 - row * 3;
+    const base = 96 + row * 3.9;
+    while (x < W) {
+      const w = 6 + r() * (5 + row * 1.1), h = 5 + r() * (6 + row * 1.2), wall = blockC[r() * 5 | 0], rf = roof[r() * 4 | 0];
+      if (x > crestCut(row)) {
+        for (let j = 0; j < h + 6; j++) for (let i = 0; i < w; i++) s.set(x + i, base - h + j, i > w * .7 ? mix(wall, [120, 66, 90], .32) : i < 1 ? mix(wall, [255, 220, 170], .4) : wall);
+        for (let j = 0; j < 3; j++) s.line(x - 1 + j, base - h - j, x + w - j, base - h - j, j === 2 ? mix(rf, [255, 200, 150], .35) : rf);
+        for (let wy = base - h + 2; wy < base - 1; wy += 3) for (let wx = x + 1.5; wx < x + w - 1; wx += 3) {
+          if (r() > .5) { s.set(wx, wy, [86, 56, 70]); } else if (r() > .4) { s.set(wx, wy, [255, 212, 120]); lit.push([wx | 0, wy | 0, r()]); }
+        }
+      }
+      x += w + (r() > .85 ? 2 : 0);
+    }
+  }
+  CITY_LIT.push(...lit);
+  const SX = 392;
+  const spire = (x, top, w, base) => {
+    for (let y = top; y < base; y++) {
+      const t = clamp((y - top) / 16, 0, 1), ww = lerp(1.2, w, Math.pow(t, .7));
+      for (let i = -ww; i <= ww; i++) {
+        const nx = i / ww, c = R.gold[clamp(Math.floor((.62 + nx * .6 + BAYER[(y & 3) * 4 + ((x + i) & 3)] * .5) * 5), 0, 4)];
+        s.set(x + i, y, (y % 5 === 0 && Math.abs(nx) < .4 && t > .3) ? hex('#6a3a24') : c);
+      }
+    }
+    s.blob(x, top - 1, 1.8, 1.8, R.gold, { dith: 0 }); s.set(x, top - 3, [255, 240, 180]);
+  };
+  [[-13, 76, 2.2], [-8, 70, 2.5], [-3, 66, 2.7], [3, 66, 2.7], [8, 70, 2.5], [13, 76, 2.2], [19, 82, 2], [-19, 84, 2]].forEach(([d, t, w]) => spire(SX + d, t, w, 104));
+  spire(SX, 60, 3, 104);
+  for (let y = 92; y < 108; y++) for (let x = SX - 26; x < SX + 26; x++) s.set(x, y, R.gold[clamp(1 + ((x * 3 + y * 5) % 7 > 3 ? 1 : 0) + (x < SX ? 1 : 0), 0, 4)]);
+  [-16, -6, 6, 16].forEach(d => { for (let y = 96; y < 107; y++) s.line(SX + d - 2, y, SX + d + 2, y, y < 99 ? R.gold[1] : [106, 52, 40]); });
+  const canv = s.canvas(); g.drawImage(canv, 0, 0);
+});
+function crestCut() { return 186; }
+
+const BUSH = (() => {
+  const s = new Sc(W, H), r = rng(71);
+  for (let i = 0; i < 280; i++) {
+    const x = 150 + r() * W, y = 112 + r() * 8 + (x > 340 ? 8 * r() : 0), rx = 5 + r() * 9;
+    s.blob(x, y, rx, rx * .78, R.bush, { dith: .9 });
+  }
+  return s.rim([240, 150, 110], .3).canvas();
+})();
+
+const GROUND = (() => {
+  const s = new Sc(W, H), r = rng(19), g = ['#1d2c20', '#2c4226', '#3f5a2a', '#5c7a30', '#86a03c', '#b6c250'].map(hex);
+  for (let x = 0; x < W; x++) {
+    const top = crest(x);
+    for (let y = top | 0; y < H; y++) {
+      const t = (y - top) / 26, n = Math.sin(x / 9 + y / 3) * .1 + (r() - .5) * .3;
+      s.set(x, y, g[clamp(Math.round(3.3 - t * 3.5 + n * 2), 0, 5)]);
+    }
+    for (let i = 0, n = 2 + (r() * 3 | 0); i < n; i++) s.set(x, top - i, g[clamp(5 - i + (r() > .5 ? -1 : 0), 0, 5)]);
+  }
+  for (let i = 0; i < 90; i++) { const x = r() * W, y = crest(x) + 2 + r() * 22, c = [[255, 230, 130], [246, 170, 190], [255, 255, 240], [170, 196, 255]][r() * 4 | 0]; s.set(x, y, c); s.set(x + 1, y, c); s.set(x, y + 1, mix(c, [80, 80, 40], .4)); }
+  [[12, 130, 16, 9], [168, 127, 9, 5], [456, 130, 12, 6], [590, 133, 15, 8]].forEach(([x, y, a, b]) => s.blob(x, y, a, b, R.rock, { dith: .7 }));
+  return s.canvas();
+})();
+
+const TREE = (() => {
+  const s = new Sc(190, H);
+  s.cap(-2, 150, 13, 76, 26, 15, R.bark, { dith: .9 }); s.cap(13, 80, 16, 26, 16, 10, R.bark, { dith: .9 });
+  s.cap(15, 60, 62, 22, 8, 3, R.bark, { dith: .8 }); s.cap(10, 36, 42, 8, 7, 3, R.bark, { dith: .8 });
+  const r = rng(13);
+  for (let i = 0; i < 90; i++) { const x = r() * 34 - 3, y = 40 + r() * 104; s.line(x, y, x + r() * 3 - 1, y + 4 + r() * 9, hex(r() > .5 ? '#2a1a12' : '#8a5a34')); }
+  return s.rim([250, 170, 110], .35).canvas();
+})();
+
+function canopy(seed, n, minR, maxR) {
+  const s = new Sc(190, H), r = rng(seed);
+  for (let i = 0; i < n; i++) {
+    const t = r(), x = -8 + Math.pow(t, 1.3) * 158 + r() * 10, y = -8 + r() * (36 - t * 26) + Math.sin(t * 7) * 2, a = minR + r() * (maxR - minR);
+    s.blob(x, y, a, a * .8, R.leaf, { dith: 1.1 });
+  }
+  for (let i = 0; i < 90; i++) { const x = r() * 150, y = r() * 44; if (s.get(x | 0, y | 0)) { s.set(x, y, hex('#a8b858')); s.set(x + 1, y, hex('#688644')); } }
+  return s.rim([250, 180, 110], .3).outline([14, 22, 20]).canvas();
+}
+const CANOPY_BACK = canopy(41, 150, 5, 11), CANOPY_FRONT = canopy(57, 60, 3, 7);
+
+const FORE = (() => {
+  const s = new Sc(W, H), r = rng(29), c = ['#121a18', '#1a2820', '#24382a', '#32482c'].map(hex);
+  for (let x = 0; x < W; x += 1) { const h = 3 + r() * 11 + Math.sin(x / 13) * 3; const lean = r() * 3 - 1; s.line(x, H, x + lean, H - h, c[r() * 4 | 0]); }
+  return s.canvas();
+})();
+
+const LOGS = (() => { const s = new Sc(34, 16); s.cap(4, 12, 28, 9, 2.8, 2.6, R.bark); s.cap(5, 8, 29, 12, 2.8, 2.6, R.wood); return s.outline().canvas(); })();
+
+const sprites = { wife: drawWife().canvas(), kid: drawKid().canvas(), baby: drawBaby().canvas() };
+const LEAN_GUITAR = (() => { const s = new Sc(44, 76); P.guitar(s, 18, 56, 34, 8); return s.rim().outline().canvas(); })();
+const LEAN_KEYS = (() => {
+  const s = new Sc(30, 46), d = [38, 35, 46], e = [62, 58, 72], k = [244, 240, 228];
+  const rowX = y => 4 + (44 - y) * .24;
+  for (let y = 2; y < 44; y++) { const x = rowX(y); s.line(x, y, x + 19, y, d); s.set(x, y, e); s.set(x + 19, y, [18, 16, 22]); }
+  for (let y = 14; y < 41; y++) { const x = rowX(y) + 3; s.line(x, y, x + 13, y, y % 4 === 0 ? [90, 84, 90] : k); if (y % 4 > 1 && (y >> 2) % 7 % 3 !== 2) s.line(x, y, x + 7, y, [30, 28, 36]); }
+  s.rect(10, 6, 3, 3, [214, 62, 56]); s.rect(15, 6, 7, 3, [120, 220, 150]);
+  return s.outline().canvas();
+})();
+
+const heroCache = {};
+const hero = id => heroCache[id] || (heroCache[id] = drawNacho(id).canvas());
+
+const LI = ['Recruit Nacho →', 'https://www.linkedin.com/in/ignaciomoralesm'];
+const GH = ['GitHub', 'https://github.com/ignaciomoralesm'];
+const CLASSES = [
+  { id: 'dev', tag: 'TECH LEAD', line: 'builds useful things', tint: ['#2c4a34', '#1c3226'], cls: 'Senior Software Engineer',
+    bio: '8+ years shipping. Led 8 engineers on a platform for 2M+ users. Cut deploy times by 60%.',
+    stats: [['Code', 92], ['Lead', 88], ['Meetings', 21]], techs: ['Refactor All', 'Ship Friday (forbidden)', 'Mentor Beam: 2 promotions'], weak: '"Quick question?"', links: [LI, GH],
+    icon: s => P.laptop(s, 11, 7) },
+  { id: 'bard', tag: 'BARD', line: 'guitar + piano practice', tint: ['#5a2230', '#3c1520'], cls: 'Guitarist, Apprentice Pianist',
+    bio: 'Plays guitar. Is learning piano. Built scorepace.com rather than simply practising.',
+    stats: [['Guitar', 74], ['Piano', 16], ['Rhythm', 60]], techs: ['Power Chord', 'Sight-Read (charging...)', 'Scorepace: party practice +1'], weak: 'Left hand', links: [['Play Scorepace →', 'https://scorepace.com']],
+    icon: s => P.guitar(s, 14, 24, 37, 7) },
+  { id: 'dad', tag: 'DAD', line: 'wife, daughter & baby boy soon', tint: ['#5a3420', '#3c2214'], cls: 'Paladin of the Household',
+    bio: 'Husband to a wonderful wife, dad to a beautiful daughter. Party grows soon.',
+    stats: [['Love', 99], ['Patience', 70], ['Sleep', 12]], techs: ['Piggyback', 'Bedtime Story x9', 'Find the Lost Toy'], weak: 'One more episode', links: [LI],
+    icon: s => { P.bottle(s, 24, 6); P.mug(s, 10, 12); } },
+  { id: 'striker', tag: 'STRIKER', line: 'Barcelona football scholar', tint: ['#24406a', '#162a4a'], cls: 'Barcelona Resident',
+    bio: 'Lives in Barcelona and likes football, which here counts as a personality.',
+    stats: [['Opinions', 99], ['Tactics', 80], ['Cardio', 19]], techs: ['Armchair VAR', 'Salt-Shaker Offside Lecture', 'Late Run'], weak: 'Extra time on a school night', links: [LI],
+    icon: s => P.ball(s, 24, 17, 13) },
+  { id: 'chef', tag: 'PIZZAIOLO', line: 'strong opinions on dough', tint: ['#6a3c1c', '#4a2812'], cls: 'Pizza Evaluator, Grade S',
+    bio: 'Loves pizza with the seriousness others reserve for system design.',
+    stats: [['Dough', 66], ['Cheese', 97], ['Restraint', 8]], techs: ['Extra Cheese', 'Fold Technique', 'Crust Reclamation'], weak: 'Pineapple', links: [LI],
+    icon: s => P.pizza(s, 24, 17, 18, 14) },
+  { id: 'coach', tag: 'COACH', line: 'helps people challenge themselves', tint: ['#3e3066', '#2a2048'], cls: 'Challenger of People',
+    bio: 'Helps people challenge themselves. Will ask whether that really was your best attempt.',
+    stats: [['Courage', 90], ['Honesty', 94], ['Chill', 30]], techs: ['Uncomfortable Question', 'Stretch Goal', 'You Can Do One More'], weak: 'People saying "I can\'t"', links: [LI],
+    icon: s => plusOneFlag(s, 12, 2) },
+  { id: 'baby', tag: '???', line: 'joins the party soon', tint: ['#2a2c38', '#1a1c26'], cls: 'Unknown (baby boy)',
+    bio: 'A new party member is on the way. Patch notes unavailable. Release date set by the customer.',
+    stats: [['Cuteness', 99], ['Volume', 95], ['Party Sleep', 2]], techs: ['Midnight Summon', 'Sleep Drain (all allies)', 'Instant Heart Melt'], weak: 'Nothing yet', links: [],
+    icon: s => { const c = [247, 212, 138]; s.rect(18, 4, 12, 3, c); s.rect(29, 6, 3, 9, c); s.rect(22, 14, 8, 3, c); s.rect(22, 16, 3, 6, c); s.rect(22, 26, 3, 3, c); } },
+];
+const byId = Object.fromEntries(CLASSES.map(c => [c.id, c]));
+
+// Pixelises a real serif at low resolution, which gives a chunky pixel-serif the Google catalogue lacks.
+function pixelText(lines, { size = 20, lh = 1.12, top = '#fff0c8', bot = '#e8b872', edge = '#2a1810', shadow = true, align = 'center', family = 'Bitter' }) {
+  const t = document.createElement('canvas').getContext('2d', { willReadFrequently: true });
+  const font = `800 ${size}px ${family}, Georgia, serif`;
+  t.font = font;
+  const w = Math.ceil(Math.max(...lines.map(l => t.measureText(l).width))) + 6, h = Math.ceil(lines.length * size * lh) + 7;
+  t.canvas.width = w; t.canvas.height = h;
+  t.font = font; t.fillStyle = '#fff'; t.textBaseline = 'alphabetic'; t.textAlign = align === 'center' ? 'center' : 'left';
+  lines.forEach((l, i) => t.fillText(l, align === 'center' ? w / 2 : 3, size * .95 + i * size * lh + 1));
+  const src = t.getImageData(0, 0, w, h).data, on = (x, y) => x >= 0 && y >= 0 && x < w && y < h && src[(y * w + x) * 4 + 3] > 105;
+  const s = new Sc(w, h), a = hex(top), b = hex(bot), e = hex(edge);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    if (on(x, y)) { const row = (y % (size * lh)) / (size * lh); s.set(x, y, row > .52 ? b : a); }
+    else if (on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1) || (shadow && (on(x - 1, y - 1) || on(x, y - 2) || on(x - 1, y - 2)))) s.set(x, y, e);
+  }
+  const c = s.canvas(); c.style.width = `calc(var(--k) * ${w}px)`; return c;
+}
+
+function frameTile(line = '#e0ae62', hi = '#f7d48a', dark = '#5e3e20') {
+  const s = new Sc(24, 24), L = hex(line), H_ = hex(hi), D = hex(dark);
+  for (let i = 0; i < 24; i++) { s.set(i, 1, H_); s.set(i, 2, L); s.set(i, 3, D); s.set(i, 22, D); s.set(i, 21, L); s.set(1, i, H_); s.set(2, i, L); s.set(3, i, D); s.set(22, i, D); s.set(21, i, L); }
+  [[0, 0], [17, 0], [0, 17], [17, 17]].forEach(([x, y]) => { for (let j = 1; j < 6; j++) for (let i = 1; i < 6; i++) s.set(x + i, y + j, (i + j) % 2 ? L : H_); s.set(x + 3, y + 3, [255, 245, 200]); });
+  return s.canvas().toDataURL();
+}
+const FRAME = frameTile();
+const applyFrame = el => { el.style.borderImageSource = `url(${FRAME})`; };
+document.querySelectorAll('.frame').forEach(applyFrame);
+
+const cardsEl = document.getElementById('cards');
+const scene = document.getElementById('scene'), lightC = document.getElementById('light');
+const ctx = scene.getContext('2d'), lg = lightC.getContext('2d');
+const stage = document.getElementById('stage');
+
+let current = 0, touched = false, swapT = -99, cam = 0;
+const mouse = { x: 0, y: 0, sx: 0, sy: 0 };
+const fx = [];
+
+function buildUI() {
+  document.getElementById('logo').append(pixelText(['ASK NACHO'], { size: 15, shadow: false }));
+  document.getElementById('label').append(pixelText(['Choose your Nacho'], { size: 10, shadow: false }));
+  const head = pixelText(['Ask Nacho to level up', 'your idea.'], { size: 19 });
+  document.getElementById('headline').append(head);
+  CLASSES.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.className = 'card frame'; applyFrame(b); b.setAttribute('aria-pressed', 'false');
+    b.style.background = `linear-gradient(${c.tint[0]},${c.tint[1]})`;
+    const ic = new Sc(48, 36); c.icon(ic); ic.outline();
+    const cv = ic.canvas(); cv.className = 'ic';
+    const tt = pixelText([c.tag], { size: 13, shadow: false }); tt.className = 'tt'; tt.style.width = tt.width * 1.5 + 'px';
+    const sm = document.createElement('small'); sm.textContent = c.line;
+    b.append(cv, tt, sm);
+    b.addEventListener('mouseenter', () => pick(i, true));
+    b.addEventListener('focus', () => pick(i, true));
+    b.addEventListener('click', () => pick(i, true));
+    cardsEl.append(b);
+  });
+  pick(0);
+}
+
+let audio;
+function blip() {
+  if (!touched) return;
+  try {
+    audio = audio || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audio.createOscillator(), g = audio.createGain();
+    o.type = 'triangle'; o.frequency.value = 660; g.gain.setValueAtTime(.05, audio.currentTime);
+    g.gain.exponentialRampToValueAtTime(.001, audio.currentTime + .12);
+    o.connect(g).connect(audio.destination); o.start(); o.stop(audio.currentTime + .12);
+  } catch (_) {}
+}
+
+function pick(i, byUser) {
+  if (byUser) touched = true;
+  if (i === current && document.getElementById('name').firstChild) return;
+  current = i;
+  const c = CLASSES[i];
+  [...cardsEl.children].forEach((el, n) => { el.classList.toggle('on', n === i); el.setAttribute('aria-pressed', n === i); });
+  const nm = document.getElementById('name'); nm.replaceChildren(pixelText([c.id === 'baby' ? '??? / Joins soon' : 'Nacho / ' + c.tag[0] + c.tag.slice(1).toLowerCase()], { size: 11, shadow: false }));
+  nm.setAttribute('aria-label', c.tag);
+  document.getElementById('cls').textContent = 'Class: ' + c.cls;
+  document.getElementById('bio').textContent = c.bio;
+  document.getElementById('stats').innerHTML = c.stats.map(([n, v]) => `<div class="stat"><span>${n}</span><div class="meter ${v < 25 ? 'low' : ''}"><i style="width:${v}%"></i></div><span>${v}</span></div>`).join('');
+  document.getElementById('techs').innerHTML = c.techs.map(t => `<li>${t}</li>`).join('');
+  document.getElementById('weak').innerHTML = `<b>Weak to:</b> ${c.weak}`;
+  document.getElementById('links').innerHTML = c.links.map(([l, h], n) => `<a class="cta ${n ? 'alt' : ''}" href="${h}" target="_blank" rel="noopener">${l}</a>`).join('');
+  swapT = tick;
+  if (stage.clientWidth < 720) cam = c.id === 'baby' || c.id === 'dad' ? 112 : 26;
+  const px = c.id === 'baby' ? 262 : 88;
+  for (let n = 0; n < 26; n++) fx.push({ x: px + (Math.random() - .5) * 34, y: 90 + (Math.random() - .5) * 50, vx: (Math.random() - .5) * .9, vy: -Math.random() * 1.1, life: 18 + Math.random() * 18, c: ['#fff0b0', '#f7d48a', '#ffffff'][n % 3] });
+  blip();
+}
+
+addEventListener('keydown', e => {
+  const d = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+  if (!d) return; e.preventDefault();
+  cardsEl.children[(current + d + CLASSES.length) % CLASSES.length].focus();
+});
+
+let tick = 0, VW = 427;
+function resize() {
+  const cssW = stage.clientWidth || stage.offsetWidth;
+  const dpr = devicePixelRatio || 1;
+  let k = Math.max(1.5, Math.round(cssW / 440 * dpr) / dpr);
+  if (cssW < 720) k = Math.round(cssW / 250 * 2) / 2;
+  if (cssW > 720) k = Math.min(k, Math.max(1.5, Math.floor(innerHeight * .5 / H * 2) / 2));
+  document.documentElement.style.setProperty('--k', k);
+  VW = Math.ceil(cssW / k);
+  scene.width = VW; scene.height = H;
+  lightC.width = Math.ceil(cssW / 2); lightC.height = Math.ceil(H * k / 2);
+  ctx.imageSmoothingEnabled = false;
+  cam = cssW < 720 ? 26 : 0;
+  scene.dataset.k = k;
+}
+
+function glow(g, x, y, r, col, a) {
+  const G = g.createRadialGradient(x, y, 0, x, y, r);
+  G.addColorStop(0, `rgba(${col},${a})`); G.addColorStop(.45, `rgba(${col},${a * .36})`); G.addColorStop(1, `rgba(${col},0)`);
+  g.fillStyle = G; g.fillRect(x - r, y - r, r * 2, r * 2);
+}
+
+const motes = (() => { const r = rng(61), a = []; for (let i = 0; i < 26; i++) a.push({ x: r() * 460, y: 70 + r() * 62, p: r() * 6.3, s: .3 + r() * .4 }); return a; })();
+const petals = (() => { const r = rng(17), a = []; for (let i = 0; i < 12; i++) a.push({ x: r() * 400, y: r() * 110, v: .12 + r() * .18, p: r() * 6.3 }); return a; })();
+
+function frame() {
+  tick++;
+  const t = tick;
+  mouse.sx += (mouse.x - mouse.sx) * .08; mouse.sy += (mouse.y - mouse.sy) * .08;
+  const off = d => -cam * (d >= 1 ? 1 : d) - Math.round(mouse.sx * d * 5);
+  const c = ctx;
+  const wind = Math.sin(t / 38);
+  c.clearRect(0, 0, VW, H);
+  c.drawImage(SKY, Math.round(off(.1)), 0);
+  for (const [x, y, p, big] of STARS) {
+    const on = Math.sin(t / 26 + p * 30) > -.3;
+    if (!on) continue;
+    c.fillStyle = big ? '#fff6d8' : 'rgba(230,226,255,.8)'; c.fillRect(x + off(.1), y, 1, 1);
+    if (big && Math.sin(t / 26 + p * 30) > .8) { c.fillRect(x + off(.1) - 1, y, 3, 1); c.fillRect(x + off(.1), y - 1, 1, 3); }
+  }
+  const drift = (t / 18) % W, drift2 = (t / 9) % W;
+  for (const ox of [-W, 0]) c.drawImage(CLOUD_FAR, Math.round(ox + drift + off(.2)), 0);
+  for (const ox of [-W, 0]) c.drawImage(CLOUD_NEAR, Math.round(ox + drift2 + off(.3)), 0);
+  c.drawImage(LAND, Math.round(off(.4)), 0);
+  for (const [x, y, p] of CITY_LIT) if (Math.sin(t / 34 + p * 40) < -.75) { c.fillStyle = '#64404a'; c.fillRect(x + Math.round(off(.4)), y, 1, 1); }
+  if (t % 4 < 2) { c.fillStyle = 'rgba(255,226,180,.7)'; for (let i = 0; i < 12; i++) { const x = 340 + ((i * 53 + (t >> 3) * 7) % 340); c.fillRect(x + Math.round(off(.4)), 88 + (i * 7) % 8, 3 + i % 3, 1); } }
+  c.drawImage(BUSH, Math.round(off(.6)) - 150, 0);
+
+  const gx = Math.round(off(1)) - Math.round(mouse.sx * 2);
+  c.drawImage(TREE, gx - 6, 0);
+  c.drawImage(GROUND, gx, 0);
+
+  const sel = CLASSES[current].id, id = sel === 'baby' ? 'dad' : sel;
+  c.drawImage(sprites.wife, gx + 140, 72);
+  c.drawImage(sprites.kid, gx + 197, 92);
+  c.drawImage(sprites.baby, gx + 242, 106);
+  if (id !== 'bard') c.drawImage(LEAN_GUITAR, gx + 8, 62);
+  if (id !== 'chef') c.drawImage(LEAN_KEYS, gx + 112, 92);
+
+  const hc = hero(id), by = 29, breathe = (t >> 4) & 1, cut = 72;
+  const hx = gx + 28;
+  c.fillStyle = 'rgba(14,10,24,.32)'; c.beginPath(); c.ellipse(hx + 60, 139, 30, 3.5, 0, 0, 7); c.fill();
+  c.drawImage(hc, 0, cut, hc.width, hc.height - cut, hx, by + cut, hc.width, hc.height - cut);
+  c.drawImage(hc, 0, 0, hc.width, cut, hx, by + breathe, hc.width, cut);
+
+  const fxx = gx + 306, fy = 127;
+  c.drawImage(LOGS, fxx - 17, fy);
+  for (let i = 0; i < 5; i++) fx.push({ x: 306 + (Math.random() - .5) * 15, y: fy + 7, vx: (Math.random() - .5) * .2 + wind * .08, vy: -.5 - Math.random() * .9, life: 10 + Math.random() * 16, flame: 1 });
+  if (t % 26 === 0) fx.push({ x: 306, y: fy - 8, vx: wind * .3, vy: -.6, life: 44, c: '#ffc070' });
+
+  c.drawImage(HEART, gx + 147, 72 + ((t >> 5) & 1));
+  c.drawImage(sel === 'baby' ? QMARK : BOTTLE, gx + 254, 80 + ((t >> 5) & 1));
+  c.fillStyle = '#fff4dc';
+  [[0, 0], [7, -6], [13, -11]].forEach(([a, b], i) => { if (((t >> 4) + i) % 4 === 3) return; const x = gx + 284 + a, y = 106 + b; c.fillRect(x, y, 3, 1); c.fillRect(x + 1, y + 1, 1, 1); c.fillRect(x, y + 2, 3, 1); });
+
+  for (const m of motes) {
+    const x = m.x + Math.sin(t / 44 + m.p) * 12, y = m.y + Math.cos(t / 37 + m.p) * 6, a = Math.sin(t / 22 + m.p * 3);
+    if (a > 0) { c.fillStyle = a > .7 ? '#fff6b0' : '#d8d86a'; c.fillRect(Math.round(x + gx), Math.round(y), 1, 1); }
+  }
+  for (let i = fx.length - 1; i >= 0; i--) {
+    const f = fx[i]; f.x += f.vx; f.y += f.vy; if (--f.life <= 0) { fx.splice(i, 1); continue; }
+    c.fillStyle = f.flame ? (f.life > 15 ? '#fff0a0' : f.life > 9 ? '#ffb040' : f.life > 4 ? '#f06828' : '#a83020') : f.c;
+    const sz = f.flame ? (f.life > 9 ? 3 : 2) : 1;
+    c.fillRect(Math.round(f.x + gx), Math.round(f.y), sz, sz);
+  }
+  for (const p of petals) {
+    p.x += p.v * .6; p.y += p.v + Math.sin(t / 20 + p.p) * .1; if (p.y > 130 || p.x > 460) { p.x = -10 + Math.random() * 180; p.y = -4; }
+    c.fillStyle = '#7e9648'; c.fillRect(Math.round(p.x + gx), Math.round(p.y), 2, 1);
+  }
+  const sway = Math.round(wind * 1.4);
+  c.drawImage(CANOPY_BACK, gx - 8 + sway, 0);
+  c.drawImage(CANOPY_FRONT, gx - 6 + Math.round(Math.sin(t / 27) * 2), 1);
+  c.drawImage(FORE, Math.round(off(1.4)) - Math.round(mouse.sx * 3), 0);
+  if (t - swapT < 5 && t > 5) { c.fillStyle = 'rgba(255,240,200,.26)'; c.fillRect(0, 0, VW, H); }
+
+  if (t % 2 === 0) {
+    const g = lg, sx = lightC.width / VW, sy = lightC.height / H;
+    g.clearRect(0, 0, lightC.width, lightC.height);
+    g.save(); g.globalAlpha = .28; g.filter = 'blur(5px)'; g.imageSmoothingEnabled = true; g.drawImage(scene, 0, 0, lightC.width, lightC.height); g.restore();
+    const sunX = (306 + off(.1)) * sx, sunY = 92 * sy;
+    glow(g, sunX, sunY, 150 * sx, '255,150,90', .5);
+    g.save(); g.globalCompositeOperation = 'lighter'; g.translate(sunX, sunY);
+    for (let i = 0; i < 6; i++) {
+      const a = Math.PI + .5 + i * .42 + Math.sin(t / 240 + i) * .04, len = 330 * sx, wid = 12 + i % 3 * 7;
+      g.save(); g.rotate(a); const G = g.createLinearGradient(0, 0, len, 0); G.addColorStop(0, 'rgba(255,190,130,.13)'); G.addColorStop(1, 'rgba(255,190,130,0)'); g.fillStyle = G;
+      g.beginPath(); g.moveTo(0, 0); g.lineTo(len, -wid * sx); g.lineTo(len, wid * sx); g.fill(); g.restore();
+    }
+    g.restore();
+    const fl = .72 + Math.sin(t / 3) * .08 + Math.sin(t / 7.3) * .08;
+    glow(g, (gx + 306) * sx, 130 * sy, 70 * sx * fl + 20 * sx, '255,134,52', .55 * fl);
+    if (id === 'dev') glow(g, (hx + 96) * sx, (by + 60) * sy, 40 * sx, '120,220,240', .4);
+    if (sel === 'baby') glow(g, (gx + 262) * sx, 118 * sy, 46 * sx, '200,226,255', .5);
+    else glow(g, (hx + 60) * sx, 90 * sy, 74 * sx, '255,226,170', .14);
+  }
+  requestAnimationFrame(frame);
+}
+
+stage.addEventListener('pointermove', e => {
+  const r = stage.getBoundingClientRect();
+  mouse.x = (e.clientX - r.left) / r.width * 2 - 1; mouse.y = (e.clientY - r.top) / r.height * 2 - 1;
+});
+addEventListener('resize', resize);
+
+function place() {
+  const copy = document.getElementById('hero-copy'), wrap = document.getElementById('copywrap');
+  if (innerWidth <= 720) { if (copy.parentNode !== wrap) wrap.append(copy); }
+  else if (copy.parentNode !== stage) stage.append(copy);
+}
+addEventListener('resize', place);
+
+Promise.race([document.fonts.load('800 21px Bitter'), new Promise(r => setTimeout(r, 1500))]).then(() => {
+  place(); resize(); buildUI(); resize();
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduced) { const cycle = setInterval(() => touched ? clearInterval(cycle) : pick((current + 1) % CLASSES.length), 4000); }
+  requestAnimationFrame(frame);
+});
+</script>
+</body>
+</html>
