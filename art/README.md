@@ -9,10 +9,14 @@ Generate in Pixellab, export, and ask Claude to wire it in.
 Build a sheet. `--canvas 72` centres every frame in a 72x72 cell, so sheets that swap in the same spot
 (breathing and walking) line up. Pixels are never resampled.
 
-    python3 tools/build_sheet.py stand  art/pixellab/anim/breathe --ms 200 --canvas 72
-    python3 tools/build_sheet.py walk   art/pixellab/anim/walk    --ms 200 --canvas 72
-    python3 tools/build_sheet.py guitar art/pixellab/anim/guitar  --ms 200 --canvas 72
-    python3 tools/build_sheet.py code   art/frames/code           --ms 200 --canvas 72
+Nacho is now drawn on a 64x64 Pixellab canvas; his sheets use 96x96 cells:
+
+    python3 tools/build_sheet.py stand  art/pixellab/anim/breathe64 --ms 200 --canvas 96
+    python3 tools/build_sheet.py code   art/pixellab/anim/code64    --ms 200 --canvas 96
+    python3 tools/build_sheet.py guitar art/pixellab/anim/guitar64  --ms 200 --canvas 96
+
+The older 48-pixel animations (breathe, walk, guitar, art/frames/code) are kept for reference. A 64-pixel
+walking animation is still to come; until then the intro breathes while it scrolls.
 
 Wife and daughter are single stills for now (`wife`, `girl`, 1 frame each); swap in their
 animations the same way when they exist.

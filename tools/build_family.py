@@ -53,9 +53,10 @@ for name in ('wife', 'girl'):
     cell.save(OUT / f'{name}.png')
     boxes[name] = cell.getbbox()
 nacho = Image.open(OUT / 'stand.png').convert('RGBA')
-boxes['nacho'] = nacho.crop((0, 0, 72, 72)).getbbox()
+boxes['nacho'] = nacho.crop((0, 0, 96, 96)).getbbox()  # 64-canvas Nacho in a 96 cell
 
-# Shadow sizes in Nacho's pixels: a bit wider than each figure's footprint at its scale in the scene.
-for name, (w, h) in {'nacho': (24, 4), 'wife': (18, 4), 'girl': (12, 3)}.items():
+# Shadow sizes in Nacho's pixels: a bit wider than each figure's footprint at its scale in the scene
+# (wife at full scale, daughter at half until she is regenerated on a 32x32 canvas).
+for name, (w, h) in {'nacho': (30, 5), 'wife': (30, 5), 'girl': (20, 3)}.items():
     shadow(w, h).save(OUT / f'shadow-{name}.png')
 print(json.dumps(boxes))

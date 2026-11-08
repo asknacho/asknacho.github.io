@@ -11,9 +11,9 @@
   var sea = seaCanvas.getContext('2d');
 
   var STEP_MS = 1000 / 12;      // low frame rate on purpose, like the 16-bit originals
-  // The backdrop is 416 pixels wide (tools/build_barcelona.py); effects use the same pixel grid.
+  // The backdrop is 544 pixels wide (tools/build_barcelona.py); effects use the same pixel grid.
   // Motion was tuned on the old 576-wide grid, so speeds and distances are scaled by K to look the same.
-  var CELL = 1586 / 416;        // art pixels per backdrop pixel
+  var CELL = 1586 / 544;        // art pixels per backdrop pixel
   var K = (1586 / 576) / CELL;
   var toCells = function (art) { return art / CELL; };
   var random = function (min, max) { return min + Math.random() * (max - min); };
