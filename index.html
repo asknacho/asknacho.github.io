@@ -54,10 +54,10 @@
       align-items: center;
       overflow: hidden;
     }
-    /* Greeting, typed like an old game; the last dot blinks like a cursor. It stays pinned to the top
-       of the screen while Nacho walks away from it. */
+    /* Greeting, typed like an old game; the last dot blinks like a cursor. It sits at the top of the
+       page (not the screen), so it scrolls away while Nacho walks down and away from it. */
     .greeting {
-      position: fixed;
+      position: absolute;
       top: max(28px, calc(env(safe-area-inset-top) + 16px));
       left: 0;
       right: 0;
@@ -267,7 +267,7 @@
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       // Intro: over the first screen of scrolling he walks from the middle of the screen down and off the
-      // bottom, away from the pinned greeting. He walks while the page moves and breathes when it stops.
+      // bottom, away from the greeting, which scrolls off the top with the page. He walks while the page moves and breathes when it stops.
       var intro = document.getElementById('intro');
       var introScene = document.querySelector('.scene--intro');
       var ticking = false, rest;
