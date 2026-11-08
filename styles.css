@@ -4,25 +4,61 @@
   padding: 0;
 }
 
+/* Day/night palette — --day is driven by the sun over Barcelona (see daylight.js).
+   1 = full daylight (paper white), 0 = night (soft dark). */
+@property --day {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+
 :root {
-  --bg: #0f172a;
-  --surface: #1e293b;
-  --surface-2: #263348;
-  --text: #f1f5f9;
-  --text-muted: #94a3b8;
+  --day: 1;
+
+  --paper: #f6f1e7;
+  --paper-surface: #fffcf6;
+  --paper-surface-2: #ece5d8;
+  --paper-text: #23201c;
+  --paper-muted: #6e665c;
+  --paper-line: rgba(35, 32, 28, 0.10);
+  --paper-line-strong: rgba(35, 32, 28, 0.20);
+  --paper-shadow: rgba(70, 50, 20, 0.10);
+
+  --dusk: #1e1d1b;
+  --dusk-surface: #282624;
+  --dusk-surface-2: #33302d;
+  --dusk-text: #ece6db;
+  --dusk-muted: #a39c91;
+  --dusk-line: rgba(255, 255, 255, 0.07);
+  --dusk-line-strong: rgba(255, 255, 255, 0.16);
+  --dusk-shadow: rgba(0, 0, 0, 0.45);
+
+  --mix: calc(var(--day) * 100%);
+  --bg:          color-mix(in oklab, var(--paper) var(--mix), var(--dusk));
+  --surface:     color-mix(in oklab, var(--paper-surface) var(--mix), var(--dusk-surface));
+  --surface-2:   color-mix(in oklab, var(--paper-surface-2) var(--mix), var(--dusk-surface-2));
+  --text:        color-mix(in oklab, var(--paper-text) var(--mix), var(--dusk-text));
+  --text-muted:  color-mix(in oklab, var(--paper-muted) var(--mix), var(--dusk-muted));
+  --line:        color-mix(in oklab, var(--paper-line) var(--mix), var(--dusk-line));
+  --line-strong: color-mix(in oklab, var(--paper-line-strong) var(--mix), var(--dusk-line-strong));
+  --shadow-color: color-mix(in oklab, var(--paper-shadow) var(--mix), var(--dusk-shadow));
+  --glass:       color-mix(in oklab, var(--bg) 85%, transparent);
+
   --indigo: #6366f1;
-  --indigo-light: #818cf8;
+  --indigo-light: color-mix(in oklab, #4f46e5 var(--mix), #818cf8);
   --pink: #ec4899;
-  --pink-light: #f472b6;
+  --pink-light: color-mix(in oklab, #db2777 var(--mix), #f472b6);
   --amber: #f59e0b;
-  --amber-light: #fbbf24;
+  --amber-light: color-mix(in oklab, #b45309 var(--mix), #fbbf24);
   --emerald: #10b981;
-  --emerald-light: #34d399;
+  --emerald-light: color-mix(in oklab, #047857 var(--mix), #34d399);
   --radius: 12px;
   --radius-lg: 20px;
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-  --shadow-hover: 0 8px 40px rgba(0, 0, 0, 0.6);
+  --shadow: 0 4px 24px var(--shadow-color);
+  --shadow-hover: 0 8px 40px var(--shadow-color);
   --transition: 0.25s ease;
+
+  transition: --day 3s ease;
 }
 
 html {
@@ -50,14 +86,14 @@ a {
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(15, 23, 42, 0.85);
+  background: var(--glass);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--line);
   transition: box-shadow var(--transition);
 }
 
 .nav.scrolled {
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 20px var(--shadow-color);
 }
 
 .nav__inner {
@@ -135,7 +171,7 @@ a {
 .hero__bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #1a0533 0%, #0f172a 40%, #0c0a2e 70%, #1a0533 100%);
+  background: transparent;
   z-index: -2;
 }
 
@@ -190,7 +226,7 @@ a {
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 800;
   letter-spacing: -1.5px;
-  background: linear-gradient(135deg, #fff 0%, var(--indigo-light) 50%, var(--pink-light) 100%);
+  background: linear-gradient(135deg, var(--text) 0%, var(--indigo-light) 50%, var(--pink-light) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -228,8 +264,8 @@ a {
   border-radius: 50px;
   font-size: 0.875rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
   transition: background var(--transition), transform var(--transition), border-color var(--transition);
 }
 
@@ -264,7 +300,7 @@ a {
 }
 
 .section--alt {
-  background: rgba(255, 255, 255, 0.02);
+  background: color-mix(in oklab, var(--surface) 40%, transparent);
 }
 
 .container {
@@ -337,7 +373,7 @@ a {
   border-radius: var(--radius);
   padding: 1.25rem 1rem;
   text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
   transition: transform var(--transition), box-shadow var(--transition);
 }
 
@@ -406,7 +442,7 @@ a {
   background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 1.75rem 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
   transition: transform var(--transition), box-shadow var(--transition);
 }
 
@@ -499,7 +535,7 @@ a {
   background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 1.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
   transition: transform var(--transition), box-shadow var(--transition);
   align-items: flex-start;
 }
@@ -639,7 +675,7 @@ a {
   background: var(--surface);
   border-radius: var(--radius-lg);
   padding: 1.75rem 2rem;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--line);
   min-width: 180px;
   transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
   text-align: center;
@@ -648,7 +684,7 @@ a {
 .contact__card:hover {
   transform: translateY(-4px);
   box-shadow: var(--shadow-hover);
-  border-color: rgba(255, 255, 255, 0.15);
+  border-color: var(--line-strong);
 }
 
 .contact__icon {
@@ -678,7 +714,7 @@ a {
 .footer {
   text-align: center;
   padding: 2rem 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--line);
   font-size: 0.85rem;
   color: var(--text-muted);
 }
@@ -711,10 +747,10 @@ a {
     left: 0;
     right: 0;
     flex-direction: column;
-    background: rgba(15, 23, 42, 0.98);
+    background: var(--bg);
     padding: 1rem 1.5rem 1.5rem;
     gap: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--line);
   }
 
   .nav__links.open {
