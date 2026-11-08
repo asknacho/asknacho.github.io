@@ -48,8 +48,8 @@
     }
     /* Full-screen scenes: Nacho breathing, then coding with his AI agent, then playing guitar. */
     .scene {
-      min-height: 100vh;
-      min-height: 100svh;
+      min-height: 55vh;
+      min-height: 55svh;
       display: grid;
       align-items: center;
       overflow: hidden;
@@ -76,16 +76,18 @@
     }
     .greeting .cursor.off { visibility: hidden; }
 
-    /* Intro, a parallax: Nacho walks down at half the scroll speed, so the page outruns him and he
+    /* Intro, a parallax: Nacho walks down at a fifth of the scroll speed, so the page outruns him and he
        drifts off the top of the screen just after the greeting, which scrolls at full speed. The scene is
-       1.5 screens tall so he never overlaps the next one; overflow stays visible so he is never clipped. */
-    .scene--intro { --scale: 5; position: relative; display: block; height: 150vh; height: 150svh; overflow: visible; }
+       0.8 screens tall; the stage stays a full screen so he starts centred, and overflow stays visible so
+       he is never clipped. At this speed he leaves before the next scene reaches him, even on phones. */
+    .scene--intro { --scale: 5; position: relative; display: block; height: 80vh; height: 80svh; overflow: visible; }
     .stage {
       height: 100vh;
       height: 100svh;
       display: grid;
       place-items: center;
     }
+    .sprite--stand { will-change: transform; }
     .scene--code { justify-items: start; padding-left: max(16px, 6vw); }
     .scene--guitar { justify-items: end; padding-right: max(16px, 6vw); }
 
@@ -267,17 +269,18 @@
     (function () {
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Intro: he walks down at half the scroll speed (parallax), so the page outruns him and he drifts
-      // off the top just after the greeting. He walks while the page moves and breathes when it stops.
+      // Intro: he walks down at a fifth of the scroll speed (parallax), so the page outruns him and he
+      // drifts off the top just after the greeting. He walks while the page moves and breathes when it
+      // stops. The position is set in the scroll event itself, not a frame later, and kept small: on
+      // iPhones the page scrolls on its own fast path, and any lag shows as a stutter on fast flicks.
       var intro = document.getElementById('intro');
-      var ticking = false, rest;
+      var rest;
       function sink() {
-        ticking = false;
-        intro.style.transform = 'translateY(' + (scrollY * 0.5).toFixed(1) + 'px)';
+        intro.style.transform = 'translate3d(0, ' + Math.round(scrollY * 0.2) + 'px, 0)';
       }
       if (!still) {
         addEventListener('scroll', function () {
-          if (!ticking) { ticking = true; requestAnimationFrame(sink); }
+          sink();
           intro.classList.add('is-walking');
           clearTimeout(rest);
           rest = setTimeout(function () { intro.classList.remove('is-walking'); }, 250);
