@@ -1,0 +1,8 @@
+{
+  "id": "guitar",
+  "image": "guitar.png",
+  "frameWidth": 52,
+  "frameHeight": 52,
+  "frames": 8,
+  "durationMs": 1200
+}
