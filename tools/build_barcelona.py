@@ -59,6 +59,20 @@ for x0 in range(955, 470, -75):
     region[replace] = piece[replace]
 art = Image.fromarray(a)
 
+# Traces of the original family on the grass: a grey mound and an orange smear (the wife and her
+# blanket roll), pale blanket patches and a brown smear (the girl's ponytail). Rebuild that stretch of
+# bushes and grass (x 590-850, below the sea) from the clean stretch just right of it, before the
+# houses and the clean stretch just left of it, alternating the two so no tile repeats next to itself.
+a = np.array(art)
+sources = [a[452:536, 852:938].copy(), a[452:536, 515:590].copy()]
+x0, i = 590, 0
+while x0 < 850:
+    tile = sources[i % 2]
+    x1 = min(850, x0 + tile.shape[1])
+    a[452:536, x0:x1] = tile[:, :x1 - x0]
+    x0, i = x1, i + 1
+art = Image.fromarray(a)
+
 # The sky. The page's own day/night background shows through it, so the city sits under whatever
 # sky the page has. Start from the scene app's sky mask (made for the fireworks), then:
 #  - fill everything it encloses (old title, sparkles, clouds), treating the top and right edges as open sky;
