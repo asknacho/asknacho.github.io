@@ -53,7 +53,7 @@
     }
     .scene--code { justify-items: start; padding-left: max(16px, 6vw); }
 
-    /* Sprite sheets: 8 frames in a row, drawn at a whole-number scale so pixels stay crisp. */
+    /* Sprite sheets: frames in a row, drawn at a whole-number scale so pixels stay crisp. */
     .sprite {
       --scale: 5;
       width: calc(var(--frame) * var(--scale));
@@ -62,13 +62,19 @@
     }
     .sprite img {
       display: block;
-      width: 800%;
+      width: calc(var(--frames) * 100%);
       height: 100%;
       image-rendering: pixelated;
-      animation: play var(--loop) steps(8) infinite;
+      animation: play var(--loop) steps(var(--frames)) infinite;
     }
-    .sprite--stand { --frame: 52px; --loop: 1.92s; }
-    .sprite--code  { --frame: 72px; --loop: 1.6s; }
+    .sprite--stand { --frame: 52px; --frames: 8; --loop: 1.92s; }
+    .sprite--code  { --frame: 72px; --frames: 8; --loop: 1.6s; }
+
+    /* While the page scrolls he walks; when it stops he breathes again. */
+    .sprite--stand .walk { display: none; }
+    .sprite--stand.is-walking { --frames: 4; --loop: 0.6s; }
+    .sprite--stand.is-walking .walk { display: block; }
+    .sprite--stand.is-walking .breathe { display: none; }
 
     @keyframes play {
       to { transform: translateX(-100%); }
@@ -153,7 +159,10 @@
   <main>
     <section class="scene scene--intro">
       <div class="stage">
-        <div class="sprite sprite--stand" id="intro"><img src="assets/stand.png" alt="Nacho standing and breathing" /></div>
+        <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks down as you scroll">
+          <img class="breathe" src="assets/stand.png" alt="" />
+          <img class="walk" src="assets/walk.png" alt="" />
+        </div>
       </div>
     </section>
     <section class="scene scene--code">
@@ -164,9 +173,9 @@
     (function () {
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Intro: move down at half the scroll speed, so he drifts off the top of the screen.
+      // Intro: walk down at half the scroll speed, so the page outruns him; breathe when it stops.
       var intro = document.getElementById('intro');
-      var ticking = false;
+      var ticking = false, rest;
       function sink() {
         ticking = false;
         intro.style.transform = 'translateY(' + (window.scrollY * 0.5).toFixed(1) + 'px)';
@@ -174,6 +183,9 @@
       if (!still) {
         addEventListener('scroll', function () {
           if (!ticking) { ticking = true; requestAnimationFrame(sink); }
+          intro.classList.add('is-walking');
+          clearTimeout(rest);
+          rest = setTimeout(function () { intro.classList.remove('is-walking'); }, 250);
         }, { passive: true });
         sink();
       }

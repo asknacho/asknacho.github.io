@@ -1,0 +1,8 @@
+{
+  "id": "walk",
+  "image": "walk.png",
+  "frameWidth": 52,
+  "frameHeight": 52,
+  "frames": 4,
+  "durationMs": 600
+}
