@@ -66,25 +66,17 @@
       height: 100%;
       image-rendering: pixelated;
     }
-    /* Every sheet uses 72x72 frames at 200 ms each. Frame counts are written out literally:
-       Safari ignores var() inside steps() and then slides the sheet instead of stepping it. */
+    /* Every sheet uses 72x72 frames at 200 ms each. Frames are advanced by script (see the end
+       of the page), not a CSS animation: iOS Safari can run transform animations on the GPU,
+       ignore steps(), and slide the sheet so halves of two frames show at once. */
     .sprite { --frame: 72px; }
-    .sprite--stand .breathe { width: 1300%; animation: play 2.6s steps(13) infinite; }
-    .sprite--stand .walk    { width: 800%;  animation: play 1.6s steps(8) infinite; }
-    .sprite--code img       { width: 800%;  animation: play 1.6s steps(8) infinite; }
-    .sprite--guitar img     { width: 1300%; animation: play 2.6s steps(13) infinite; }
+    .sprite img[data-frames="13"] { width: 1300%; }
+    .sprite img[data-frames="8"]  { width: 800%; }
 
     /* While the page scrolls he walks; when it stops he breathes again. */
     .sprite--stand .walk { display: none; }
     .sprite--stand.is-walking .walk { display: block; }
     .sprite--stand.is-walking .breathe { display: none; }
-
-    @keyframes play {
-      to { transform: translateX(-100%); }
-    }
-
-    /* The intro sprite sinks at half the scroll speed, so the page outruns him. */
-    .sprite--stand { will-change: transform; }
 
     /* Later scenes rise into view. */
     .reveal {
@@ -98,7 +90,6 @@
     @media (max-height: 360px) { .sprite { --scale: 3; } }
 
     @media (prefers-reduced-motion: reduce) {
-      .sprite img { animation: none; }
       .reveal { opacity: 1; transform: none; transition: none; }
     }
   </style>
@@ -163,16 +154,16 @@
     <section class="scene scene--intro">
       <div class="stage">
         <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks down as you scroll">
-          <img class="breathe" src="assets/stand.png" alt="" />
-          <img class="walk" src="assets/walk.png" alt="" />
+          <img class="breathe" src="assets/stand.png" data-frames="13" alt="" />
+          <img class="walk" src="assets/walk.png" data-frames="8" alt="" />
         </div>
       </div>
     </section>
     <section class="scene scene--code">
-      <div class="sprite sprite--code reveal"><img src="assets/code.png" alt="Nacho on his laptop, talking to an AI agent that codes for him" /></div>
+      <div class="sprite sprite--code reveal"><img src="assets/code.png" data-frames="8" alt="Nacho on his laptop, talking to an AI agent that codes for him" /></div>
     </section>
     <section class="scene scene--guitar">
-      <div class="sprite sprite--guitar reveal"><img src="assets/guitar.png" alt="Nacho sitting on the grass, playing guitar and singing" /></div>
+      <div class="sprite sprite--guitar reveal"><img src="assets/guitar.png" data-frames="13" alt="Nacho sitting on the grass, playing guitar and singing" /></div>
     </section>
   </main>
   <script>
@@ -195,6 +186,19 @@
         }, { passive: true });
         sink();
       }
+
+      // Sprite sheets: show one whole frame every 200 ms by moving the sheet a frame at a time.
+      var sheets = [].slice.call(document.querySelectorAll('.sprite img[data-frames]'));
+      var tick = 0;
+      function step() {
+        sheets.forEach(function (img) {
+          var n = +img.dataset.frames;
+          img.style.transform = 'translateX(' + (-(tick % n) * 100 / n) + '%)';
+        });
+        tick++;
+      }
+      step();
+      if (!still) setInterval(step, 200);
 
       // Later scenes: fade and rise in once they are on screen.
       var reveal = new IntersectionObserver(function (entries) {
