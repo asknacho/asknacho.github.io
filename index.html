@@ -54,11 +54,14 @@
       align-items: center;
       overflow: hidden;
     }
-    /* Greeting, typed like an old game; the last dot blinks like a cursor. It sits at the top of the
-       page (not the screen), so it scrolls away while Nacho walks down and away from it. */
+    /* Greeting, typed like an old game; the last dot blinks like a cursor. It sits just above Nacho's
+       head at the start, fixed to the page (not the screen), so it scrolls away while he walks down and
+       away from it. His head is 24 sprite pixels above the middle of the screen (art starts 12 px into
+       his 72 px cell), so the text sits one line plus a 6-pixel gap above that. */
     .greeting {
       position: absolute;
-      top: max(28px, calc(env(safe-area-inset-top) + 16px));
+      top: calc(50vh - var(--scale) * 30px - 1.4em);
+      top: calc(50svh - var(--scale) * 30px - 1.4em);
       left: 0;
       right: 0;
       z-index: 10;
@@ -75,7 +78,7 @@
 
     /* Intro: two screens tall. The stage sticks to the screen for the first one while Nacho walks down
        and off the bottom, away from the greeting; then the page moves on to the next scene. */
-    .scene--intro { display: block; height: 200vh; height: 200svh; overflow: visible; }  /* sticky needs visible */
+    .scene--intro { --scale: 5; position: relative; display: block; height: 200vh; height: 200svh; overflow: visible; }  /* sticky needs visible */
     .stage {
       position: sticky;
       top: 0;
@@ -120,8 +123,8 @@
     }
     .reveal.is-visible { opacity: 1; transform: none; }
 
-    @media (max-width: 420px), (max-height: 480px) { .sprite { --scale: 4; } }
-    @media (max-height: 360px) { .sprite { --scale: 3; } }
+    @media (max-width: 420px), (max-height: 480px) { .sprite, .scene--intro { --scale: 4; } }
+    @media (max-height: 360px) { .sprite, .scene--intro { --scale: 3; } }
 
     /* Finale: Barcelona, the sea and the Sagrada Familia (Nacho comes back here later).
        One scale for everything: --fs screen pixels per Nacho pixel; the backdrop is drawn at half that
@@ -230,8 +233,8 @@
 </head>
 <body>
   <main>
-    <h1 class="greeting">Hi! I'm Nacho..<span class="cursor" id="cursor" aria-hidden="true">.</span></h1>
     <section class="scene scene--intro">
+      <h1 class="greeting">Hi! I'm Nacho..<span class="cursor" id="cursor" aria-hidden="true">.</span></h1>
       <div class="stage">
         <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks away as you scroll">
           <img class="breathe" src="assets/stand.png" data-frames="13" alt="" />
