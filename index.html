@@ -20,7 +20,12 @@
       --day: 1;
       --paper: #f6f1e7;
       --dusk: #1e1d1b;
-  --ink: color-mix(in oklab, #23201c calc(var(--day) * 100%), #ece6db);
+  /* Text flips between near-black and near-white at the exact point where the background
+    gives both equal contrast (--day 0.462), so it never blends into the background. */
+  --ink-dark: #0d0b09;
+  --ink-light: #fffaf2;
+  --ink-mix: calc(clamp(0, (var(--day) - 0.462) * 1000, 1) * 100%);
+  --ink: color-mix(in srgb, var(--ink-dark) var(--ink-mix), var(--ink-light));
       --bg: color-mix(in oklab, var(--paper) calc(var(--day) * 100%), var(--dusk));
       transition: --day 3s ease;
     }
@@ -38,6 +43,8 @@
 
     body {
       background-color: var(--bg);
+      color: #0d0b09;
+      color: var(--ink);
     }
     /* Full-screen scenes: Nacho breathing, then coding with his AI agent, then playing guitar. */
     .scene {
