@@ -116,39 +116,35 @@
        One scale for everything: --fs screen pixels per Nacho pixel; the backdrop is drawn at half that
        (fs/2), as a distant layer, keeping the original picture's proportions between him and the city.
        fs is always a multiple of 4 so every pixel lands on whole screen pixels. The backdrop is 416x100
-       pixels, anchored on the city. */
+       pixels plus 30 rows of sky on top, anchored on the city. */
     .bcn {
       --fs: 4;
       --glow: clamp(0, 1 - max(var(--day) - 0.5, 0.5 - var(--day)) / 0.35, 1);  /* peaks at dawn and dusk */
       position: relative;
-      height: calc(50px * var(--fs) + clamp(140px, 32vh, 360px));
+      height: calc(65px * var(--fs));
       overflow: hidden;
       container-type: size;
-      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 35%);
-      mask-image: linear-gradient(to bottom, transparent, #000 35%);
     }
     .bcn-art {
       position: absolute;
       bottom: 0;
       width: calc(208px * var(--fs));
-      height: calc(50px * var(--fs));
+      height: calc(65px * var(--fs));
       left: calc((100cqw - 208px * var(--fs)) * 0.85);
+      /* The whole scene, its lighting included, fades in from transparent at the top, so it rises out
+         of the page background at any time of day instead of meeting it at an edge. The fade runs
+         through the 30 rows of sky added above the picture (23%), ending just above Nacho's head. */
+      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 23%);
+      mask-image: linear-gradient(to bottom, transparent, #000 23%);
     }
     .bcn-art > * { position: absolute; }
-    .bcn-backdrop, .bcn-skyfill {
+    .bcn-backdrop {
       filter: brightness(calc(0.8 + 0.35 * var(--day))) saturate(calc(0.8 + 0.3 * var(--day)));
     }
-    .bcn-backdrop {
-      inset: 0; width: 100%; height: 100%; image-rendering: pixelated;
-      /* The top rows melt into the plain sky above, so there is no edge. */
-      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%);
-      mask-image: linear-gradient(to bottom, transparent, #000 22%);
-    }
-    /* The backdrop starts just above Nacho's head; plain sky (the average of its top rows) continues above. */
-    .bcn-skyfill { left: 0; right: 0; bottom: 0; height: 100cqh; background: #393138; }
-    .bcn-sea { left: 30.288%; top: 61%; width: 51.442%; height: 16%; image-rendering: pixelated; }
-    .bcn-sky { left: 0; top: -45.115%; width: 100%; height: 260%; image-rendering: pixelated; }
-    .bcn-light { left: 0; right: 0; bottom: 0; height: 100cqh; pointer-events: none; }
+    .bcn-backdrop { inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+    .bcn-sea { left: 30.288%; top: 70%; width: 51.442%; height: 12.308%; image-rendering: pixelated; }
+    .bcn-sky { left: 0; top: -11.627%; width: 100%; height: 200%; image-rendering: pixelated; }
+    .bcn-light { inset: 0; pointer-events: none; }
     .bcn-light--noon  { background: linear-gradient(#cfe4ff, #fff6e0); mix-blend-mode: soft-light; opacity: calc(var(--day) * 0.55); }
     .bcn-light--glow  { background: linear-gradient(to top, #ff9a52, #ff6f7d 45%, transparent 80%); mix-blend-mode: soft-light; opacity: calc(var(--glow) * 0.65); }
     .bcn-light--night { background: #141c3d; mix-blend-mode: multiply; opacity: calc((1 - var(--day)) * 0.55); }
@@ -263,7 +259,6 @@
     </section>
     <section class="bcn" id="barcelona" aria-label="Nacho on a hill above Barcelona">
       <div class="bcn-art">
-        <div class="bcn-skyfill"></div>
         <img class="bcn-backdrop" src="assets/barcelona.png" alt="" />
         <canvas class="bcn-sea" width="214" height="16" data-mask="assets/barcelona-sea-mask.png" aria-hidden="true"></canvas>
         <div class="bcn-haze"></div>

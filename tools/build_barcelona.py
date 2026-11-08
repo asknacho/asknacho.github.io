@@ -67,7 +67,22 @@ OUT.mkdir(exist_ok=True)
 GRID = (416, 100)
 band = art.crop(CROP).convert('RGB').filter(ImageFilter.UnsharpMask(2, 80, 2))
 pixels = band.resize(GRID, Image.BOX).quantize(colors=48, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
-pixels.save(OUT / 'barcelona.png', optimize=True)
+
+# Headroom: the band starts just above Nacho's head, and the page fades the scene in from transparent
+# at the top. Add PAD rows of sky above it so the fade happens in open sky, never across his head.
+# Higher rows are the sky's typical colour (median of the band's top edge, so clouds and the tree
+# touching the edge leave no streaks or blocks); only the last few rows blend into the real top row,
+# so there is no seam. Same palette.
+PAD = 30
+edge = np.array(pixels.convert('RGB').crop((0, 0, GRID[0], 1))).astype(float)[0]
+soft = np.median(edge, axis=0)
+rows = [soft * (1 - (r / PAD) ** 10) + edge * (r / PAD) ** 10 for r in range(PAD)]
+sky = Image.fromarray(np.array(rows).round().astype(np.uint8)).quantize(palette=pixels, dither=Image.Dither.NONE)
+padded = Image.new('P', (GRID[0], GRID[1] + PAD))
+padded.putpalette(pixels.getpalette())
+padded.paste(sky, (0, 0))
+padded.paste(pixels, (0, PAD))
+padded.save(OUT / 'barcelona.png', optimize=True)
 scale = (CROP[2] - CROP[0]) / GRID[0]  # art pixels per backdrop pixel (3.8125)
 
 # Masks for the effects, resampled to the same grid. The sky grid covers the whole original art.
@@ -77,8 +92,7 @@ effects = json.loads((SRC / 'effects.json').read_text())
 sea = effects['sea']
 sea_box = [round(sea['x'] / scale), round((sea['y'] - CROP[1]) / scale), round(sea['width'] / scale), round(sea['height'] / scale)]
 Image.open(SRC / 'sea-mask.png').convert('RGBA').resize(sea_box[2:], Image.NEAREST).save(OUT / 'barcelona-sea-mask.png')
-top_sky = pixels.convert('RGB').crop((0, 0, GRID[0], 6)).resize((1, 1), Image.BOX).getpixel((0, 0))  # sky above the art
-meta = {'grid': GRID, 'artPerPixel': scale, 'crop': CROP, 'skyGrid': sky_grid, 'skyTop': -CROP[1] / scale,
-        'seaBox': sea_box, 'topSkyColour': '#%02x%02x%02x' % top_sky}
+meta = {'grid': [GRID[0], GRID[1] + PAD], 'padTop': PAD, 'artPerPixel': scale, 'crop': CROP, 'skyGrid': sky_grid,
+        'skyTop': PAD - CROP[1] / scale, 'seaBox': [sea_box[0], sea_box[1] + PAD, sea_box[2], sea_box[3]]}
 (OUT / 'barcelona.json').write_text(json.dumps(meta, indent=2) + '\n')
 print(meta)
