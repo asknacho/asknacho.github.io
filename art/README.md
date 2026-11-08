@@ -19,6 +19,6 @@ animations the same way when they exist.
 
 The Barcelona backdrop for the family scene is built from the old scene app's art:
 
-    python3 tools/build_barcelona.py   # -> assets/barcelona.webp, sky and sea masks, barcelona.json
+    python3 tools/build_barcelona.py   # -> assets/barcelona.png (416x100 pixel art), sky and sea masks, barcelona.json
 
 This writes `assets/<name>.png` and `assets/<name>.json` (frame size, frame count, loop length).

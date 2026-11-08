@@ -11,7 +11,10 @@
   var sea = seaCanvas.getContext('2d');
 
   var STEP_MS = 1000 / 12;      // low frame rate on purpose, like the 16-bit originals
-  var CELL = 1586 / 576;        // art pixels per sky-grid cell
+  // The backdrop is 416 pixels wide (tools/build_barcelona.py); effects use the same pixel grid.
+  // Motion was tuned on the old 576-wide grid, so speeds and distances are scaled by K to look the same.
+  var CELL = 1586 / 416;        // art pixels per backdrop pixel
+  var K = (1586 / 576) / CELL;
   var toCells = function (art) { return art / CELL; };
   var random = function (min, max) { return min + Math.random() * (max - min); };
   var pick = function (items) { return items[Math.floor(Math.random() * items.length)]; };
@@ -46,16 +49,16 @@
     sea.drawImage(seaMask, 0, 0);
     var water = sea.getImageData(0, 0, w, h).data;
     sea.clearRect(0, 0, w, h);
-    for (var tries = 0; glints.length < 80 && tries < 4000; tries++) {
+    for (var tries = 0; glints.length < 40 && tries < 4000; tries++) {
       var x = Math.floor(random(0, w)), y = Math.floor(random(0, h));
       if (!water[(y * w + x) * 4 + 3]) continue;
       glints.push({
         x: x, y: y,
-        length: Math.round(random(3, 11)),
+        length: Math.max(1, Math.round(random(3, 11) * K)),
         height: Math.random() < 0.25 ? 2 : 1,
         phase: random(0, Math.PI * 2),
         periodMs: random(3200, 7000),
-        drift: random(1.5, 4),
+        drift: random(1.5, 4) * K,
         alpha: random(0.1, 0.26),
         color: pick(GLINTS)
       });
@@ -67,7 +70,7 @@
   }
 
   function burst(r) {
-    var rings = r.willow ? [[30, 3.4]] : [[28, 4.4], [16, 2.5]];
+    var rings = r.willow ? [[30, 3.4 * K]] : [[28, 4.4 * K], [16, 2.5 * K]];
     rings.forEach(function (ring) {
       var twist = random(0, Math.PI);
       for (var i = 0; i < ring[0]; i++) {
@@ -78,7 +81,7 @@
           age: 0,
           life: r.willow ? Math.round(random(22, 30)) : Math.round(random(14, 20)),
           colors: r.colors,
-          gravity: r.willow ? 0.09 : 0.045
+          gravity: (r.willow ? 0.09 : 0.045) * K
         });
       }
     });
@@ -89,9 +92,9 @@
     var count = Math.round(random(3, 5));
     var birds = [];
     for (var i = 0; i < count; i++) {
-      birds.push({ dx: -dir * (i * random(7, 10)), dy: (i % 2 ? 1 : -1) * Math.ceil(i / 2) * random(3, 5), flap: Math.floor(random(0, 8)) });
+      birds.push({ dx: -dir * (i * random(7, 10) * K), dy: (i % 2 ? 1 : -1) * Math.ceil(i / 2) * random(3, 5) * K, flap: Math.floor(random(0, 8)) });
     }
-    flocks.push({ x: dir > 0 ? -12 : skyCanvas.width + 12, y: toCells(random(180, 330)), dir: dir, speed: random(1.1, 1.7), birds: birds, age: 0 });
+    flocks.push({ x: dir > 0 ? -12 : skyCanvas.width + 12, y: toCells(random(180, 330)), dir: dir, speed: random(1.1, 1.7) * K, birds: birds, age: 0 });
   }
 
   function advance(day) {
@@ -107,7 +110,7 @@
     flocks.forEach(function (f) { f.x += f.dir * f.speed; f.age++; });
     flocks = flocks.filter(function (f) { return f.dir > 0 ? f.x < width + 60 : f.x > -60; });
 
-    rockets.forEach(function (r) { r.y -= 3; if (r.y <= r.top) burst(r); });
+    rockets.forEach(function (r) { r.y -= 3 * K; if (r.y <= r.top) burst(r); });
     rockets = rockets.filter(function (r) { return r.y > r.top; });
 
     sparks.forEach(function (s) {
@@ -128,7 +131,7 @@
       f.birds.forEach(function (b, index) {
         var pose = (f.age + b.flap) % 8 < 4 ? BIRD_UP : BIRD_DOWN;
         var left = Math.round(f.x + b.dx);
-        var top = Math.round(f.y + b.dy + Math.sin((f.age + index * 5) / 11) * 2);
+        var top = Math.round(f.y + b.dy + Math.sin((f.age + index * 5) / 11) * 2 * K);
         pose.forEach(function (row, ry) {
           for (var rx = 0; rx < row.length; rx++) {
             if (row[rx] === 'x') c.fillRect(left + (f.dir > 0 ? rx : 4 - rx), top + ry, 1, 1);

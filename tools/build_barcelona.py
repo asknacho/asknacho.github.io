@@ -5,11 +5,12 @@
 Takes scene/public/sprites/background.png (the whole mockup page), applies the scene app's patches
 that hide the title and the baby's bubble, paints over the leftover sparkle and the yellow "excited"
 ticks with clean sky from the same rows, and crops the landscape band. Also copies the sky and sea
-masks used by the fireworks, birds and sea glints.
+masks used by the fireworks, birds and sea glints. The result is re-rendered as pixel art at
+half the characters' pixel size (see below), so backdrop and sprites read as one picture.
 """
 import json, shutil
 from pathlib import Path
-from PIL import Image
+from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / 'scene' / 'public' / 'sprites'
@@ -58,10 +59,26 @@ for x0 in range(955, 470, -75):
 art = Image.fromarray(a)
 
 OUT.mkdir(exist_ok=True)
-art.crop(CROP).convert('RGB').save(OUT / 'barcelona.webp', quality=92, method=6)  # painted art, lossy is invisible here
-shutil.copy(SRC / 'sky-mask.png', OUT / 'barcelona-sky-mask.png')
-shutil.copy(SRC / 'sea-mask.png', OUT / 'barcelona-sea-mask.png')
+
+# Re-render as real pixel art at a density that matches the characters. In the original art Nacho
+# stands ~355 px tall and his sprite is 46 px, so one sprite pixel is ~7.6 art pixels. The backdrop is
+# drawn at twice that density (one backdrop pixel = half a sprite pixel), as distant layers usually are:
+# 416x100 pixels, a light sharpen before averaging, then a 48-colour palette with no dithering.
+GRID = (416, 100)
+band = art.crop(CROP).convert('RGB').filter(ImageFilter.UnsharpMask(2, 80, 2))
+pixels = band.resize(GRID, Image.BOX).quantize(colors=48, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+pixels.save(OUT / 'barcelona.png', optimize=True)
+scale = (CROP[2] - CROP[0]) / GRID[0]  # art pixels per backdrop pixel (3.8125)
+
+# Masks for the effects, resampled to the same grid. The sky grid covers the whole original art.
+sky_grid = (GRID[0], round(992 / scale))
+Image.open(SRC / 'sky-mask.png').convert('RGBA').resize(sky_grid, Image.NEAREST).save(OUT / 'barcelona-sky-mask.png')
 effects = json.loads((SRC / 'effects.json').read_text())
-meta = {'art': [1586, 992], 'crop': CROP, 'skyGrid': [effects['grid']['width'], effects['grid']['height']], 'sea': effects['sea']}
+sea = effects['sea']
+sea_box = [round(sea['x'] / scale), round((sea['y'] - CROP[1]) / scale), round(sea['width'] / scale), round(sea['height'] / scale)]
+Image.open(SRC / 'sea-mask.png').convert('RGBA').resize(sea_box[2:], Image.NEAREST).save(OUT / 'barcelona-sea-mask.png')
+top_sky = pixels.convert('RGB').crop((0, 0, GRID[0], 6)).resize((1, 1), Image.BOX).getpixel((0, 0))  # sky above the art
+meta = {'grid': GRID, 'artPerPixel': scale, 'crop': CROP, 'skyGrid': sky_grid, 'skyTop': -CROP[1] / scale,
+        'seaBox': sea_box, 'topSkyColour': '#%02x%02x%02x' % top_sky}
 (OUT / 'barcelona.json').write_text(json.dumps(meta, indent=2) + '\n')
-print('barcelona.webp', art.crop(CROP).size, meta)
+print(meta)
