@@ -63,20 +63,19 @@
     }
     .sprite img {
       display: block;
-      width: calc(var(--frames) * 100%);
       height: 100%;
       image-rendering: pixelated;
-      animation: play var(--loop) steps(var(--frames)) infinite;
     }
-    /* Every sheet uses 72x72 frames; each loop runs at 200 ms per frame. */
+    /* Every sheet uses 72x72 frames at 200 ms each. Frame counts are written out literally:
+       Safari ignores var() inside steps() and then slides the sheet instead of stepping it. */
     .sprite { --frame: 72px; }
-    .sprite--stand  { --frames: 13; --loop: 2.6s; }
-    .sprite--code   { --frames: 8;  --loop: 1.6s; }
-    .sprite--guitar { --frames: 13; --loop: 2.6s; }
+    .sprite--stand .breathe { width: 1300%; animation: play 2.6s steps(13) infinite; }
+    .sprite--stand .walk    { width: 800%;  animation: play 1.6s steps(8) infinite; }
+    .sprite--code img       { width: 800%;  animation: play 1.6s steps(8) infinite; }
+    .sprite--guitar img     { width: 1300%; animation: play 2.6s steps(13) infinite; }
 
     /* While the page scrolls he walks; when it stops he breathes again. */
     .sprite--stand .walk { display: none; }
-    .sprite--stand.is-walking { --frames: 8; --loop: 1.6s; }
     .sprite--stand.is-walking .walk { display: block; }
     .sprite--stand.is-walking .breathe { display: none; }
 
