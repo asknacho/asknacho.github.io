@@ -17,6 +17,9 @@ Build a sheet. `--canvas 72` centres every frame in a 72x72 cell, so sheets that
 Wife and daughter are single stills for now (`wife`, `girl`, 1 frame each); swap in their
 animations the same way when they exist.
 
+`python3 tools/build_family.py` removes the grass mats from the wife and daughter stills, puts them in
+72x72 cells and draws the pixel contact shadows.
+
 The Barcelona backdrop for the family scene is built from the old scene app's art:
 
     python3 tools/build_barcelona.py   # -> assets/barcelona.png (416x100 pixel art), sky and sea masks, barcelona.json
