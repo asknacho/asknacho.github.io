@@ -35,6 +35,32 @@
     body {
       background-color: var(--bg);
     }
+    body {
+      display: grid;
+      place-items: center;
+    }
+
+    /* Nacho breathing: 16-frame sheet (209x358 per frame), one breath every 1.92s. */
+    .nacho {
+      width: min(209px, 45vh * 209 / 358);
+      aspect-ratio: 209 / 358;
+      overflow: hidden;
+    }
+
+    .nacho img {
+      display: block;
+      width: 1600%;
+      height: 100%;
+      animation: breathe 1.92s steps(16) infinite;
+    }
+
+    @keyframes breathe {
+      to { transform: translateX(-100%); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .nacho img { animation: none; }
+    }
   </style>
   <script>
     // Sets --day on <html> from the sun's height over Barcelona:
@@ -92,5 +118,9 @@
     })();
   </script>
 </head>
-<body></body>
+<body>
+  <div class="nacho">
+    <img src="assets/male.png" alt="Nacho" />
+  </div>
+</body>
 </html>
