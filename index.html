@@ -35,43 +35,62 @@
     body {
       background-color: var(--bg);
     }
-    body {
+    /* Two full-screen scenes: Nacho breathing, then Nacho coding with his AI agent. */
+    .scene {
+      min-height: 100vh;
+      min-height: 100svh;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+    }
+    /* Taller than the screen so the page has room to outrun him before the next scene. */
+    .scene--intro { display: block; min-height: 150vh; min-height: 150svh; overflow: visible; }
+    .stage {
+      height: 100vh;
+      height: 100svh;
       display: grid;
       place-items: center;
     }
+    .scene--code { justify-items: start; padding-left: max(16px, 6vw); }
 
-    /* Nacho: 8-frame sheets (52x52 per frame, 48px art). By day he stands and breathes,
-       at night he sits and plays guitar. Drawn at a whole-number scale to keep pixels crisp. */
-    .nacho {
+    /* Sprite sheets: 8 frames in a row, drawn at a whole-number scale so pixels stay crisp. */
+    .sprite {
       --scale: 5;
-      width: calc(52px * var(--scale));
-      height: calc(52px * var(--scale));
+      width: calc(var(--frame) * var(--scale));
+      height: calc(var(--frame) * var(--scale));
       overflow: hidden;
-      display: none;
     }
-
-    :root[data-pose="stand"] .nacho--stand,
-    :root[data-pose="guitar"] .nacho--guitar { display: block; }
-
-    .nacho img {
+    .sprite img {
       display: block;
       width: 800%;
       height: 100%;
       image-rendering: pixelated;
       animation: play var(--loop) steps(8) infinite;
     }
-
-    .nacho--stand { --loop: 1.92s; }
-    .nacho--guitar { --loop: 1.2s; }
+    .sprite--stand { --frame: 52px; --loop: 1.92s; }
+    .sprite--code  { --frame: 72px; --loop: 1.6s; }
 
     @keyframes play {
       to { transform: translateX(-100%); }
     }
 
-    @media (max-height: 420px) { .nacho { --scale: 3; } }
+    /* The intro sprite sinks at half the scroll speed, so the page outruns him. */
+    .sprite--stand { will-change: transform; }
+
+    /* The coding scene rises into view. */
+    .sprite--code {
+      opacity: 0;
+      transform: translateY(48px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+    .sprite--code.is-visible { opacity: 1; transform: none; }
+
+    @media (max-width: 420px), (max-height: 480px) { .sprite { --scale: 4; } }
+    @media (max-height: 360px) { .sprite { --scale: 3; } }
 
     @media (prefers-reduced-motion: reduce) {
-      .nacho img { animation: none; }
+      .sprite img { animation: none; }
+      .sprite--code { opacity: 1; transform: none; transition: none; }
     }
   </style>
   <script>
@@ -123,7 +142,6 @@
       function update() {
         var day = !isNaN(forced) ? Math.min(1, Math.max(0, forced)) : dayFactor(sunElevation(at || new Date()));
         document.documentElement.style.setProperty('--day', day.toFixed(3));
-      document.documentElement.dataset.pose = day > 0.5 ? 'stand' : 'guitar';
       }
 
       update();
@@ -132,7 +150,40 @@
   </script>
 </head>
 <body>
-  <div class="nacho nacho--stand"><img src="assets/stand.png" alt="Nacho standing" /></div>
-  <div class="nacho nacho--guitar"><img src="assets/guitar.png" alt="Nacho playing guitar" /></div>
+  <main>
+    <section class="scene scene--intro">
+      <div class="stage">
+        <div class="sprite sprite--stand" id="intro"><img src="assets/stand.png" alt="Nacho standing and breathing" /></div>
+      </div>
+    </section>
+    <section class="scene scene--code">
+      <div class="sprite sprite--code" id="coding"><img src="assets/code.png" alt="Nacho on his laptop, talking to an AI agent that codes for him" /></div>
+    </section>
+  </main>
+  <script>
+    (function () {
+      var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Intro: move down at half the scroll speed, so he drifts off the top of the screen.
+      var intro = document.getElementById('intro');
+      var ticking = false;
+      function sink() {
+        ticking = false;
+        intro.style.transform = 'translateY(' + (window.scrollY * 0.5).toFixed(1) + 'px)';
+      }
+      if (!still) {
+        addEventListener('scroll', function () {
+          if (!ticking) { ticking = true; requestAnimationFrame(sink); }
+        }, { passive: true });
+        sink();
+      }
+
+      // Coding: fade and rise in once it is on screen.
+      var coding = document.getElementById('coding');
+      new IntersectionObserver(function (entries, obs) {
+        if (entries[0].isIntersecting) { coding.classList.add('is-visible'); obs.disconnect(); }
+      }, { threshold: 0.35 }).observe(coding);
+    })();
+  </script>
 </body>
 </html>

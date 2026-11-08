@@ -1,0 +1,8 @@
+{
+  "id": "code",
+  "image": "code.png",
+  "frameWidth": 72,
+  "frameHeight": 72,
+  "frames": 8,
+  "durationMs": 1600
+}
