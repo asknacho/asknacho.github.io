@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ignacio Morales</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   <style>
     /* Day/night background — --day is driven by the sun over Barcelona (see daylight.js).
        1 = full daylight (paper white), 0 = night (soft dark). */
@@ -17,6 +20,7 @@
       --day: 1;
       --paper: #f6f1e7;
       --dusk: #1e1d1b;
+  --ink: color-mix(in oklab, #23201c calc(var(--day) * 100%), #ece6db);
       --bg: color-mix(in oklab, var(--paper) calc(var(--day) * 100%), var(--dusk));
       transition: --day 3s ease;
     }
@@ -43,6 +47,18 @@
       align-items: center;
       overflow: hidden;
     }
+    /* Greeting above Nacho, typed like an old game; the last dot blinks like a cursor. */
+    .hero { display: grid; justify-items: center; gap: 28px; }
+    .greeting {
+      font-family: 'Press Start 2P', ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: clamp(11px, 4.4vw, 22px);
+      line-height: 1.4;
+      color: var(--ink);
+      white-space: nowrap;
+      text-align: center;
+    }
+    .greeting .cursor.off { visibility: hidden; }
+
     /* Taller than the screen so the page has room to outrun him before the next scene. */
     .scene--intro { display: block; min-height: 150vh; min-height: 150svh; overflow: visible; }
     .stage {
@@ -153,9 +169,12 @@
   <main>
     <section class="scene scene--intro">
       <div class="stage">
+        <div class="hero" id="hero">
+        <p class="greeting">Hi! I'm Nacho..<span class="cursor" id="cursor">.</span></p>
         <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks down as you scroll">
           <img class="breathe" src="assets/stand.png" data-frames="13" alt="" />
           <img class="walk" src="assets/walk.png" data-frames="8" alt="" />
+        </div>
         </div>
       </div>
     </section>
@@ -172,10 +191,11 @@
 
       // Intro: walk down at half the scroll speed, so the page outruns him; breathe when it stops.
       var intro = document.getElementById('intro');
+      var hero = document.getElementById('hero');
       var ticking = false, rest;
       function sink() {
         ticking = false;
-        intro.style.transform = 'translateY(' + (window.scrollY * 0.5).toFixed(1) + 'px)';
+        hero.style.transform = 'translateY(' + (window.scrollY * 0.5).toFixed(1) + 'px)';
       }
       if (!still) {
         addEventListener('scroll', function () {
@@ -199,6 +219,10 @@
       }
       step();
       if (!still) setInterval(step, 200);
+
+      // The last dot blinks twice a second, like the cursor in an old text box.
+      var cursor = document.getElementById('cursor');
+      if (!still) setInterval(function () { cursor.classList.toggle('off'); }, 500);
 
       // Later scenes: fade and rise in once they are on screen.
       var reveal = new IntersectionObserver(function (entries) {
