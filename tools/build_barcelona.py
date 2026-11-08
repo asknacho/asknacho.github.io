@@ -61,10 +61,10 @@ art = Image.fromarray(a)
 OUT.mkdir(exist_ok=True)
 
 # Re-render as real pixel art at a density that matches the characters. In the original art Nacho
-# stands ~355 px tall and his 64-canvas sprite is 61 px, so one sprite pixel is ~5.8 art pixels. The
-# backdrop is drawn at twice that density (one backdrop pixel = half a sprite pixel), as distant layers
-# usually are: 544x130 pixels, a light sharpen before averaging, then a 48-colour palette, no dithering.
-GRID = (544, 130)
+# stands ~355 px tall and his sprite is 46 px, so one sprite pixel is ~7.6 art pixels. The backdrop is
+# drawn at twice that density (one backdrop pixel = half a sprite pixel), as distant layers usually are:
+# 416x100 pixels, a light sharpen before averaging, then a 48-colour palette with no dithering.
+GRID = (416, 100)
 band = art.crop(CROP).convert('RGB').filter(ImageFilter.UnsharpMask(2, 80, 2))
 pixels = band.resize(GRID, Image.BOX).quantize(colors=48, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
 pixels.save(OUT / 'barcelona.png', optimize=True)

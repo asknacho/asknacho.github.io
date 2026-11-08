@@ -79,7 +79,7 @@
 
     /* Sprite sheets: frames in a row, drawn at a whole-number scale so pixels stay crisp. */
     .sprite {
-      --scale: 4;
+      --scale: 5;
       width: calc(var(--frame) * var(--scale));
       height: calc(var(--frame) * var(--scale));
       overflow: hidden;
@@ -89,12 +89,17 @@
       height: 100%;
       image-rendering: pixelated;
     }
-    /* Nacho's sheets (64-pixel art) use 96x96 frames, the family stills 72x72; 200 ms per frame. Frames are advanced by script (see the end
+    /* Every sheet uses 72x72 frames at 200 ms each. Frames are advanced by script (see the end
        of the page), not a CSS animation: iOS Safari can run transform animations on the GPU,
        ignore steps(), and slide the sheet so halves of two frames show at once. */
-    .sprite { --frame: 96px; }
+    .sprite { --frame: 72px; }
     .sprite img[data-frames="13"] { width: 1300%; }
-    .sprite img[data-frames="9"]  { width: 900%; }
+    .sprite img[data-frames="8"]  { width: 800%; }
+
+    /* While the page scrolls he walks; when it stops he breathes again. */
+    .sprite--stand .walk { display: none; }
+    .sprite--stand.is-walking .walk { display: block; }
+    .sprite--stand.is-walking .breathe { display: none; }
 
     /* Later scenes rise into view. */
     .reveal {
@@ -104,18 +109,19 @@
     }
     .reveal.is-visible { opacity: 1; transform: none; }
 
-    @media (max-width: 420px), (max-height: 520px) { .sprite { --scale: 3; } }
-    @media (max-height: 380px) { .sprite { --scale: 2; } }
+    @media (max-width: 420px), (max-height: 480px) { .sprite { --scale: 4; } }
+    @media (max-height: 360px) { .sprite { --scale: 3; } }
 
     /* Finale: Nacho, his wife and daughter in front of Barcelona, the sea and the Sagrada Familia.
-       One scale for everything: --fs screen pixels per character pixel. Nacho (61 px tall) and his wife
-       (seated, 46 px: about three quarters of him) share that grid. The backdrop is drawn at half the
-       pixel size (fs/2), as a distant layer, and so is his daughter until she is regenerated on a 32x32
-       canvas. The backdrop is 544x130 pixels, anchored on the city. */
+       One scale for everything: --fs screen pixels per character pixel. Nacho's sprite pixels are fs,
+       the backdrop and his wife are drawn at half that (fs/2) and his daughter at a quarter (fs/4),
+       which keeps real-life proportions: seated, she is half his height. fs is always a multiple of 4
+       so every pixel lands on whole screen pixels. The backdrop is 416x100 pixels, anchored on the city. */
     .bcn {
+      --fs: 4;
       --glow: clamp(0, 1 - max(var(--day) - 0.5, 0.5 - var(--day)) / 0.35, 1);  /* peaks at dawn and dusk */
       position: relative;
-      height: calc(65px * var(--fs) + clamp(140px, 32vh, 360px));
+      height: calc(50px * var(--fs) + clamp(140px, 32vh, 360px));
       overflow: hidden;
       container-type: size;
       -webkit-mask-image: linear-gradient(to bottom, transparent, #000 35%);
@@ -124,9 +130,9 @@
     .bcn-art {
       position: absolute;
       bottom: 0;
-      width: calc(272px * var(--fs));
-      height: calc(65px * var(--fs));
-      left: calc((100cqw - 272px * var(--fs)) * 0.85);
+      width: calc(208px * var(--fs));
+      height: calc(50px * var(--fs));
+      left: calc((100cqw - 208px * var(--fs)) * 0.85);
     }
     .bcn-art > * { position: absolute; }
     .bcn-backdrop, .bcn-skyfill {
@@ -139,9 +145,9 @@
       mask-image: linear-gradient(to bottom, transparent, #000 22%);
     }
     /* The backdrop starts just above Nacho's head; plain sky (the average of its top rows) continues above. */
-    .bcn-skyfill { left: 0; right: 0; bottom: 0; height: 100cqh; background: #393038; }
-    .bcn-sea { left: 30.331%; top: 61.538%; width: 51.471%; height: 16.154%; image-rendering: pixelated; }
-    .bcn-sky { left: 0; top: -45.382%; width: 100%; height: 261.538%; image-rendering: pixelated; }
+    .bcn-skyfill { left: 0; right: 0; bottom: 0; height: 100cqh; background: #393138; }
+    .bcn-sea { left: 30.288%; top: 61%; width: 51.442%; height: 16%; image-rendering: pixelated; }
+    .bcn-sky { left: 0; top: -45.115%; width: 100%; height: 260%; image-rendering: pixelated; }
     .bcn-light { left: 0; right: 0; bottom: 0; height: 100cqh; pointer-events: none; }
     .bcn-light--noon  { background: linear-gradient(#cfe4ff, #fff6e0); mix-blend-mode: soft-light; opacity: calc(var(--day) * 0.55); }
     .bcn-light--glow  { background: linear-gradient(to top, #ff9a52, #ff6f7d 45%, transparent 80%); mix-blend-mode: soft-light; opacity: calc(var(--glow) * 0.65); }
@@ -149,22 +155,22 @@
 
     /* Family. It sits inside the backdrop, under the same light, haze and colour as the city, so day,
        dusk and night grade everyone together. Positions are in Nacho's pixels (fs), measured from where
-       his art starts, which lines up with the page gutter (numbers from tools/build_family.py):
-       Nacho's 96 cell has his art at x 28-65 with 18 px under his feet; the wife's 72 cell 21-52 with 13
-       under; the daughter's 72 cell 15-55 with 16 under, drawn at half scale. Grass line: 4 px up. */
+       his art starts, which lines up with the page gutter. Cells are 72x72 with air around the art
+       (tools/build_family.py): Nacho x 23-50 with 14 px under his feet; wife 21-52 with 13 under, drawn
+       at half scale; daughter 15-55 with 16 under, at a quarter. The grass line is 3 px up. */
     .bcn-family {
-      left: calc(max(16px, 6vw) - (100cqw - 272px * var(--fs)) * 0.85);
+      left: calc(max(16px, 6vw) - (100cqw - 208px * var(--fs)) * 0.85);
       bottom: 0;
     }
     .bcn-family > * { position: absolute; }
-    .bcn-family .sprite--nacho { --scale: var(--fs);                         left: calc(-28px * var(--fs));   bottom: calc((4 - 18) * var(--fs) * 1px); }
-    .bcn-family .sprite--wife  { --scale: var(--fs);           --frame: 72px; left: calc(18px * var(--fs));    bottom: calc((4 - 13) * var(--fs) * 1px); }
-    .bcn-family .sprite--girl  { --scale: calc(var(--fs) / 2); --frame: 72px; left: calc(64.5px * var(--fs));  bottom: calc((4 - 8) * var(--fs) * 1px); }
+    .bcn-family .sprite--nacho { --scale: var(--fs);           left: calc(-23px * var(--fs));    bottom: calc((3 - 14) * var(--fs) * 1px); }
+    .bcn-family .sprite--wife  { --scale: calc(var(--fs) / 2); left: calc(18.5px * var(--fs));   bottom: calc((3 - 6.5) * var(--fs) * 1px); }
+    .bcn-family .sprite--girl  { --scale: calc(var(--fs) / 4); left: calc(42.25px * var(--fs));  bottom: calc((3 - 4) * var(--fs) * 1px); }
     /* Pixel contact shadows on Nacho's grid, centred under each figure on the grass line. */
     .bcn-shadow { image-rendering: pixelated; }
-    .bcn-shadow--nacho { left: calc(3.5px * var(--fs));  bottom: calc(1.5px * var(--fs)); width: calc(30px * var(--fs)); height: calc(5px * var(--fs)); }
-    .bcn-shadow--wife  { left: calc(39.5px * var(--fs)); bottom: calc(1.5px * var(--fs)); width: calc(30px * var(--fs)); height: calc(5px * var(--fs)); }
-    .bcn-shadow--girl  { left: calc(72px * var(--fs));   bottom: calc(2.5px * var(--fs)); width: calc(20px * var(--fs)); height: calc(3px * var(--fs)); }
+    .bcn-shadow--nacho { left: calc(1.5px * var(--fs));  bottom: calc(1px * var(--fs));   width: calc(24px * var(--fs)); height: calc(4px * var(--fs)); }
+    .bcn-shadow--wife  { left: calc(27.75px * var(--fs)); bottom: calc(1px * var(--fs));  width: calc(18px * var(--fs)); height: calc(4px * var(--fs)); }
+    .bcn-shadow--girl  { left: calc(45px * var(--fs));   bottom: calc(1.5px * var(--fs)); width: calc(12px * var(--fs)); height: calc(3px * var(--fs)); }
 
     /* Aerial perspective: the far city and sea sit behind a thin haze in the sky's colour, strongest at
        the horizon and gone by the foreground grass, so the family reads as closer. */
@@ -177,14 +183,10 @@
     }
     .sprite img[data-frames="1"] { width: 100%; }
 
-    /* Smallest scale that makes the 272-pixel-wide backdrop cover the screen: 3 on phones (the family
-       fits in 92 of Nacho's pixels), then even values so the half-size backdrop pixels stay whole. */
-    .bcn { --fs: 3; }
-    @media (min-width: 817px)  { .bcn { --fs: 4; } }
-    @media (min-width: 1089px) { .bcn { --fs: 6; } }
-    @media (min-width: 1633px) { .bcn { --fs: 8; } }
-    @media (min-width: 2177px) { .bcn { --fs: 10; } }
-    @media (min-width: 2721px) { .bcn { --fs: 12; } }
+    /* Smallest multiple of 4 that makes the 208-pixel-wide backdrop cover the screen. */
+    @media (min-width: 833px)  { .bcn { --fs: 8; } }
+    @media (min-width: 1665px) { .bcn { --fs: 12; } }
+    @media (min-width: 2497px) { .bcn { --fs: 16; } }
 
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; transform: none; transition: none; }
@@ -252,12 +254,15 @@
       <div class="stage">
         <div class="hero" id="hero">
         <p class="greeting">Hi! I'm Nacho..<span class="cursor" id="cursor">.</span></p>
-        <div class="sprite sprite--stand" id="intro"><img src="assets/stand.png" data-frames="13" alt="Nacho, standing and breathing" /></div>
+        <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks down as you scroll">
+          <img class="breathe" src="assets/stand.png" data-frames="13" alt="" />
+          <img class="walk" src="assets/walk.png" data-frames="8" alt="" />
+        </div>
         </div>
       </div>
     </section>
     <section class="scene scene--code">
-      <div class="sprite sprite--code reveal"><img src="assets/code.png" data-frames="9" alt="Nacho on his laptop, talking to an AI agent that codes for him" /></div>
+      <div class="sprite sprite--code reveal"><img src="assets/code.png" data-frames="8" alt="Nacho on his laptop, talking to an AI agent that codes for him" /></div>
     </section>
     <section class="scene scene--guitar">
       <div class="sprite sprite--guitar reveal"><img src="assets/guitar.png" data-frames="13" alt="Nacho sitting on the grass, playing guitar and singing" /></div>
@@ -266,7 +271,7 @@
       <div class="bcn-art">
         <div class="bcn-skyfill"></div>
         <img class="bcn-backdrop" src="assets/barcelona.png" alt="" />
-        <canvas class="bcn-sea" width="280" height="21" data-mask="assets/barcelona-sea-mask.png" aria-hidden="true"></canvas>
+        <canvas class="bcn-sea" width="214" height="16" data-mask="assets/barcelona-sea-mask.png" aria-hidden="true"></canvas>
         <div class="bcn-haze"></div>
         <div class="bcn-family">
           <img class="bcn-shadow bcn-shadow--nacho" src="assets/shadow-nacho.png" alt="" />
@@ -279,19 +284,19 @@
         <div class="bcn-light bcn-light--noon"></div>
         <div class="bcn-light bcn-light--glow"></div>
         <div class="bcn-light bcn-light--night"></div>
-        <canvas class="bcn-sky" width="544" height="340" data-mask="assets/barcelona-sky-mask.png" aria-hidden="true"></canvas>
+        <canvas class="bcn-sky" width="416" height="260" data-mask="assets/barcelona-sky-mask.png" aria-hidden="true"></canvas>
       </div>
     </section>
   </main>
-  <script src="assets/barcelona.js?v=3" defer></script>
+  <script src="assets/barcelona.js?v=2" defer></script>
   <script>
     (function () {
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Intro: he sinks at half the scroll speed, so the page outruns him. (A walk cycle plays here
-      // again once there is a 64-pixel walking animation to match the new breathing one.)
+      // Intro: walk down at half the scroll speed, so the page outruns him; breathe when it stops.
+      var intro = document.getElementById('intro');
       var hero = document.getElementById('hero');
-      var ticking = false;
+      var ticking = false, rest;
       function sink() {
         ticking = false;
         hero.style.transform = 'translateY(' + (window.scrollY * 0.5).toFixed(1) + 'px)';
@@ -299,6 +304,9 @@
       if (!still) {
         addEventListener('scroll', function () {
           if (!ticking) { ticking = true; requestAnimationFrame(sink); }
+          intro.classList.add('is-walking');
+          clearTimeout(rest);
+          rest = setTimeout(function () { intro.classList.remove('is-walking'); }, 250);
         }, { passive: true });
         sink();
       }
