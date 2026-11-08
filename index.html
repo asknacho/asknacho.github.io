@@ -112,6 +112,65 @@
     @media (max-width: 420px), (max-height: 480px) { .sprite { --scale: 4; } }
     @media (max-height: 360px) { .sprite { --scale: 3; } }
 
+    /* Finale: Nacho, his wife and daughter in front of Barcelona, the sea and the Sagrada Família.
+       The backdrop is anchored on the city and covers the section; its lighting follows --day. */
+    .bcn {
+      --fs: 5;  /* family scale: screen pixels per art pixel */
+      --glow: clamp(0, 1 - max(var(--day) - 0.5, 0.5 - var(--day)) / 0.35, 1);  /* peaks at dawn and dusk */
+      position: relative;
+      height: clamp(480px, 85vh, 860px);
+      height: clamp(480px, 85svh, 860px);
+      overflow: hidden;
+      container-type: size;
+      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 38%);
+      mask-image: linear-gradient(to bottom, transparent, #000 38%);
+    }
+    .bcn-art {
+      position: absolute;
+      bottom: 0;
+      aspect-ratio: 1586 / 380;
+      width: max(100cqw, 100cqh * 4.1737);
+      left: calc((100cqw - max(100cqw, 100cqh * 4.1737)) * 0.85);
+    }
+    .bcn-art > * { position: absolute; }
+    .bcn-art img {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      filter: brightness(calc(0.8 + 0.35 * var(--day))) saturate(calc(0.8 + 0.3 * var(--day)));
+    }
+    .bcn-sea { left: 30.265%; top: 61.053%; width: 51.45%; height: 16.316%; image-rendering: pixelated; }
+    .bcn-sky { left: 0; top: -45.263%; width: 100%; height: 261.053%; image-rendering: pixelated; }
+    .bcn-light { inset: 0; pointer-events: none; }
+    .bcn-light--noon  { background: linear-gradient(#cfe4ff, #fff6e0); mix-blend-mode: soft-light; opacity: calc(var(--day) * 0.55); }
+    .bcn-light--glow  { background: linear-gradient(to top, #ff9a52, #ff6f7d 55%, transparent); mix-blend-mode: soft-light; opacity: calc(var(--glow) * 0.65); }
+    .bcn-light--night { background: #141c3d; mix-blend-mode: multiply; opacity: calc((1 - var(--day)) * 0.55); }
+
+    .bcn-family {
+      position: absolute;
+      display: flex;
+      align-items: flex-end;
+      /* Cells have 23 art px of air left of Nacho and 13 below the feet: line the art up, not the cells. */
+      left: calc(max(16px, 6vw) - 23px * var(--fs));
+      bottom: calc(clamp(10px, 4cqh, 32px) - 13px * var(--fs));
+      filter: brightness(calc(0.72 + 0.28 * var(--day))) saturate(calc(0.85 + 0.15 * var(--day))) sepia(calc(var(--glow) * 0.2));
+    }
+    .bcn-family .sprite { --scale: var(--fs); }
+    .bcn-family .sprite--wife { margin-left: calc(-34px * var(--fs)); }
+    /* Pixellab drew the daughter at a bigger scale (her head is wider than Nacho's shoulders), so she
+       is shown at 60%: an exact 3x on desktop. Her cell also has 14 art px of air under her, not 13. */
+    .bcn-family .sprite--girl {
+      --scale: calc(var(--fs) * 0.6);
+      margin-left: calc(-23px * var(--fs));
+      margin-bottom: calc(4.6px * var(--fs));
+    }
+    .sprite img[data-frames="1"] { width: 100%; }
+
+    @media (min-width: 1600px) { .bcn { --fs: 6; } }
+    @media (max-width: 900px) { .bcn { --fs: 4; } }
+    @media (max-width: 560px) { .bcn { --fs: 3; } }
+    @media (max-width: 370px) { .bcn { --fs: 2; } }
+
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; transform: none; transition: none; }
     }
@@ -191,7 +250,23 @@
     <section class="scene scene--guitar">
       <div class="sprite sprite--guitar reveal"><img src="assets/guitar.png" data-frames="13" alt="Nacho sitting on the grass, playing guitar and singing" /></div>
     </section>
+    <section class="bcn" id="barcelona" aria-label="Nacho with his wife and daughter on a hill above Barcelona">
+      <div class="bcn-art">
+        <img src="assets/barcelona.webp" alt="" />
+        <canvas class="bcn-sea" width="816" height="62" data-mask="assets/barcelona-sea-mask.png" aria-hidden="true"></canvas>
+        <div class="bcn-light bcn-light--noon"></div>
+        <div class="bcn-light bcn-light--glow"></div>
+        <div class="bcn-light bcn-light--night"></div>
+        <canvas class="bcn-sky" width="576" height="360" data-mask="assets/barcelona-sky-mask.png" aria-hidden="true"></canvas>
+      </div>
+      <div class="bcn-family">
+        <div class="sprite sprite--nacho"><img src="assets/stand.png" data-frames="13" alt="Nacho" /></div>
+        <div class="sprite sprite--wife"><img src="assets/wife.png" data-frames="1" alt="His wife, sitting on the grass" /></div>
+        <div class="sprite sprite--girl"><img src="assets/girl.png" data-frames="1" alt="His daughter, lying on her belly, chin in her hands" /></div>
+      </div>
+    </section>
   </main>
+  <script src="assets/barcelona.js?v=1" defer></script>
   <script>
     (function () {
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;

@@ -1,0 +1,8 @@
+{
+  "id": "wife",
+  "image": "wife.png",
+  "frameWidth": 72,
+  "frameHeight": 72,
+  "frames": 1,
+  "durationMs": 200
+}
