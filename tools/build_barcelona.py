@@ -6,7 +6,8 @@ Takes scene/public/sprites/background.png (the whole mockup page), applies the s
 that hide the title and the baby's bubble, paints over the leftover sparkle and the yellow "excited"
 ticks with clean sky from the same rows, and crops the landscape band. Also copies the sky and sea
 masks used by the fireworks, birds and sea glints. The result is re-rendered as pixel art at
-half the characters' pixel size (see below), so backdrop and sprites read as one picture.
+half the characters' pixel size (see below), so backdrop and sprites read as one picture, and the sky
+is cut out (transparent) so the page's own day/night background becomes the sky.
 """
 import json, shutil
 from pathlib import Path
@@ -58,6 +59,38 @@ for x0 in range(955, 470, -75):
     region[replace] = piece[replace]
 art = Image.fromarray(a)
 
+# The sky. The page's own day/night background shows through it, so the city sits under whatever
+# sky the page has. Start from the scene app's sky mask (made for the fireworks), then:
+#  - fill everything it encloses (old title, sparkles, clouds), treating the top and right edges as open sky;
+#  - the old bottle bubble at the horizon, and clouds touching the tree or the hill, by place and colour;
+#  - the Tibidabo hill: traced per column (it is blue-grey, the sky purple) and kept with its tower;
+#  - any leftover island that never reaches the ground.
+from scipy import ndimage as ndi
+HORIZON = 404
+W, H = art.size
+yy, xx = np.mgrid[0:H, 0:W]
+mask = np.array(Image.open(SRC / 'sky-mask.png').convert('RGBA').split()[3].resize(art.size, Image.NEAREST)) > 127
+sky = ndi.binary_fill_holes(np.pad(mask, ((1, 0), (0, 1)), constant_values=True))[1:, :-1]
+sky |= (xx >= 836) & (xx < 960) & (yy >= 300) & (yy < HORIZON)
+rgb = np.array(art)[..., :3].astype(int)
+lum = rgb @ [.3, .59, .11]
+hillish = (rgb[..., 2] - rgb[..., 1] < 14) & (lum < 120)
+hill_top = np.full(W, HORIZON)
+for x in range(1390, W):
+    ys = np.nonzero(hillish[285:HORIZON, x])[0]
+    if len(ys):
+        hill_top[x] = 285 + ys[0]
+hill_top[1390:] = ndi.median_filter(hill_top[1390:], size=25, mode='nearest')
+tower = (xx >= 1480) & (xx < 1545) & (yy >= 270) & (yy < 350) & (rgb[..., 0] > 140) & (rgb[..., 1] > 110)
+hill = (xx >= 1390) & (yy >= hill_top[None, :]) & (yy < HORIZON)
+sky &= ~(hill | tower)
+sky |= (xx >= 1390) & (yy < hill_top[None, :]) & ~tower
+cloud = (rgb[..., 0] > 140) & (lum > 115) & (rgb[..., 0] >= rgb[..., 2])
+sky |= cloud & (yy < HORIZON) & ((xx < 600) | ((xx > 1400) & (yy < 285)))
+labels, _ = ndi.label(~sky)
+grounded = np.unique(labels[HORIZON:][~sky[HORIZON:]])
+sky |= ~sky & ~np.isin(labels, grounded)
+
 OUT.mkdir(exist_ok=True)
 
 # Re-render as real pixel art at a density that matches the characters. In the original art Nacho
@@ -68,21 +101,20 @@ GRID = (416, 100)
 band = art.crop(CROP).convert('RGB').filter(ImageFilter.UnsharpMask(2, 80, 2))
 pixels = band.resize(GRID, Image.BOX).quantize(colors=48, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
 
-# Headroom: the band starts just above Nacho's head, and the page fades the scene in from transparent
-# at the top. Add PAD rows of sky above it so the fade happens in open sky, never across his head.
-# Higher rows are the sky's typical colour (median of the band's top edge, so clouds and the tree
-# touching the edge leave no streaks or blocks); only the last few rows blend into the real top row,
-# so there is no seam. Same palette.
-PAD = 30
-edge = np.array(pixels.convert('RGB').crop((0, 0, GRID[0], 1))).astype(float)[0]
-soft = np.median(edge, axis=0)
-rows = [soft * (1 - (r / PAD) ** 10) + edge * (r / PAD) ** 10 for r in range(PAD)]
-sky = Image.fromarray(np.array(rows).round().astype(np.uint8)).quantize(palette=pixels, dither=Image.Dither.NONE)
-padded = Image.new('P', (GRID[0], GRID[1] + PAD))
-padded.putpalette(pixels.getpalette())
-padded.paste(sky, (0, 0))
-padded.paste(pixels, (0, PAD))
-padded.save(OUT / 'barcelona.png', optimize=True)
+# Cut the sky out at the backdrop's pixel size: a backdrop pixel is sky if most of its art pixels are.
+sky_px = np.array(Image.fromarray((sky[CROP[1]:CROP[3], CROP[0]:CROP[2]] * 255).astype(np.uint8)).resize(GRID, Image.BOX)) >= 128
+out = np.array(pixels.convert('RGBA'))
+out[sky_px] = 0
+# Edge pixels that averaged in some of the old purple sky (much bluer than green) would show as a fringe
+# on the page's plain sky. Strip them where they touch the cut-out, twice to catch two-pixel fringes.
+for _ in range(2):
+    clear = out[..., 3] == 0
+    touching = np.zeros_like(clear)
+    touching[1:] |= clear[:-1]; touching[:-1] |= clear[1:]; touching[:, 1:] |= clear[:, :-1]; touching[:, :-1] |= clear[:, 1:]
+    c = out[..., :3].astype(int)
+    purple = (c[..., 2] - c[..., 1] >= 14) & (c[..., 0] >= c[..., 1])
+    out[touching & ~clear & purple] = 0
+Image.fromarray(out).save(OUT / 'barcelona.png', optimize=True)
 scale = (CROP[2] - CROP[0]) / GRID[0]  # art pixels per backdrop pixel (3.8125)
 
 # Masks for the effects, resampled to the same grid. The sky grid covers the whole original art.
@@ -92,7 +124,7 @@ effects = json.loads((SRC / 'effects.json').read_text())
 sea = effects['sea']
 sea_box = [round(sea['x'] / scale), round((sea['y'] - CROP[1]) / scale), round(sea['width'] / scale), round(sea['height'] / scale)]
 Image.open(SRC / 'sea-mask.png').convert('RGBA').resize(sea_box[2:], Image.NEAREST).save(OUT / 'barcelona-sea-mask.png')
-meta = {'grid': [GRID[0], GRID[1] + PAD], 'padTop': PAD, 'artPerPixel': scale, 'crop': CROP, 'skyGrid': sky_grid,
-        'skyTop': PAD - CROP[1] / scale, 'seaBox': [sea_box[0], sea_box[1] + PAD, sea_box[2], sea_box[3]]}
+meta = {'grid': GRID, 'artPerPixel': scale, 'crop': CROP, 'skyGrid': sky_grid, 'skyTop': -CROP[1] / scale,
+        'seaBox': sea_box, 'transparentSky': True}
 (OUT / 'barcelona.json').write_text(json.dumps(meta, indent=2) + '\n')
 print(meta)

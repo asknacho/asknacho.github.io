@@ -116,12 +116,11 @@
        One scale for everything: --fs screen pixels per Nacho pixel; the backdrop is drawn at half that
        (fs/2), as a distant layer, keeping the original picture's proportions between him and the city.
        fs is always a multiple of 4 so every pixel lands on whole screen pixels. The backdrop is 416x100
-       pixels plus 30 rows of sky on top, anchored on the city. */
+       pixels with its sky cut out: the page's own day/night background is the sky. */
     .bcn {
       --fs: 4;
-      --glow: clamp(0, 1 - max(var(--day) - 0.5, 0.5 - var(--day)) / 0.35, 1);  /* peaks at dawn and dusk */
       position: relative;
-      height: calc(65px * var(--fs));
+      height: calc(50px * var(--fs));
       overflow: hidden;
       container-type: size;
     }
@@ -129,47 +128,39 @@
       position: absolute;
       bottom: 0;
       width: calc(208px * var(--fs));
-      height: calc(65px * var(--fs));
+      height: calc(50px * var(--fs));
       left: calc((100cqw - 208px * var(--fs)) * 0.85);
-      /* The whole scene, its lighting included, fades in from transparent at the top, so it rises out
-         of the page background at any time of day instead of meeting it at an edge. The fade runs
-         through the 30 rows of sky added above the picture (23%), ending just above Nacho's head. */
-      -webkit-mask-image: linear-gradient(to bottom, transparent, #000 23%);
-      mask-image: linear-gradient(to bottom, transparent, #000 23%);
     }
-    .bcn-art > * { position: absolute; }
-    .bcn-backdrop {
-      filter: brightness(calc(0.8 + 0.35 * var(--day))) saturate(calc(0.8 + 0.3 * var(--day)));
-    }
+    .bcn-art > *, .bcn-graded > * { position: absolute; }
+    /* Day, dusk and night grading: one colour matrix (#bcn-grade, set from --day by the script at the
+       end of the page) over the city, sea and Nacho together. A filter only touches real pixels, so the
+       transparent sky stays the page background. Fireworks sit outside it: they make their own light. */
+    .bcn-graded { inset: 0; filter: url(#bcn-grade); }
     .bcn-backdrop { inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
-    .bcn-sea { left: 30.288%; top: 70%; width: 51.442%; height: 12.308%; image-rendering: pixelated; }
-    .bcn-sky { left: 0; top: -11.627%; width: 100%; height: 200%; image-rendering: pixelated; }
-    .bcn-light { inset: 0; pointer-events: none; }
-    .bcn-light--noon  { background: linear-gradient(#cfe4ff, #fff6e0); mix-blend-mode: soft-light; opacity: calc(var(--day) * 0.55); }
-    .bcn-light--glow  { background: linear-gradient(to top, #ff9a52, #ff6f7d 45%, transparent 80%); mix-blend-mode: soft-light; opacity: calc(var(--glow) * 0.65); }
-    .bcn-light--night { background: #141c3d; mix-blend-mode: multiply; opacity: calc((1 - var(--day)) * 0.55); }
+    .bcn-sea { left: 30.288%; top: 61%; width: 51.442%; height: 16%; image-rendering: pixelated; }
+    .bcn-sky { left: 0; top: -45.115%; width: 100%; height: 260%; image-rendering: pixelated; }
 
-    /* Nacho sits inside the backdrop, under the same light, haze and colour as the city, so day, dusk
-       and night grade him with it. Positions are in his pixels (fs), measured from where his art starts,
-       which lines up with the page gutter: in his 72x72 cell the art spans x 23-50 with 14 px under his
-       feet. The grass line is 3 px up. */
+    /* Nacho, positioned in his pixels (fs) from where his art starts, which lines up with the page
+       gutter: in his 72x72 cell the art spans x 23-50 with 14 px under his feet. Grass line: 3 px up. */
     .bcn-family {
       left: calc(max(16px, 6vw) - (100cqw - 208px * var(--fs)) * 0.85);
       bottom: 0;
     }
     .bcn-family > * { position: absolute; }
-    .bcn-family .sprite--nacho { --scale: var(--fs);           left: calc(-23px * var(--fs));    bottom: calc((3 - 14) * var(--fs) * 1px); }
+    .bcn-family .sprite--nacho { --scale: var(--fs); left: calc(-23px * var(--fs)); bottom: calc((3 - 14) * var(--fs) * 1px); }
     /* Pixel contact shadow on Nacho's grid, centred under him on the grass line. */
     .bcn-shadow { image-rendering: pixelated; }
-    .bcn-shadow--nacho { left: calc(1.5px * var(--fs));  bottom: calc(1px * var(--fs));   width: calc(24px * var(--fs)); height: calc(4px * var(--fs)); }
+    .bcn-shadow--nacho { left: calc(1.5px * var(--fs)); bottom: calc(1px * var(--fs)); width: calc(24px * var(--fs)); height: calc(4px * var(--fs)); }
 
-    /* Aerial perspective: the far city and sea sit behind a thin haze in the sky's colour, strongest at
-       the horizon and gone by the foreground grass, so Nacho reads as closer. */
+    /* Aerial perspective: a thin haze over the far city and sea, strongest at the horizon and gone by
+       the foreground grass, so Nacho reads as closer. Clipped to the backdrop's pixels (not the sky). */
     .bcn-haze {
-      left: 0; right: 0; top: 0; bottom: 0;
+      inset: 0;
       background: linear-gradient(to bottom, transparent 15%, var(--haze) 58%, var(--haze) 66%, transparent 88%);
       --haze: color-mix(in oklab, #e6e0ee calc(var(--day) * 100%), #262b48);
       opacity: 0.28;
+      -webkit-mask: url(assets/barcelona.png) 0 0 / 100% 100%;
+      mask: url(assets/barcelona.png) 0 0 / 100% 100%;
       pointer-events: none;
     }
 
@@ -258,17 +249,21 @@
       <div class="sprite sprite--guitar reveal"><img src="assets/guitar.png" data-frames="13" alt="Nacho sitting on the grass, playing guitar and singing" /></div>
     </section>
     <section class="bcn" id="barcelona" aria-label="Nacho on a hill above Barcelona">
+      <svg width="0" height="0" aria-hidden="true" focusable="false" style="position: absolute">
+        <filter id="bcn-grade" color-interpolation-filters="sRGB">
+          <feColorMatrix id="bcn-grade-matrix" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" />
+        </filter>
+      </svg>
       <div class="bcn-art">
-        <img class="bcn-backdrop" src="assets/barcelona.png" alt="" />
-        <canvas class="bcn-sea" width="214" height="16" data-mask="assets/barcelona-sea-mask.png" aria-hidden="true"></canvas>
-        <div class="bcn-haze"></div>
-        <div class="bcn-family">
-          <img class="bcn-shadow bcn-shadow--nacho" src="assets/shadow-nacho.png" alt="" />
-          <div class="sprite sprite--nacho"><img src="assets/stand.png" data-frames="13" alt="Nacho" /></div>
+        <div class="bcn-graded">
+          <img class="bcn-backdrop" src="assets/barcelona.png" alt="" />
+          <canvas class="bcn-sea" width="214" height="16" data-mask="assets/barcelona-sea-mask.png" aria-hidden="true"></canvas>
+          <div class="bcn-haze"></div>
+          <div class="bcn-family">
+            <img class="bcn-shadow bcn-shadow--nacho" src="assets/shadow-nacho.png" alt="" />
+            <div class="sprite sprite--nacho"><img src="assets/stand.png" data-frames="13" alt="Nacho" /></div>
+          </div>
         </div>
-        <div class="bcn-light bcn-light--noon"></div>
-        <div class="bcn-light bcn-light--glow"></div>
-        <div class="bcn-light bcn-light--night"></div>
         <canvas class="bcn-sky" width="416" height="260" data-mask="assets/barcelona-sky-mask.png" aria-hidden="true"></canvas>
       </div>
     </section>
@@ -312,6 +307,32 @@
       // The last dot blinks twice a second, like the cursor in an old text box.
       var cursor = document.getElementById('cursor');
       if (!still) setInterval(function () { cursor.classList.toggle('off'); }, 500);
+
+      // Barcelona grading from --day: bright and neutral by day, warm around dawn and dusk, dark and
+      // blue at night. Per-channel gains times a saturation matrix, written into #bcn-grade.
+      var gradeMatrix = document.getElementById('bcn-grade-matrix');
+      function grade() {
+        var d = parseFloat(document.documentElement.style.getPropertyValue('--day'));
+        if (isNaN(d)) d = 1;
+        var glow = Math.max(0, Math.min(1, 1 - Math.abs(d - 0.5) / 0.35));
+        var dayGain = [1.06, 1.05, 1.04], nightGain = [0.5, 0.55, 0.8], duskGain = [1.1, 0.86, 0.72];
+        var gain = [0, 1, 2].map(function (i) {
+          var g = nightGain[i] + (dayGain[i] - nightGain[i]) * d;
+          return g + (duskGain[i] - g) * glow * 0.5;
+        });
+        var s = 0.7 + 0.3 * d + 0.1 * glow;
+        var sat = [
+          [0.213 + 0.787 * s, 0.715 - 0.715 * s, 0.072 - 0.072 * s],
+          [0.213 - 0.213 * s, 0.715 + 0.285 * s, 0.072 - 0.072 * s],
+          [0.213 - 0.213 * s, 0.715 - 0.715 * s, 0.072 + 0.928 * s]
+        ];
+        var rows = sat.map(function (row, i) {
+          return row.map(function (v) { return (v * gain[i]).toFixed(4); }).join(' ') + ' 0 0';
+        });
+        gradeMatrix.setAttribute('values', rows.join('  ') + '  0 0 0 1 0');
+      }
+      grade();
+      setInterval(grade, 60000);
 
       // Later scenes: fade and rise in once they are on screen.
       var reveal = new IntersectionObserver(function (entries) {
