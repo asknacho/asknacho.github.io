@@ -146,8 +146,15 @@ export function Scene() {
   return (
     <main className="page">
       <h1 className="visually-hidden">
-        Ask Nacho to level up your idea. Ignacio Morales, senior software engineer and friendly side-quest enthusiast in Barcelona.
+        Ask Nacho to level up your idea. Ignacio Morales, engineering manager and hands-on software engineer in Barcelona.
       </h1>
+      <nav className="scene-nav" aria-label="Quick links">
+        <p>Engineering manager · Barcelona</p>
+        <a href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">LinkedIn →</a>
+        <a href="https://github.com/asknacho" target="_blank" rel="noopener">GitHub →</a>
+        <a href="https://scorepace.com" target="_blank" rel="noopener">Play ScorePace →</a>
+        <p className="scene-nav__hint">Select a character or card to explore.</p>
+      </nav>
       {phone ? (
         <>
           <div className="slice slice--static" style={sliceStyle([225, 6, 560, 84])} />

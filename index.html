@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ignacio Morales</title>
+  <title>Ignacio Morales · Engineering Manager</title>
+  <meta name="description" content="Engineering manager in Barcelona. Leading teams, shipping useful software, and building ScorePace." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
@@ -76,6 +77,23 @@
     }
     .greeting .cursor.off { visibility: hidden; }
 
+    .intro-copy {
+      position: absolute;
+      top: calc(50svh + var(--scale) * 24px);
+      left: 16px;
+      right: 16px;
+      z-index: 10;
+      margin: auto;
+      max-width: 34rem;
+      text-align: center;
+      font: 17px/1.6 ui-sans-serif, system-ui, sans-serif;
+    }
+    .intro-copy p { margin-bottom: 12px; }
+    .intro-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 24px; }
+    .intro-links a { padding: 6px 0; }
+    .scene--intro { min-height: 640px; }
+    .scene--code { scroll-margin-top: 24px; }
+
     /* Intro, a parallax: Nacho walks down at a fifth of the scroll speed, so the page outruns him and he
        drifts off the top of the screen just after the greeting, which scrolls at full speed. The scene is
        0.8 screens tall; the stage stays a full screen so he starts centred, and overflow stays visible so
@@ -106,22 +124,28 @@
       .scene--guitar .panel { order: 0; }
     }
 
-    /* Info next to each character: no box, just the greeting's pixel font in the page ink, small and
-       airy. Secondary lines are softer; links are plain underlined text. */
+    /* Keep pixel headings, with readable body text for the longer story. */
     .panel {
-      --muted: color-mix(in oklab, var(--ink) 62%, var(--bg));
+      --muted: color-mix(in oklab, var(--ink) 78%, var(--bg));
       color: var(--ink);
-      font-family: 'Press Start 2P', ui-monospace, 'SF Mono', Menlo, monospace;
-      font-size: 11px;
-      line-height: 2;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 17px;
+      line-height: 1.65;
       transition-delay: 0.15s;
     }
-    .panel h2 { font-size: clamp(13px, 2vw, 15px); font-weight: 400; line-height: 1.6; margin-bottom: 18px; }
-    .panel-tag { color: var(--muted); margin-bottom: 6px; }
+    .panel h2 { font-family: 'Press Start 2P', ui-monospace, monospace; font-size: clamp(13px, 2vw, 15px); font-weight: 400; line-height: 1.6; margin-bottom: 18px; }
+    .panel-tag { color: var(--muted); margin-bottom: 10px; font: 11px/1.6 'Press Start 2P', ui-monospace, monospace; }
     .panel p { margin-bottom: 18px; }
     .quests { list-style: none; display: grid; gap: 16px; margin-bottom: 20px; }
     .quest-meta, .quest-what { color: var(--muted); }
-    /* A teammate's words: indented with a soft rule, same pixel font, attribution softer. */
+    .highlights { padding-left: 20px; margin-bottom: 20px; }
+    .highlights li + li { margin-top: 8px; }
+    .career { margin-bottom: 22px; }
+    .career summary { cursor: pointer; padding: 8px 0; text-decoration: underline; text-underline-offset: 4px; }
+    .career summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+    .career[open] summary { margin-bottom: 12px; }
+    .quest-role { font-weight: 650; }
+    /* A teammate's words, with softer attribution. */
     .kudos { margin: 4px 0 22px; padding-left: 14px; border-left: 3px solid color-mix(in oklab, var(--ink) 35%, transparent); }
     .kudos p { margin-bottom: 6px; }
     .kudos footer { color: var(--muted); }
@@ -154,10 +178,11 @@
 
     /* Later scenes rise into view. */
     .reveal {
-      opacity: 0;
-      transform: translateY(48px);
+      opacity: 1;
+      transform: none;
       transition: opacity 0.8s ease, transform 0.8s ease;
     }
+    .reveal.is-pending { opacity: 0; transform: translateY(24px); }
     .reveal.is-visible { opacity: 1; transform: none; }
 
     @media (max-width: 420px), (max-height: 480px) { .sprite, .scene--intro { --scale: 4; } }
@@ -278,41 +303,56 @@
           <img class="walk" src="assets/walk.png" data-frames="8" alt="" />
         </div>
       </div>
+      <div class="intro-copy">
+        <p>Engineering manager in Barcelona.<br />Building teams and useful things.</p>
+        <nav class="intro-links" aria-label="Quick links">
+          <a class="panel-link" href="#work">Explore my work ↓</a>
+          <a class="panel-link" href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">Connect on LinkedIn →</a>
+        </nav>
+      </div>
     </section>
-    <section class="scene scene--code">
+    <section class="scene scene--code" id="work">
       <div class="sprite sprite--code reveal"><img src="assets/code.png" data-frames="8" alt="Nacho on his laptop, talking to an AI agent that codes for him" /></div>
       <article class="panel reveal" aria-labelledby="dev-title">
         <p class="panel-tag">Quest log</p>
         <h2 id="dev-title">Engineering manager</h2>
         <p>Leading engineering teams in Barcelona since 2021. Hands-on, people first.</p>
-        <ol class="quests">
-          <li>
-            <div class="quest-role">Engineering Manager</div>
-            <div class="quest-meta">G2 · 2026 – now</div>
-            <div class="quest-what">Runs a team of six: steady delivery rhythm, regular 1:1s and written decisions, while still shipping code and making AI agents part of how the team reviews and builds.</div>
-          </li>
-          <li>
-            <div class="quest-role">Engineering Manager</div>
-            <div class="quest-meta">Gartner · 2023 – 2026</div>
-            <div class="quest-what">Grew into a wider scope; delegated real ownership and grew engineers into leads. Trusted with critical-path work under shifting scope and tight deadlines.</div>
-          </li>
-          <li>
-            <div class="quest-role">Engineering Lead</div>
-            <div class="quest-meta">Gartner · 2021 – 2023</div>
-            <div class="quest-what">First lead role: aligned the team with product and stakeholders, ran hiring, and kept a motivated team over-delivering.</div>
-          </li>
-          <li>
-            <div class="quest-role">Sr. Software Engineer</div>
-            <div class="quest-meta">Gartner · 2019 – 2021</div>
-            <div class="quest-what">Full stack on high-traffic software marketplaces: Ruby on Rails, React, AWS.</div>
-          </li>
-        </ol>
+        <ul class="highlights">
+          <li>Leading a team of six at G2, while staying hands-on with code and AI-assisted engineering.</li>
+          <li>Grew engineers into leads and delegated ownership across a wider scope at Gartner.</li>
+          <li>Built high-traffic software marketplaces with Ruby on Rails, React, and AWS.</li>
+        </ul>
+        <details class="career">
+          <summary>Career history · 2019–now</summary>
+          <ol class="quests">
+            <li>
+              <div class="quest-role">Engineering Manager</div>
+              <div class="quest-meta">G2 · 2026 – now</div>
+              <div class="quest-what">Runs a team of six: steady delivery rhythm, regular 1:1s and written decisions, while still shipping code and making AI agents part of how the team reviews and builds.</div>
+            </li>
+            <li>
+              <div class="quest-role">Engineering Manager</div>
+              <div class="quest-meta">Gartner · 2023 – 2026</div>
+              <div class="quest-what">Grew into a wider scope; delegated real ownership and grew engineers into leads. Trusted with critical-path work under shifting scope and tight deadlines.</div>
+            </li>
+            <li>
+              <div class="quest-role">Engineering Lead</div>
+              <div class="quest-meta">Gartner · 2021 – 2023</div>
+              <div class="quest-what">First lead role: aligned the team with product and stakeholders, ran hiring, and kept a motivated team over-delivering.</div>
+            </li>
+            <li>
+              <div class="quest-role">Sr. Software Engineer</div>
+              <div class="quest-meta">Gartner · 2019 – 2021</div>
+              <div class="quest-what">Full stack on high-traffic software marketplaces: Ruby on Rails, React, AWS.</div>
+            </li>
+          </ol>
+        </details>
         <p class="quest-what">Strengths: developing people · delegation · clear communication · prioritisation · technical depth · AI-native engineering.</p>
         <p class="quest-what">AWS certified · Rails Girls Summer of Code coach · BSc Computer Science.</p>
         <!-- From a teammate's farewell message (translated from Spanish). Attributed anonymously until he
              agrees to be named. -->
         <blockquote class="kudos">
-          <p>“Your arrival in this team has been the most positive and disruptive thing I’ve seen at work: a whirlwind of fresh air that turned every process around, organically and without much noise. Spotting blockers, cutting through communication, adding value to the product… Now I know what to look for in my next lead: a Nacho.”</p>
+          <p>“Spotting blockers, cutting through communication, adding value to the product… Now I know what to look for in my next lead: a Nacho.”</p>
           <footer>— an engineer on my team</footer>
         </blockquote>
         <a class="panel-link" href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">Recruit Nacho →</a>
@@ -416,8 +456,11 @@
         entries.forEach(function (e) {
           if (e.isIntersecting) { e.target.classList.add('is-visible'); reveal.unobserve(e.target); }
         });
-      }, { threshold: 0.35 });
-      document.querySelectorAll('.reveal').forEach(function (el) { reveal.observe(el); });
+      }, { threshold: 0 });
+      document.querySelectorAll('.reveal').forEach(function (el) {
+        if (!still) el.classList.add('is-pending');
+        reveal.observe(el);
+      });
     })();
   </script>
 </body>
