@@ -3,7 +3,7 @@
 // everything is masked so it stays behind the tree, the city and the hill.
 (function () {
   var section = document.getElementById('barcelona');
-  if (!section || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (!section || section.hidden || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   var skyCanvas = section.querySelector('.bcn-sky');
   var seaCanvas = section.querySelector('.bcn-sea');
