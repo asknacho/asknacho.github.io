@@ -1,8 +1,0 @@
-{
-  "id": "hero-walk",
-  "image": "hero-walk.png",
-  "frameWidth": 260,
-  "frameHeight": 260,
-  "frames": 8,
-  "durationMs": 1600
-}

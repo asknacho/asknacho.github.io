@@ -55,13 +55,13 @@
       overflow: hidden;
     }
     /* Greeting, typed like an old game; the last dot blinks like a cursor. It sits just above Nacho's
-       head at the start, fixed to the page (not the screen), so it scrolls away while he walks off to the
-       right. His art fills his 256 px cell from the very top, so the text sits a line plus 12 px above
-       half a cell up from the middle of the screen (cells are 260 px: 4 px of room under the soles). */
+       head at the start, fixed to the page (not the screen), so it scrolls away while he walks down and
+       away from it. His head is 24 sprite pixels above the middle of the screen (art starts 12 px into
+       his 72 px cell), so the text sits one line plus a 6-pixel gap above that. */
     .greeting {
       position: absolute;
-      top: calc(50vh - var(--hero) * 130px - 12px - 1.4em);
-      top: calc(50svh - var(--hero) * 130px - 12px - 1.4em);
+      top: calc(50vh - var(--scale) * 30px - 1.4em);
+      top: calc(50svh - var(--scale) * 30px - 1.4em);
       left: 0;
       right: 0;
       z-index: 10;
@@ -76,20 +76,18 @@
     }
     .greeting .cursor.off { visibility: hidden; }
 
-    /* Intro: as the page scrolls, Nacho walks off to the right and leaves the browser that way, before
-       the page would carry him off the top. Only his sideways position is scripted; up and down he moves
-       with the page itself, so there is nothing to stutter. The scene is 0.8 screens tall; the stage stays
-       a full screen so he starts centred. Clipped sideways only, so walking out does not widen the page. */
-    .scene--intro { --hero: 1; position: relative; display: block; height: 80vh; height: 80svh; overflow: visible; overflow-x: clip; }
+    /* Intro, a parallax: Nacho walks down at a fifth of the scroll speed, so the page outruns him and he
+       drifts off the top of the screen just after the greeting, which scrolls at full speed. The scene is
+       0.8 screens tall; the stage stays a full screen so he starts centred, and overflow stays visible so
+       he is never clipped. At this speed he leaves before the next scene reaches him, even on phones. */
+    .scene--intro { --scale: 5; position: relative; display: block; height: 80vh; height: 80svh; overflow: visible; }
     .stage {
       height: 100vh;
       height: 100svh;
       display: grid;
       place-items: center;
     }
-    /* The intro Nacho is the high-detail Pixellab art: 260 px cells, shown 1:1 (two classes, so the
-       general sprite size rules below can't override it and scale his pixels unevenly). */
-    .sprite.sprite--stand { --frame: 260px; --scale: var(--hero); will-change: transform; }
+    .sprite--stand { will-change: transform; }
     .scene--code { justify-items: start; padding-left: max(16px, 6vw); }
     .scene--guitar { justify-items: end; padding-right: max(16px, 6vw); }
 
@@ -125,9 +123,8 @@
     }
     .reveal.is-visible { opacity: 1; transform: none; }
 
-    @media (max-width: 420px), (max-height: 480px) { .sprite { --scale: 4; } }
-    @media (max-height: 360px) { .sprite { --scale: 3; } }
-    @media (max-height: 520px) { .scene--intro { --hero: 0.75; } }
+    @media (max-width: 420px), (max-height: 480px) { .sprite, .scene--intro { --scale: 4; } }
+    @media (max-height: 360px) { .sprite, .scene--intro { --scale: 3; } }
 
     /* Finale: Barcelona, the sea and the Sagrada Familia (Nacho comes back here later).
        One scale for everything: --fs screen pixels per Nacho pixel; the backdrop is drawn at half that
@@ -240,8 +237,8 @@
       <h1 class="greeting">Hi! I'm Nacho..<span class="cursor" id="cursor" aria-hidden="true">.</span></h1>
       <div class="stage">
         <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks away as you scroll">
-          <img class="breathe" src="assets/hero-stand.png" data-frames="13" alt="" />
-          <img class="walk" src="assets/hero-walk.png" data-frames="8" alt="" />
+          <img class="breathe" src="assets/stand.png" data-frames="13" alt="" />
+          <img class="walk" src="assets/walk.png" data-frames="8" alt="" />
         </div>
       </div>
     </section>
@@ -272,21 +269,15 @@
     (function () {
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Intro: he walks to the right as the page scrolls and is out of the browser's right edge by the
-      // time the page has scrolled 80% of the way to carrying him off the top. Only x is scripted (set
-      // in the scroll event itself); vertically he simply scrolls with the page. He walks while the page
-      // moves and breathes when it stops.
+      // Intro: he walks down at a fifth of the scroll speed (parallax), so the page outruns him and he
+      // drifts off the top just after the greeting. He walks while the page moves and breathes when it
+      // stops. The position is set in the scroll event itself, not a frame later, and kept small: on
+      // iPhones the page scrolls on its own fast path, and any lag shows as a stutter on fast flicks.
       var intro = document.getElementById('intro');
-      var rest, pace = 1;
-      function measure() {
-        var w = intro.offsetWidth, h = intro.offsetHeight;
-        pace = (innerWidth / 2 + w * 0.32) / (0.8 * (innerHeight / 2 + h / 2));  // art is ~146 of 260 px wide
-      }
+      var rest;
       function sink() {
-        intro.style.transform = 'translate3d(' + Math.round(scrollY * pace) + 'px, 0, 0)';
+        intro.style.transform = 'translate3d(0, ' + Math.round(scrollY * 0.2) + 'px, 0)';
       }
-      measure();
-      addEventListener('resize', function () { measure(); sink(); });
       if (!still) {
         addEventListener('scroll', function () {
           sink();

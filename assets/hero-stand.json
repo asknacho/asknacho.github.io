@@ -1,8 +1,0 @@
-{
-  "id": "hero-stand",
-  "image": "hero-stand.png",
-  "frameWidth": 260,
-  "frameHeight": 260,
-  "frames": 13,
-  "durationMs": 2600
-}
