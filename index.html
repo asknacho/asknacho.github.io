@@ -116,9 +116,14 @@
     .scene--guitar { grid-template-columns: minmax(0, 34rem) auto; justify-content: end; }
     .scene--guitar .panel { order: -1; }
     @media (max-width: 720px) {
-      .scene--code, .scene--guitar { grid-template-columns: minmax(0, 1fr); justify-content: stretch; }
-      .scene--code .sprite { justify-self: start; }
-      .scene--guitar .sprite { justify-self: end; }
+      .scene--code, .scene--guitar {
+        grid-template-columns: minmax(0, 1fr);
+        justify-content: stretch;
+        min-height: 0;
+        gap: 12px;
+        padding: 20px max(16px, 6vw);
+      }
+      .scene--code .sprite, .scene--guitar .sprite { justify-self: center; }
       .scene--guitar .panel { order: 0; }
     }
 
