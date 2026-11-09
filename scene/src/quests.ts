@@ -19,7 +19,7 @@ export const QUESTS = {
   },
   code: {
     title: 'Code', kind: 'Class: Engineering Manager',
-    bio: 'Leading engineering teams since 2021. Now at G2, leading six engineers while staying hands-on. Previously grew engineers into leads at Gartner.',
+    bio: 'I lead three teams at G2: 13 people working on Marketing Technology, Centralized API, and MCPs. I help AI agents work together to make development smoother, and help engineers grow into product engineers who ship useful improvements quickly, in small steps. Before G2, I helped engineers grow into leads at Gartner.',
     stats: [['Code', 92], ['Lead', 88], ['Meetings', 21]], weakTo: '"Quick question?"', links: [RECRUIT, GITHUB],
   },
   scorepace: {
