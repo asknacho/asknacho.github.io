@@ -87,8 +87,9 @@
       display: grid;
       place-items: center;
     }
-    /* The intro Nacho is the high-detail Pixellab art: 260 px cells, shown 1:1. */
-    .sprite--stand { --frame: 260px; --scale: var(--hero); will-change: transform; }
+    /* The intro Nacho is the high-detail Pixellab art: 260 px cells, shown 1:1 (two classes, so the
+       general sprite size rules below can't override it and scale his pixels unevenly). */
+    .sprite.sprite--stand { --frame: 260px; --scale: var(--hero); will-change: transform; }
     .scene--code { justify-items: start; padding-left: max(16px, 6vw); }
     .scene--guitar { justify-items: end; padding-right: max(16px, 6vw); }
 
