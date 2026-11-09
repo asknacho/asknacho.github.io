@@ -341,7 +341,7 @@
       </div>
       <div class="stage">
         <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks away as you scroll">
-          <img class="breathe" src="assets/stand-polished.webp" alt="" />
+          <img class="breathe" src="assets/cycles/wave-still.webp" alt="" />
           <img class="walk" src="assets/walk.png" data-frames="8" alt="" />
           <img class="sleep" src="assets/sleep.png" alt="" />
           <div class="reading"><img src="assets/family-reading.webp" width="1388" height="999" alt="" /><canvas id="family-motion" width="1388" height="999" aria-hidden="true"></canvas></div>
@@ -350,7 +350,7 @@
       </div>
     </section>
     <section class="scene scene--code" id="work">
-      <div class="sprite sprite--code sprite--polished reveal"><img src="assets/code-polished.webp" width="720" height="720" loading="lazy" decoding="async" alt="Nacho on his laptop, talking to an AI agent that codes for him" /></div>
+      <div class="sprite sprite--code sprite--polished reveal"><img src="assets/cycles/code-still.webp" width="720" height="720" loading="lazy" decoding="async" alt="Nacho on his laptop, talking to an AI agent that codes for him" /><canvas class="sprite-cycle" id="code-cycle" hidden aria-hidden="true"></canvas></div>
       <article class="panel reveal" aria-labelledby="dev-title">
         <p class="panel-tag">Quest log</p>
         <h2 id="dev-title">Engineering manager</h2>
@@ -400,7 +400,7 @@
     </section>
     <section class="scene scene--guitar">
       <div class="music-portrait reveal">
-        <div class="sprite sprite--guitar sprite--polished" id="music-portrait"><img src="assets/guitar-polished.webp" width="720" height="720" loading="lazy" decoding="async" alt="Nacho playing acoustic guitar" /></div>
+        <div class="sprite sprite--guitar sprite--polished" id="music-portrait"><img src="assets/cycles/guitar-still.webp" width="720" height="720" loading="lazy" decoding="async" alt="Nacho playing acoustic guitar" /><canvas class="sprite-cycle" id="music-cycle" hidden aria-hidden="true"></canvas></div>
         <div class="instrument-picker" role="group" aria-label="Choose Nacho’s instrument">
           <button type="button" data-instrument="guitar" aria-pressed="true">Guitar</button>
           <button type="button" data-instrument="piano" aria-pressed="false">Piano</button>
@@ -424,7 +424,7 @@
     </section>
   </main>
   <script src="assets/barcelona.js?v=4" defer></script>
-  <script src="assets/share-ready.js" defer></script>
+  <script type="module" src="assets/share-ready.js"></script>
   <script>
     (function () {
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;

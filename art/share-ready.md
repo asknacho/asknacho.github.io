@@ -4,7 +4,7 @@ New poses were generated with the built-in imagegen tool, using the existing Nac
 
 Outputs: `assets/stand-polished.webp`, `assets/wave.webp`, `assets/code-polished.webp`, `assets/guitar-polished.webp`, and `assets/piano.webp`.
 
-The greeting has four frames, aligned by the feet and packed horizontally. Its first frame also supplies the resting daytime pose. Walking retains the original frame-by-frame animation.
+The original still poses above are retained as art references. Runtime typing, guitar, piano and waving now use twelve-frame sheets in `assets/cycles/`; see `art/cycles/README.md`. Their first frames supply the reduced-motion stills. Walking retains the original frame-by-frame animation. The earlier four-frame greeting and whole-image music/coding sway are no longer used.
 
 The full-resolution family scene is animated directly on a 1388×999 canvas: clipped layers rock the mother and baby, lift the daughter's hand and block, and draw an occasional turning page. The original image is the reduced-motion and no-JavaScript fallback. Motion stops when the scene leaves the viewport or the tab is hidden.
 

@@ -5,7 +5,16 @@
   padding: 12%;
   image-rendering: auto;
 }
-.sprite.sprite--polished { overflow: visible; }
+.sprite.sprite--polished { overflow: visible; position: relative; }
+.sprite--polished .sprite-cycle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12%;
+}
+.sprite.has-cycle > img { visibility: hidden; }
+.sprite-cycle[hidden], .sprite--stand .wave[hidden] { display: none !important; }
 .sprite--stand .reading { position: relative; }
 .sprite--stand .reading img {
   width: 100%;
@@ -38,7 +47,7 @@ html[data-activity="active"] .scene-status {
 }
 .sprite--stand .wave {
   display: none;
-  width: 400%;
+  width: 100%;
   height: 100%;
   image-rendering: auto;
 }
@@ -71,20 +80,7 @@ html[data-motion="on"][data-activity="active"] .sprite--stand.is-on-screen .brea
 html[data-motion="on"][data-activity="sleeping"] .sprite--stand.is-on-screen .sleep {
   animation: sleep-breathe 5s ease-in-out infinite;
 }
-html[data-motion="on"] .sprite--code.is-on-screen img {
-  animation: coding-breathe 4s steps(3, end) infinite;
-  transform-origin: 50% 75%;
-}
-html[data-motion="on"] .sprite--guitar.is-on-screen img {
-  animation: music-sway 3.6s ease-in-out infinite;
-  transform-origin: 50% 78%;
-}
-html[data-motion="on"] .sprite--guitar[data-instrument="piano"].is-on-screen img {
-  animation-duration: 4.8s;
-}
 @keyframes sleep-breathe { 50% { transform: scaleY(1.025); } }
-@keyframes coding-breathe { 50% { transform: translateY(-2px) rotate(-0.3deg); } }
-@keyframes music-sway { 50% { transform: rotate(0.8deg) translateY(-1px); } }
 @media (prefers-reduced-motion: reduce) {
   .sprite--stand .sleep,
   .sprite--polished img { animation: none !important; }

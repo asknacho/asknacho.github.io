@@ -1,0 +1,8 @@
+{
+  "image": "guitar.webp",
+  "frames": 12,
+  "columns": 4,
+  "frameWidth": 378,
+  "frameHeight": 378,
+  "frameMs": 120
+}

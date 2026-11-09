@@ -1,9 +1,14 @@
+import { SpriteCycle } from './sprite-cycles.js';
+
 (() => {
   'use strict';
   const root = document.documentElement;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const intro = document.getElementById('intro');
   const status = document.getElementById('scene-status');
+  const players = [];
+  let wavePlayer;
+  const motionAllowed = () => !reduced.matches && !document.hidden;
   const labels = { active: 'Out and about', reading: 'Family time', sleeping: 'Recharging' };
   const updateStatus = () => {
     status.textContent = `${labels[root.dataset.activity]} · ${root.dataset.barcelonaClock} in Barcelona`;
@@ -14,13 +19,26 @@
   // Instrument choice changes the art, not the time-based intro schedule.
   const portrait = document.getElementById('music-portrait');
   const instrumentImage = portrait.querySelector('img');
+  const codeHost = document.querySelector('.sprite--code');
+  const codePlayer = new SpriteCycle({
+    canvas: document.getElementById('code-cycle'), host: codeHost,
+    allowed: () => motionAllowed() && codeHost.classList.contains('is-on-screen'),
+  });
+  const musicPlayer = new SpriteCycle({
+    canvas: document.getElementById('music-cycle'), host: portrait,
+    allowed: () => motionAllowed() && portrait.classList.contains('is-on-screen'),
+  });
+  players.push(codePlayer, musicPlayer);
+  codePlayer.load('code');
+  musicPlayer.load('guitar');
   document.querySelectorAll('[data-instrument]').forEach(button => {
     if (button.tagName !== 'BUTTON') return;
     button.addEventListener('click', () => {
       const instrument = button.dataset.instrument;
-      instrumentImage.src = `assets/${instrument === 'piano' ? 'piano' : 'guitar-polished'}.webp`;
+      instrumentImage.src = `assets/cycles/${instrument}-still.webp`;
       instrumentImage.alt = instrument === 'piano' ? 'Nacho practising digital piano' : 'Nacho playing acoustic guitar';
       portrait.dataset.instrument = instrument;
+      musicPlayer.load(instrument);
       document.querySelectorAll('button[data-instrument]').forEach(other => {
         other.setAttribute('aria-pressed', String(other === button));
       });
@@ -37,8 +55,6 @@
   let familyVisible = false;
   let frame = 0;
   let lastPaint = 0;
-  let waveTimer;
-  let waveStart;
   const w = canvas.width, h = canvas.height;
   const polygon = points => {
     const path = new Path2D();
@@ -106,6 +122,7 @@
     frame = 0;
     if (allowed && ready && familyVisible && root.dataset.activity === 'reading') frame = requestAnimationFrame(paint);
     if (!allowed) stopWave();
+    players.forEach(player => player.sync());
   }
   const loaded = () => { ready = family.naturalWidth > 0; syncMotion(); };
   if (family.complete) loaded();
@@ -121,26 +138,27 @@
   [intro, document.querySelector('.sprite--code'), portrait].forEach(element => visibility.observe(element));
 
   // A greeting runs once on entry, then yields immediately to scrolling.
-  const wave = new Image();
+  const wave = document.createElement('canvas');
   wave.className = 'wave';
-  wave.alt = '';
-  function stopWave() {
-    clearInterval(waveTimer);
-    intro.classList.remove('is-greeting');
-  }
-  wave.addEventListener('load', () => {
-    if (reduced.matches || document.hidden || root.dataset.activity !== 'active' || scrollY > 40) return;
-    intro.append(wave);
-    waveStart = performance.now();
-    intro.classList.add('is-greeting');
-    waveTimer = setInterval(() => {
-      const elapsed = performance.now() - waveStart;
-      if (elapsed > 2600) return stopWave();
-      const frameIndex = elapsed < 300 ? 0 : elapsed < 600 ? 1 : 2 + Math.floor(elapsed / 220) % 2;
-      wave.style.transform = `translateX(${-frameIndex * 25}%)`;
-    }, 180);
+  wave.setAttribute('aria-hidden', 'true');
+  intro.append(wave);
+  wavePlayer = new SpriteCycle({
+    canvas: wave, once: true, onComplete: stopWave,
+    allowed: () => motionAllowed() && root.dataset.activity === 'active' &&
+      intro.classList.contains('is-greeting') && intro.classList.contains('is-on-screen'),
   });
-  if (!reduced.matches && root.dataset.activity === 'active') wave.src = 'assets/wave.webp';
+  players.push(wavePlayer);
+  function stopWave() {
+    intro.classList.remove('is-greeting');
+    wavePlayer?.pause();
+  }
+  if (!reduced.matches && root.dataset.activity === 'active') {
+    wavePlayer.load('wave').then(loaded => {
+      if (!loaded || !motionAllowed() || root.dataset.activity !== 'active' || scrollY > 40) return;
+      intro.classList.add('is-greeting');
+      wavePlayer.restart();
+    });
+  }
   addEventListener('scroll', stopWave, { passive: true });
   addEventListener('nacho-activity-change', () => { stopWave(); syncMotion(); });
   document.addEventListener('visibilitychange', syncMotion);

@@ -1,0 +1,8 @@
+{
+  "image": "wave.webp",
+  "frames": 12,
+  "columns": 4,
+  "frameWidth": 486,
+  "frameHeight": 486,
+  "frameMs": 160
+}
