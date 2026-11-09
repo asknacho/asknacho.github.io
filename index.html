@@ -113,7 +113,7 @@
       padding: 40px max(16px, 6vw);
     }
     .scene--code { justify-content: start; }
-    .scene--guitar { grid-template-columns: minmax(0, 34rem) auto; justify-content: end; }
+    .scene--guitar { grid-template-columns: minmax(0, 34rem) auto; justify-content: end; min-height: 0; }
     .scene--guitar .panel { order: -1; }
     @media (max-width: 720px) {
       .scene--code, .scene--guitar {
@@ -208,8 +208,8 @@
     /* Keep both landmarks in the right-hand crop on phones, with a shared transparent sky. */
     .bcn {
       position: relative;
-      height: clamp(280px, 34vw, 560px);
-      margin-top: 48px;
+      height: clamp(180px, 22vw, 360px);
+      margin-top: 16px;
       overflow: hidden;
       isolation: isolate;
     }
