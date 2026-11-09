@@ -22,3 +22,10 @@ The Barcelona backdrop for the family scene is built from the old scene app's ar
     python3 tools/build_barcelona.py   # -> assets/barcelona.png (416x100 pixel art), sky and sea masks, barcelona.json
 
 This writes `assets/<name>.png` and `assets/<name>.json` (frame size, frame count, loop length).
+
+The homepage footer now uses `assets/barcelona-skyline.png`, a transparent panorama generated to match
+Nacho's chunky pixel style. It includes the Sagrada Família and Tibidabo, with the landmarks grouped
+on the right so they both fit the mobile crop. This asset is independent of `build_barcelona.py`.
+`assets/barcelona.js` draws small canvas birds in daylight and fireworks at night; it masks the
+particles against the skyline's alpha, pauses off screen/in background tabs, and respects reduced motion.
+Preview the footer locally with `?bcn=12:00#barcelona` or `?bcn=23:00#barcelona`.

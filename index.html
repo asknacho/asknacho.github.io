@@ -116,9 +116,14 @@
     .scene--guitar { grid-template-columns: minmax(0, 34rem) auto; justify-content: end; }
     .scene--guitar .panel { order: -1; }
     @media (max-width: 720px) {
-      .scene--code, .scene--guitar { grid-template-columns: minmax(0, 1fr); justify-content: stretch; }
-      .scene--code .sprite { justify-self: start; }
-      .scene--guitar .sprite { justify-self: end; }
+      .scene--code, .scene--guitar {
+        grid-template-columns: minmax(0, 1fr);
+        justify-content: stretch;
+        min-height: 0;
+        gap: 12px;
+        padding: 20px max(16px, 6vw);
+      }
+      .scene--code .sprite, .scene--guitar .sprite { justify-self: center; }
       .scene--guitar .panel { order: 0; }
     }
 
@@ -189,51 +194,33 @@
 
     @media (max-width: 420px), (max-height: 480px) { .sprite, .scene--intro { --scale: 4; } }
     @media (max-height: 360px) { .sprite, .scene--intro { --scale: 3; } }
+    @media (max-width: 720px) { .sprite, .scene--intro { --scale: 3; } }
 
-    /* Finale: Barcelona, the sea and the Sagrada Familia (Nacho comes back here later).
-       One scale for everything: --fs screen pixels per Nacho pixel; the backdrop is drawn at half that
-       (fs/2), as a distant layer, keeping the original picture's proportions between him and the city.
-       fs is always a multiple of 4 so every pixel lands on whole screen pixels. The backdrop is 416x100
-       pixels with its sky cut out: the page's own day/night background is the sky. */
+    /* Keep both landmarks in the right-hand crop on phones, with a shared transparent sky. */
     .bcn {
-      --fs: 4;
       position: relative;
-      height: calc(50px * var(--fs));
+      height: clamp(280px, 34vw, 560px);
+      margin-top: 48px;
       overflow: hidden;
-      container-type: size;
+      isolation: isolate;
     }
-    .bcn-art {
+    .bcn-backdrop {
       position: absolute;
       bottom: 0;
-      width: calc(208px * var(--fs));
-      height: calc(50px * var(--fs));
-      left: calc((100cqw - 208px * var(--fs)) * 0.85);
+      right: 0;
+      width: max(100%, 780px);
+      height: auto;
+      image-rendering: pixelated;
+      filter: url(#bcn-grade);
     }
-    .bcn-art > *, .bcn-graded > * { position: absolute; }
-    /* Day, dusk and night grading: one colour matrix (#bcn-grade, set from --day by the script at the
-       end of the page) over the city and sea (and anyone standing in front of them). A filter only touches real pixels, so the
-       transparent sky stays the page background. Fireworks sit outside it: they make their own light. */
-    .bcn-graded { inset: 0; filter: url(#bcn-grade); }
-    .bcn-backdrop { inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
-    .bcn-sea { left: 30.288%; top: 61%; width: 51.442%; height: 16%; image-rendering: pixelated; }
-    .bcn-sky { left: 0; top: -45.115%; width: 100%; height: 260%; image-rendering: pixelated; }
-
-    /* Aerial perspective: a thin haze over the far city and sea, strongest at the horizon and gone by
-       the foreground grass. Clipped to the backdrop's pixels (not the sky). */
-    .bcn-haze {
+    .bcn-sky {
+      position: absolute;
       inset: 0;
-      background: linear-gradient(to bottom, transparent 15%, var(--haze) 58%, var(--haze) 66%, transparent 88%);
-      --haze: color-mix(in oklab, #e6e0ee calc(var(--day) * 100%), #262b48);
-      opacity: 0.28;
-      -webkit-mask: url(assets/barcelona.png) 0 0 / 100% 100%;
-      mask: url(assets/barcelona.png) 0 0 / 100% 100%;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
       pointer-events: none;
     }
-
-    /* Smallest multiple of 4 that makes the 208-pixel-wide backdrop cover the screen. */
-    @media (min-width: 833px)  { .bcn { --fs: 8; } }
-    @media (min-width: 1665px) { .bcn { --fs: 12; } }
-    @media (min-width: 2497px) { .bcn { --fs: 16; } }
 
     @media (prefers-reduced-motion: reduce) {
       .reveal { opacity: 1; transform: none; transition: none; }
@@ -380,24 +367,17 @@
         <a class="panel-link" href="https://scorepace.com" target="_blank" rel="noopener">Play ScorePace →</a>
       </article>
     </section>
-    <!-- Hidden for now: remove the hidden attribute to bring the Barcelona scene back. -->
-    <section class="bcn" id="barcelona" hidden aria-label="A hill above Barcelona: the sea, the city and the Sagrada Familia">
+    <section class="bcn" id="barcelona" aria-label="Barcelona skyline: the Sagrada Família and Tibidabo mountain">
       <svg width="0" height="0" aria-hidden="true" focusable="false" style="position: absolute">
         <filter id="bcn-grade" color-interpolation-filters="sRGB">
           <feColorMatrix id="bcn-grade-matrix" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0" />
         </filter>
       </svg>
-      <div class="bcn-art">
-        <div class="bcn-graded">
-          <img class="bcn-backdrop" src="assets/barcelona.png" alt="" loading="lazy" />
-          <canvas class="bcn-sea" width="214" height="16" data-mask="assets/barcelona-sea-mask.png" aria-hidden="true"></canvas>
-          <div class="bcn-haze"></div>
-        </div>
-        <canvas class="bcn-sky" width="416" height="260" data-mask="assets/barcelona-sky-mask.png" aria-hidden="true"></canvas>
-      </div>
+      <img class="bcn-backdrop" src="assets/barcelona-skyline.png" alt="" loading="lazy" />
+      <canvas class="bcn-sky" aria-hidden="true"></canvas>
     </section>
   </main>
-  <script src="assets/barcelona.js?v=3" defer></script>
+  <script src="assets/barcelona.js?v=4" defer></script>
   <script>
     (function () {
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
