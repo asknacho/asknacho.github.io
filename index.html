@@ -175,13 +175,22 @@
     .sprite img[data-frames="8"]  { width: 800%; }
 
     /* While the page scrolls he walks; when it stops he breathes again. */
-    .sprite--stand .walk, .sprite--stand .sleep { display: none; }
-    .sprite--stand .sleep { width: 100%; object-fit: contain; }
-    html[data-sleeping="true"] .sprite--stand .breathe,
-    html[data-sleeping="true"] .sprite--stand .walk { display: none; }
-    html[data-sleeping="true"] .sprite--stand .sleep { display: block; }
+    .sprite--stand .walk, .sprite--stand .sleep, .sprite--stand .reading { display: none; }
+    .sprite--stand .sleep, .sprite--stand .reading { width: 100%; object-fit: contain; }
+    .sprite--stand .reading { image-rendering: auto; }
     .sprite--stand.is-walking .walk { display: block; }
     .sprite--stand.is-walking .breathe { display: none; }
+    html[data-activity="sleeping"] .sprite--stand .breathe,
+    html[data-activity="sleeping"] .sprite--stand .walk,
+    html[data-activity="reading"] .sprite--stand .breathe,
+    html[data-activity="reading"] .sprite--stand .walk { display: none; }
+    html[data-activity="sleeping"] .sprite--stand .sleep,
+    html[data-activity="reading"] .sprite--stand .reading { display: block; }
+    html[data-activity="reading"] .sprite--stand {
+      width: calc(100px * var(--scale));
+      position: relative;
+      top: calc(14px * var(--scale));
+    }
 
     /* Later scenes rise into view. */
     .reveal {
@@ -275,18 +284,26 @@
       function update() {
         var day = !isNaN(forced) ? Math.min(1, Math.max(0, forced)) : dayFactor(sunElevation(at || new Date()));
         document.documentElement.style.setProperty('--day', day.toFixed(3));
-        var hour = +new Intl.DateTimeFormat('en-GB', {
-          timeZone: 'Europe/Madrid', hourCycle: 'h23', hour: 'numeric'
-        }).format(at || new Date());
-        var sleeping = String(hour >= 21 || hour < 7);
-        if (document.documentElement.dataset.sleeping !== sleeping) {
-          document.documentElement.dataset.sleeping = sleeping;
-          dispatchEvent(new Event('nacho-sleep-change'));
+        var clock = {};
+        new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Europe/Madrid', hourCycle: 'h23', hour: 'numeric', minute: 'numeric'
+        }).formatToParts(at || new Date()).forEach(function (part) { clock[part.type] = +part.value; });
+        var minutes = clock.hour * 60 + clock.minute;
+        // Inclusive minute ranges: sleep through 07:00, active through 18:00, read through 23:00.
+        var activity = minutes <= 420 || minutes >= 1381 ? 'sleeping'
+          : minutes <= 1080 ? 'active' : 'reading';
+        if (document.documentElement.dataset.activity !== activity) {
+          document.documentElement.dataset.activity = activity;
+          dispatchEvent(new Event('nacho-activity-change'));
         }
       }
 
-      update();
-      setInterval(update, 60000);
+      function refresh() {
+        update();
+        // Switch on the next Barcelona minute boundary, even when the page opened mid-minute.
+        setTimeout(refresh, 60000 - Date.now() % 60000);
+      }
+      refresh();
     })();
   </script>
 </head>
@@ -308,6 +325,7 @@
           <img class="breathe" src="assets/stand.png" data-frames="13" alt="" />
           <img class="walk" src="assets/walk.png" data-frames="8" alt="" />
           <img class="sleep" src="assets/sleep.png" alt="" />
+          <img class="reading" src="assets/family-reading.png" alt="" />
         </div>
       </div>
     </section>
@@ -390,11 +408,11 @@
       // iPhones the page scrolls on its own fast path, and any lag shows as a stutter on fast flicks.
       var intro = document.getElementById('intro');
       var rest;
-      function isSleeping() {
-        return document.documentElement.dataset.sleeping === 'true';
+      function isActive() {
+        return document.documentElement.dataset.activity === 'active';
       }
       function sink() {
-        if (isSleeping() || still) {
+        if (!isActive() || still) {
           intro.style.removeProperty('transform');
           return;
         }
@@ -402,7 +420,7 @@
       }
       if (!still) {
         addEventListener('scroll', function () {
-          if (isSleeping()) return;
+          if (!isActive()) return;
           sink();
           intro.classList.add('is-walking');
           clearTimeout(rest);
@@ -414,12 +432,14 @@
       function updateIntroState() {
         clearTimeout(rest);
         intro.classList.remove('is-walking');
-        intro.setAttribute('aria-label', isSleeping()
+        intro.setAttribute('aria-label', document.documentElement.dataset.activity === 'sleeping'
           ? 'Nacho, asleep in a sleeping bag'
+          : document.documentElement.dataset.activity === 'reading'
+          ? 'Nacho reading on the sofa, his wife holding their baby, and their three-year-old daughter playing on the floor'
           : 'Nacho, standing and breathing, walks away as you scroll');
         sink();
       }
-      addEventListener('nacho-sleep-change', updateIntroState);
+      addEventListener('nacho-activity-change', updateIntroState);
       updateIntroState();
 
       // Sprite sheets: show one whole frame every 200 ms by moving the sheet a frame at a time.
