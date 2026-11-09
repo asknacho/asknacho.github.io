@@ -5,8 +5,11 @@
 - Left shoe: most of its upper was missing. It is rebuilt as a mirror image of the complete right shoe
   (canvas upper, laces, white toe cap, sole, dark underside), aligned to the same ground line, so its
   fill, shading and outline weight match. The left sock cuff above it is kept.
-- Right shoe and right hand: their outer outline was missing; it is redrawn 2 px thick, the weight the
-  art uses elsewhere, in the art's own outline colour. The rebuilt left shoe's toe gets the same.
+- Shoe toes: their outer outline was missing; it is redrawn 2 px thick in the art's outline colour.
+- Hair top, right hand and left jeans cuff: their outline was missing. It is painted inward (the shape
+  does not change) with the colour gradient and thickness of the nearest outline the art does have:
+  4 px from the neighbouring hair, 4 px from the sleeve above the hand, 2 px from the other cuff.
+- Left jeans cuff: a notch was cut out of the rolled hem; it is filled so the fold is solid.
 - Both soles: gaps in the 3-row dark underside are closed.
 - 4 px of room on the left (for the left shoe's toe) and below the feet.
 """
@@ -59,9 +62,44 @@ def outline(ys, xs, width=2):
         box = np.zeros_like(op); box[ys, xs] = True
         a[box & near & ~op] = OUTLINE
 
-outline(slice(118, 176), slice(X(108), a.shape[1]))   # right hand
 outline(slice(226, 253), slice(X(112), a.shape[1]))   # right shoe toe and sole edge
 outline(slice(226, 253), slice(0, X(26)))            # left shoe toe, matching the right one
+
+# Left jeans cuff: the rolled hem had a notch cut out of its lower left (rows 223-225), leaving a loose
+# strip above it. Fill the notch by continuing the hem's bottom row downward, so it is one solid fold.
+for y in range(223, 226):
+    for x in range(X(29), X(45)):
+        if a[y, x, 3] == 0 and a[222, x, 3] > 0:
+            a[y, x] = a[222, x]
+
+from scipy import ndimage as ndi
+
+def depth_map():
+    """Distance (in pixels) of every opaque pixel from transparency or the image edge."""
+    op = np.pad(a[..., 3] > 0, 1, constant_values=False)
+    return ndi.distance_transform_cdt(op, metric='taxicab')[1:-1, 1:-1]
+
+def profile(ys, xs, depth):
+    """The art's own outline in a reference spot: mean colour at each depth 1..depth from the edge."""
+    d = depth_map()
+    box = np.zeros(d.shape, bool); box[ys, xs] = True
+    return [a[box & (d == k)][:, :3].mean(0).round().astype(np.uint8) for k in range(1, depth + 1)]
+
+def graded_outline(ys, xs, prof):
+    """Repaint the edge band of a region inward with a reference outline profile (no change in shape).
+    Pixels that are already outline-dark are kept."""
+    d = depth_map()
+    box = np.zeros(d.shape, bool); box[ys, xs] = True
+    for k, colour in enumerate(prof, start=1):
+        sel = box & (d == k) & (lum(a) >= 45)
+        a[sel, :3] = colour
+
+# Hair top: the bare tufts get the 4 px profile of the outlined hair right next to them.
+graded_outline(slice(0, 30), slice(X(26), X(122)), profile(slice(0, 20), slice(X(44), X(68)), 4))
+# Right hand: the 4 px profile of the sleeve outline just above it.
+graded_outline(slice(138, 165), slice(X(117), a.shape[1]), profile(slice(112, 136), slice(X(128), a.shape[1]), 4))
+# Left cuff's outer edge: the 2 px profile of the right cuff's inner edge.
+graded_outline(slice(213, 226), slice(X(27), X(46)), profile(slice(213, 231), slice(X(84), X(96)), 2))
 
 out = ROOT / 'art' / 'pixellab' / 'hd' / 'south-fixed.png'
 Image.fromarray(a).save(out)
