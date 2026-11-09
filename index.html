@@ -106,40 +106,23 @@
       .scene--guitar .panel { order: 0; }
     }
 
-    /* Text box: pixel-font headings, a readable body font, colours from the day/night ink and page
-       background so it has the same contrast as the rest of the page at any time of day. */
+    /* Info next to each character: no box, just the greeting's pixel font in the page ink, small and
+       airy. Secondary lines are softer; links are plain underlined text. */
     .panel {
-      --muted: color-mix(in oklab, var(--ink) 68%, var(--bg));
+      --muted: color-mix(in oklab, var(--ink) 62%, var(--bg));
       color: var(--ink);
-      background: color-mix(in oklab, var(--bg) 90%, var(--ink));
-      border: 3px solid var(--ink);
-      box-shadow: 6px 6px 0 color-mix(in oklab, var(--ink) 22%, transparent);
-      padding: 20px 22px 22px;
-      font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+      font-family: 'Press Start 2P', ui-monospace, 'SF Mono', Menlo, monospace;
+      font-size: 11px;
+      line-height: 2;
       transition-delay: 0.15s;
     }
-    .panel-tag, .panel h2, .panel-link {
-      font-family: 'Press Start 2P', ui-monospace, 'SF Mono', Menlo, monospace;
-      font-weight: 400;
-    }
-    .panel-tag { font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
-    .panel h2 { font-size: clamp(13px, 2.2vw, 16px); line-height: 1.5; margin-bottom: 16px; }
-    .panel p { margin-bottom: 14px; }
-    .quests { list-style: none; display: grid; gap: 14px; margin-bottom: 18px; }
-    .quests li { padding-left: 14px; border-left: 3px solid color-mix(in oklab, var(--ink) 35%, transparent); }
-    .quest-role { font-weight: 700; }
-    .quest-meta { font-size: 14px; color: var(--muted); }
-    .quest-what { font-size: 15px; margin-top: 2px; }
-    .panel-link {
-      display: inline-block;
-      font-size: 11px;
-      line-height: 1.4;
-      padding: 11px 14px;
-      color: var(--bg);
-      background: var(--ink);
-      text-decoration: none;
-    }
-    .panel-link:hover, .panel-link:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+    .panel h2 { font-size: clamp(13px, 2vw, 15px); font-weight: 400; line-height: 1.6; margin-bottom: 18px; }
+    .panel-tag { color: var(--muted); margin-bottom: 6px; }
+    .panel p { margin-bottom: 18px; }
+    .quests { list-style: none; display: grid; gap: 16px; margin-bottom: 20px; }
+    .quest-meta, .quest-what { color: var(--muted); }
+    .panel-link { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
+    .panel-link:hover, .panel-link:focus-visible { text-decoration-thickness: 3px; outline: none; }
 
     /* Sprite sheets: frames in a row, drawn at a whole-number scale so pixels stay crisp. */
     .sprite {
@@ -323,7 +306,7 @@
       <article class="panel reveal" aria-labelledby="music-title">
         <p class="panel-tag">Side quest</p>
         <h2 id="music-title">ScorePace</h2>
-        <p>Plays guitar, is learning piano, and built <strong>scorepace.com</strong> to help himself learn rather than just practise.</p>
+        <p>Plays guitar, is learning piano, and built scorepace.com to help himself learn rather than just practise.</p>
         <a class="panel-link" href="https://scorepace.com" target="_blank" rel="noopener">Play ScorePace →</a>
       </article>
     </section>
