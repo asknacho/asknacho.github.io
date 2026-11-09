@@ -13,13 +13,13 @@ const SCOREPACE: [string, string] = ['Play Scorepace →', 'https://scorepace.co
 
 export const QUESTS = {
   hero: {
-    title: "Hola, I'm Nacho", kind: 'Class: Tech Lead, Bard, Dad',
-    bio: 'Ignacio Morales. Senior software engineer in Barcelona who loves pizza, coding and helping people challenge themselves.',
+    title: "Hola, I'm Nacho", kind: 'Class: Engineering Manager, Bard, Dad',
+    bio: 'Ignacio Morales. Engineering manager and hands-on software engineer in Barcelona who loves pizza, coding and helping people challenge themselves.',
     stats: [['Code', 92], ['Curls', 99], ['Sleep', 12]], weakTo: '"Quick question?"', links: [RECRUIT, GITHUB],
   },
   code: {
-    title: 'Code', kind: 'Class: Senior Software Engineer',
-    bio: '8+ years shipping. Led 8 engineers on a platform for 2M+ users. Cut deploy times by 60%.',
+    title: 'Code', kind: 'Class: Engineering Manager',
+    bio: 'Leading engineering teams since 2021. Now at G2, leading six engineers while staying hands-on. Previously grew engineers into leads at Gartner.',
     stats: [['Code', 92], ['Lead', 88], ['Meetings', 21]], weakTo: '"Quick question?"', links: [RECRUIT, GITHUB],
   },
   scorepace: {
