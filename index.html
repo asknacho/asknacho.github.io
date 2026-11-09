@@ -121,6 +121,10 @@
     .panel p { margin-bottom: 18px; }
     .quests { list-style: none; display: grid; gap: 16px; margin-bottom: 20px; }
     .quest-meta, .quest-what { color: var(--muted); }
+    /* A teammate's words: indented with a soft rule, same pixel font, attribution softer. */
+    .kudos { margin: 4px 0 22px; padding-left: 14px; border-left: 3px solid color-mix(in oklab, var(--ink) 35%, transparent); }
+    .kudos p { margin-bottom: 6px; }
+    .kudos footer { color: var(--muted); }
     .panel-link { color: var(--ink); text-decoration: underline; text-underline-offset: 4px; }
     .panel-link:hover, .panel-link:focus-visible { text-decoration-thickness: 3px; outline: none; }
 
@@ -305,6 +309,12 @@
         </ol>
         <p class="quest-what">Strengths: developing people · delegation · clear communication · prioritisation · technical depth · AI-native engineering.</p>
         <p class="quest-what">AWS certified · Rails Girls Summer of Code coach · BSc Computer Science.</p>
+        <!-- From a teammate's farewell message (translated from Spanish). Attributed anonymously until he
+             agrees to be named. -->
+        <blockquote class="kudos">
+          <p>“Your arrival in this team has been the most positive and disruptive thing I’ve seen at work: a whirlwind of fresh air that turned every process around, organically and without much noise. Spotting blockers, cutting through communication, adding value to the product… Now I know what to look for in my next lead: a Nacho.”</p>
+          <footer>— an engineer on my team</footer>
+        </blockquote>
         <a class="panel-link" href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">Recruit Nacho →</a>
       </article>
     </section>
