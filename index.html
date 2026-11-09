@@ -88,8 +88,58 @@
       place-items: center;
     }
     .sprite--stand { will-change: transform; }
-    .scene--code { justify-items: start; padding-left: max(16px, 6vw); }
-    .scene--guitar { justify-items: end; padding-right: max(16px, 6vw); }
+    /* Character scenes: the character on one side, an RPG-style text box on the other, as if the
+       character were talking. Coding: Nacho left, box right. Guitar: box left, Nacho right.
+       On narrow screens the box sits under the character. */
+    .scene--code, .scene--guitar {
+      grid-template-columns: auto minmax(0, 34rem);
+      gap: clamp(20px, 4vw, 64px);
+      padding: 40px max(16px, 6vw);
+    }
+    .scene--code { justify-content: start; }
+    .scene--guitar { grid-template-columns: minmax(0, 34rem) auto; justify-content: end; }
+    .scene--guitar .panel { order: -1; }
+    @media (max-width: 720px) {
+      .scene--code, .scene--guitar { grid-template-columns: minmax(0, 1fr); justify-content: stretch; }
+      .scene--code .sprite { justify-self: start; }
+      .scene--guitar .sprite { justify-self: end; }
+      .scene--guitar .panel { order: 0; }
+    }
+
+    /* Text box: pixel-font headings, a readable body font, colours from the day/night ink and page
+       background so it has the same contrast as the rest of the page at any time of day. */
+    .panel {
+      --muted: color-mix(in oklab, var(--ink) 68%, var(--bg));
+      color: var(--ink);
+      background: color-mix(in oklab, var(--bg) 90%, var(--ink));
+      border: 3px solid var(--ink);
+      box-shadow: 6px 6px 0 color-mix(in oklab, var(--ink) 22%, transparent);
+      padding: 20px 22px 22px;
+      font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+      transition-delay: 0.15s;
+    }
+    .panel-tag, .panel h2, .panel-link {
+      font-family: 'Press Start 2P', ui-monospace, 'SF Mono', Menlo, monospace;
+      font-weight: 400;
+    }
+    .panel-tag { font-size: 10px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+    .panel h2 { font-size: clamp(13px, 2.2vw, 16px); line-height: 1.5; margin-bottom: 16px; }
+    .panel p { margin-bottom: 14px; }
+    .quests { list-style: none; display: grid; gap: 14px; margin-bottom: 18px; }
+    .quests li { padding-left: 14px; border-left: 3px solid color-mix(in oklab, var(--ink) 35%, transparent); }
+    .quest-role { font-weight: 700; }
+    .quest-meta { font-size: 14px; color: var(--muted); }
+    .quest-what { font-size: 15px; margin-top: 2px; }
+    .panel-link {
+      display: inline-block;
+      font-size: 11px;
+      line-height: 1.4;
+      padding: 11px 14px;
+      color: var(--bg);
+      background: var(--ink);
+      text-decoration: none;
+    }
+    .panel-link:hover, .panel-link:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 
     /* Sprite sheets: frames in a row, drawn at a whole-number scale so pixels stay crisp. */
     .sprite {
@@ -244,9 +294,38 @@
     </section>
     <section class="scene scene--code">
       <div class="sprite sprite--code reveal"><img src="assets/code.png" data-frames="8" alt="Nacho on his laptop, talking to an AI agent that codes for him" /></div>
+      <!-- MOCK DATA: placeholder roles, companies and years until the real job history is added. -->
+      <article class="panel reveal" aria-labelledby="dev-title">
+        <p class="panel-tag">Quest log</p>
+        <h2 id="dev-title">Software engineer &amp; tech lead</h2>
+        <ol class="quests">
+          <li>
+            <div class="quest-role">Tech Lead</div>
+            <div class="quest-meta">Acme Corp · 2022 – now</div>
+            <div class="quest-what">Leads a team of 8 building a platform used by 2M people, with AI agents in the daily workflow.</div>
+          </li>
+          <li>
+            <div class="quest-role">Senior Software Engineer</div>
+            <div class="quest-meta">Startup XYZ · 2019 – 2022</div>
+            <div class="quest-what">Built the core product from zero to Series A; owned the real-time backend.</div>
+          </li>
+          <li>
+            <div class="quest-role">Software Engineer</div>
+            <div class="quest-meta">Big Co · 2016 – 2019</div>
+            <div class="quest-what">Full-stack work on customer-facing web apps; mentored new joiners.</div>
+          </li>
+        </ol>
+        <a class="panel-link" href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">Recruit Nacho →</a>
+      </article>
     </section>
     <section class="scene scene--guitar">
       <div class="sprite sprite--guitar reveal"><img src="assets/guitar.png" data-frames="13" alt="Nacho sitting on the grass, playing guitar and singing" /></div>
+      <article class="panel reveal" aria-labelledby="music-title">
+        <p class="panel-tag">Side quest</p>
+        <h2 id="music-title">ScorePace</h2>
+        <p>Plays guitar, is learning piano, and built <strong>scorepace.com</strong> to help himself learn rather than just practise.</p>
+        <a class="panel-link" href="https://scorepace.com" target="_blank" rel="noopener">Play ScorePace →</a>
+      </article>
     </section>
     <!-- Hidden for now: remove the hidden attribute to bring the Barcelona scene back. -->
     <section class="bcn" id="barcelona" hidden aria-label="A hill above Barcelona: the sea, the city and the Sagrada Familia">
