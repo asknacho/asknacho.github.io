@@ -57,11 +57,11 @@
     /* Greeting, typed like an old game; the last dot blinks like a cursor. It sits just above Nacho's
        head at the start, fixed to the page (not the screen), so it scrolls away while he walks off to the
        right. His art fills his 256 px cell from the very top, so the text sits a line plus 12 px above
-       half a cell up from the middle of the screen. */
+       half a cell up from the middle of the screen (cells are 260 px: 4 px of room under the soles). */
     .greeting {
       position: absolute;
-      top: calc(50vh - var(--hero) * 128px - 12px - 1.4em);
-      top: calc(50svh - var(--hero) * 128px - 12px - 1.4em);
+      top: calc(50vh - var(--hero) * 130px - 12px - 1.4em);
+      top: calc(50svh - var(--hero) * 130px - 12px - 1.4em);
       left: 0;
       right: 0;
       z-index: 10;
@@ -87,8 +87,8 @@
       display: grid;
       place-items: center;
     }
-    /* The intro Nacho is the high-detail Pixellab art: 256 px cells, shown 1:1. */
-    .sprite--stand { --frame: 256px; --scale: var(--hero); will-change: transform; }
+    /* The intro Nacho is the high-detail Pixellab art: 260 px cells, shown 1:1. */
+    .sprite--stand { --frame: 260px; --scale: var(--hero); will-change: transform; }
     .scene--code { justify-items: start; padding-left: max(16px, 6vw); }
     .scene--guitar { justify-items: end; padding-right: max(16px, 6vw); }
 
@@ -279,7 +279,7 @@
       var rest, pace = 1;
       function measure() {
         var w = intro.offsetWidth, h = intro.offsetHeight;
-        pace = (innerWidth / 2 + w * 0.32) / (0.8 * (innerHeight / 2 + h / 2));  // art is ~146 of 256 px wide
+        pace = (innerWidth / 2 + w * 0.32) / (0.8 * (innerHeight / 2 + h / 2));  // art is ~146 of 260 px wide
       }
       function sink() {
         intro.style.transform = 'translate3d(' + Math.round(scrollY * pace) + 'px, 0, 0)';
