@@ -14,7 +14,7 @@
   padding: 12%;
 }
 .sprite.has-cycle > img { visibility: hidden; }
-.sprite-cycle[hidden], .sprite--stand .wave[hidden] { display: none !important; }
+.sprite-cycle[hidden] { display: none !important; }
 .sprite--stand .reading { position: relative; }
 .sprite--stand .reading img {
   width: 100%;
@@ -35,11 +35,8 @@
 .intro-cycle canvas[hidden], .reading canvas[hidden] { display: none !important; }
 /* Match the couch's adult proportions, with visible feet/bag on the same floor.
    The 108px art frame sits in a 72px-high viewport. Native bottom edges are
-   wave 393/486, walk 415/514 and sleep 322/506; offsets remove their padding. */
+   Standing and sleeping offsets remove the transparent padding. */
 .sprite--stand .breathe,
-.sprite--stand .wave,
-.sprite--stand .walk img,
-.sprite--stand .walk canvas,
 .sprite--stand .sleep img,
 .sprite--stand .sleep canvas {
   position: absolute;
@@ -48,10 +45,7 @@
   left: calc(-4px * var(--scale));
   object-fit: fill;
 }
-.sprite--stand .breathe,
-.sprite--stand .wave { top: calc(-15.333333px * var(--scale)); }
-.sprite--stand .walk img,
-.sprite--stand .walk canvas { top: calc(-15.198444px * var(--scale)); }
+.sprite--stand .breathe { top: calc(-14.985222px * var(--scale)); }
 .sprite--stand .sleep img,
 .sprite--stand .sleep canvas { top: calc(3.272727px * var(--scale)); }
 .scene-status {
@@ -65,12 +59,6 @@
   opacity: 0.75;
   z-index: 1;
 }
-.sprite--stand .wave {
-  display: none;
-  image-rendering: auto;
-}
-html[data-activity="active"] .sprite--stand.is-greeting .wave { display: block; }
-html[data-activity="active"] .sprite--stand.is-greeting .breathe { display: none; }
 .music-portrait { display: grid; justify-items: center; gap: 0; }
 .instrument-picker { display: flex; gap: 6px; }
 .instrument-picker button {
@@ -89,12 +77,7 @@ html[data-activity="active"] .sprite--stand.is-greeting .breathe { display: none
 }
 .instrument-picker button:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); }
 .instrument-picker button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-.sprite--stand .breathe { image-rendering: auto; }
-html[data-motion="on"][data-activity="active"] .sprite--stand.is-on-screen .breathe {
-  animation: idle-breathe 4s ease-in-out infinite;
-  transform-origin: 50% 80.864198%;
-}
-@keyframes idle-breathe { 50% { transform: scaleY(1.025); } }
+.sprite--stand .breathe { image-rendering: pixelated; }
 @media (prefers-reduced-motion: reduce) {
   .sprite--stand .sleep,
   .sprite--polished img { animation: none !important; }

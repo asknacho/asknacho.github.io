@@ -1,6 +1,6 @@
 # Sprite cycles
 
-Typing, guitar, piano, greeting, walking and sleeping each have twelve distinct raster frames. Family time uses four frames: open eyes and one blink for each of Nacho, his wife and their older daughter. Playback copies one complete atlas cell at a time, with no tweening, whole-image rotation, scaling, morphing or interpolation.
+Typing, guitar, piano and sleeping use twelve distinct raster frames. Walking and greeting sheets are retained as source references but are no longer used by the homepage. The daytime hero is a stationary high-resolution standing image. Family time uses four frames: open eyes and one blink for each of Nacho, his wife and their older daughter. Playback copies one complete atlas cell at a time, with no tweening, whole-image rotation, scaling, morphing or interpolation.
 
 | Cycle | Frame duration | Full cycle |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ Typing, guitar, piano, greeting, walking and sleeping each have twelve distinct 
 | Family | 130 ms blinks with long still holds | 8.19 s |
 | Sleep | 360 ms | 4.32 s |
 
-The greeting plays one complete cycle on arrival, then rests. Walking runs while scrolling and returns to the resting pose when scrolling stops. Typing, instruments, family and sleeping loop while visible. Reduced motion shows the still artwork; scrolling away or hiding the tab pauses playback. The intro poses share the couch scene's floor and caption baseline. The caption stays fixed behind the walking character, which passes in front as the page scrolls.
+The daytime hero does not animate, change poses or move relative to its caption when scrolling. Typing, instruments, family and sleeping loop while visible. Reduced motion shows still artwork; hiding the tab or scrolling the animated scenes off screen pauses playback. The intro poses share the couch scene's floor and caption baseline.
 
 Walking, typing, instrument, greeting and sleeping source poses were generated with the built-in imagegen tool from the approved new-style stills. Family poses are authored directly from the approved artwork by `tools/build_family_cycle.cjs`. `source/` retains the twelve-pose input atlases. `tools/build_sprite_cycles.cjs` registers each pose using the head and pins the static image to frame 1, admitting redraws only inside the action regions (hands, wrists and sleeves). This keeps faces and the rest of the body stable rather than letting generated frames drift.
 

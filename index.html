@@ -21,7 +21,7 @@
   <meta name="twitter:description" content="Engineering manager in Barcelona. Building teams and useful things." />
   <meta name="twitter:image" content="https://asknacho.to/assets/social-card.png" />
   <meta name="twitter:image:alt" content="Pixel art of Nacho reading with his family; engineering manager in Barcelona" />
-  <link rel="stylesheet" href="assets/share-ready.css" />
+  <link rel="stylesheet" href="assets/share-ready.css?v=standing-hd" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
@@ -72,7 +72,7 @@
       align-items: center;
       overflow: hidden;
     }
-    /* The introduction stays above Nacho's starting pose, outside his walking path. */
+    /* The introduction stays above the character artwork. */
     .intro-heading {
       position: absolute;
       top: calc(var(--hero-height) / 2 - var(--scale) * 30px);
@@ -105,8 +105,7 @@
     .scene--intro { min-height: 640px; }
     .scene--code { scroll-margin-top: 24px; }
 
-    /* A minimum stage height keeps the introduction on screen in short viewports.
-       Nacho walks at a fifth of scroll speed while the text scrolls away above him. */
+    /* A minimum stage height keeps the introduction on screen in short viewports. */
     .scene--intro {
       --scale: 5;
       --hero-height: max(720px, 100svh);
@@ -127,7 +126,6 @@
       top: calc(14px * var(--scale));
       overflow: hidden;
       z-index: 2;
-      will-change: transform;
     }
     /* Character scenes: the character on one side, an RPG-style text box on the other, as if the
        character were talking. Coding: Nacho left, box right. Guitar: box left, Nacho right.
@@ -195,16 +193,12 @@
     /* A 72px logical viewport; discrete atlas cells are copied by sprite-cycles.js. */
     .sprite { --frame: 72px; }
 
-    /* While the page scrolls he walks; when it stops he breathes again. */
-    .sprite--stand .walk, .sprite--stand .sleep, .sprite--stand .reading { display: none; }
+    /* The resting daytime pose stays stationary while the page scrolls. */
+    .sprite--stand .sleep, .sprite--stand .reading { display: none; }
     .sprite--stand .sleep, .sprite--stand .reading { width: 100%; object-fit: contain; }
     .sprite--stand .reading { image-rendering: auto; }
-    .sprite--stand.is-walking .walk { display: block; }
-    .sprite--stand.is-walking .breathe { display: none; }
     html[data-activity="sleeping"] .sprite--stand .breathe,
-    html[data-activity="sleeping"] .sprite--stand .walk,
-    html[data-activity="reading"] .sprite--stand .breathe,
-    html[data-activity="reading"] .sprite--stand .walk { display: none; }
+    html[data-activity="reading"] .sprite--stand .breathe { display: none; }
     html[data-activity="sleeping"] .sprite--stand .sleep,
     html[data-activity="reading"] .sprite--stand .reading { display: block; }
 
@@ -339,9 +333,8 @@
         </div>
       </div>
       <div class="stage">
-        <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks away as you scroll">
-          <img class="breathe" src="assets/cycles/wave-still.webp" alt="" />
-          <div class="walk intro-cycle"><img src="assets/cycles/walk-still.webp" alt="" /><canvas id="walk-cycle" hidden aria-hidden="true"></canvas></div>
+        <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing">
+          <img class="breathe" src="assets/standing-hd.webp" alt="" />
           <div class="sleep intro-cycle"><img src="assets/cycles/sleep-still.webp" alt="" /><canvas id="sleep-cycle" hidden aria-hidden="true"></canvas></div>
           <div class="reading"><img src="assets/family-reading.webp" width="1388" height="999" alt="" /><canvas id="family-motion" width="1388" height="999" aria-hidden="true"></canvas></div>
         </div>
@@ -423,47 +416,19 @@
     </section>
   </main>
   <script src="assets/barcelona.js?v=4" defer></script>
-  <script type="module" src="assets/share-ready.js"></script>
+  <script type="module" src="assets/share-ready.js?v=standing-hd"></script>
   <script>
     (function () {
       var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      // Intro: he walks down at a fifth of the scroll speed (parallax), so the page outruns him and he
-      // drifts off the top just after the greeting. He walks while the page moves and breathes when it
-      // stops. The position is set in the scroll event itself, not a frame later, and kept small: on
-      // iPhones the page scrolls on its own fast path, and any lag shows as a stutter on fast flicks.
       var intro = document.getElementById('intro');
-      var rest;
-      function isActive() {
-        return document.documentElement.dataset.activity === 'active';
-      }
-      function sink() {
-        if (!isActive() || still) {
-          intro.style.removeProperty('transform');
-          return;
-        }
-        intro.style.transform = 'translate3d(0, ' + Math.round(scrollY * 0.2) + 'px, 0)';
-      }
-      if (!still) {
-        addEventListener('scroll', function () {
-          if (!isActive()) return;
-          sink();
-          intro.classList.add('is-walking');
-          clearTimeout(rest);
-          rest = setTimeout(function () { intro.classList.remove('is-walking'); }, 250);
-        }, { passive: true });
-        sink();
-      }
 
       function updateIntroState() {
-        clearTimeout(rest);
-        intro.classList.remove('is-walking');
         intro.setAttribute('aria-label', document.documentElement.dataset.activity === 'sleeping'
           ? 'Nacho, asleep in a sleeping bag'
           : document.documentElement.dataset.activity === 'reading'
           ? 'Nacho reading on the sofa, his wife holding their baby, and their three-year-old daughter playing on the floor'
-          : 'Nacho, standing and breathing, walks away as you scroll');
-        sink();
+          : 'Nacho, standing');
       }
       addEventListener('nacho-activity-change', updateIntroState);
       updateIntroState();

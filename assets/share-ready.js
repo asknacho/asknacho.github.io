@@ -7,7 +7,6 @@ import { SpriteCycle } from './sprite-cycles.js';
   const intro = document.getElementById('intro');
   const status = document.getElementById('scene-status');
   const players = [];
-  let wavePlayer;
   const motionAllowed = () => !reduced.matches && !document.hidden;
   const labels = { active: 'Out and about', reading: 'Family time', sleeping: 'Recharging' };
   const updateStatus = () => {
@@ -45,16 +44,11 @@ import { SpriteCycle } from './sprite-cycles.js';
     });
   });
 
-  // All intro actions use the same discrete twelve-frame player.
+  // Family blinking and sleeping use discrete sprite frames.
   const introAllowed = activity => motionAllowed() && root.dataset.activity === activity &&
     intro.classList.contains('is-on-screen');
-  const walkHost = intro.querySelector('.walk');
   const sleepHost = intro.querySelector('.sleep');
   const familyHost = intro.querySelector('.reading');
-  const walkPlayer = new SpriteCycle({
-    canvas: document.getElementById('walk-cycle'), host: walkHost,
-    allowed: () => introAllowed('active') && intro.classList.contains('is-walking'),
-  });
   const sleepPlayer = new SpriteCycle({
     canvas: document.getElementById('sleep-cycle'), host: sleepHost,
     allowed: () => introAllowed('sleeping'),
@@ -63,21 +57,19 @@ import { SpriteCycle } from './sprite-cycles.js';
     canvas: document.getElementById('family-motion'), host: familyHost,
     allowed: () => introAllowed('reading'),
   });
-  players.push(walkPlayer, sleepPlayer, familyPlayer);
+  players.push(sleepPlayer, familyPlayer);
   const introAssets = new Set();
   function loadIntroAction() {
-    if (reduced.matches) return;
-    const action = root.dataset.activity === 'active' ? 'walk'
-      : root.dataset.activity === 'sleeping' ? 'sleep' : 'family';
+    if (reduced.matches || root.dataset.activity === 'active') return;
+    const action = root.dataset.activity === 'sleeping' ? 'sleep' : 'family';
     if (introAssets.has(action)) return;
     introAssets.add(action);
-    const player = { walk: walkPlayer, sleep: sleepPlayer, family: familyPlayer }[action];
+    const player = { sleep: sleepPlayer, family: familyPlayer }[action];
     player.load(action).then(loaded => { if (!loaded) introAssets.delete(action); });
   }
   function syncMotion() {
     const allowed = motionAllowed();
     root.dataset.motion = allowed ? 'on' : 'off';
-    if (!allowed) stopWave();
     loadIntroAction();
     players.forEach(player => player.sync());
   }
@@ -89,30 +81,7 @@ import { SpriteCycle } from './sprite-cycles.js';
   });
   [intro, document.querySelector('.sprite--code'), portrait].forEach(element => visibility.observe(element));
 
-  // A greeting runs once on entry, then yields immediately to scrolling.
-  const wave = document.createElement('canvas');
-  wave.className = 'wave';
-  wave.setAttribute('aria-hidden', 'true');
-  intro.append(wave);
-  wavePlayer = new SpriteCycle({
-    canvas: wave, once: true, onComplete: stopWave,
-    allowed: () => motionAllowed() && root.dataset.activity === 'active' &&
-      intro.classList.contains('is-greeting') && intro.classList.contains('is-on-screen'),
-  });
-  players.push(wavePlayer);
-  function stopWave() {
-    intro.classList.remove('is-greeting');
-    wavePlayer?.pause();
-  }
-  if (!reduced.matches && root.dataset.activity === 'active') {
-    wavePlayer.load('wave').then(loaded => {
-      if (!loaded || !motionAllowed() || root.dataset.activity !== 'active' || scrollY > 40) return;
-      intro.classList.add('is-greeting');
-      wavePlayer.restart();
-    });
-  }
-  addEventListener('scroll', () => { stopWave(); walkPlayer.sync(); }, { passive: true });
-  addEventListener('nacho-activity-change', () => { stopWave(); syncMotion(); });
+  addEventListener('nacho-activity-change', syncMotion);
   document.addEventListener('visibilitychange', syncMotion);
   reduced.addEventListener('change', syncMotion);
   syncMotion();

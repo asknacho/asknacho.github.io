@@ -4,7 +4,7 @@ New poses were generated with the built-in imagegen tool, using the existing Nac
 
 Outputs: `assets/stand-polished.webp`, `assets/wave.webp`, `assets/code-polished.webp`, `assets/guitar-polished.webp`, and `assets/piano.webp`.
 
-The original still poses above are retained as art references. Runtime typing, guitar, piano, waving, walking and sleeping use twelve-frame sheets; family time uses four blink states in `assets/cycles/`; see `art/cycles/README.md`. Still artwork supplies the reduced-motion fallback. The earlier four-frame greeting and whole-image music/coding sway are no longer used.
+The original still poses above are retained as art references. Runtime typing, guitar, piano and sleeping use twelve-frame sheets; family time uses four blink states in `assets/cycles/`; see `art/cycles/README.md`. Still artwork supplies the reduced-motion fallback. The daytime hero uses `assets/standing-hd.webp`, a dedicated high-detail still. Walking, greeting, scroll parallax and whole-image standing movement are disabled. See `art/standing.md` for the artwork source and prompt.
 
 The full-resolution family scene has four raster states: eyes open, Nacho blinking, his wife blinking, and their older daughter blinking. Only six eye rectangles change. Blinks last 130 ms and are staggered with long pauses. The baby and all other artwork remain still. The original image is the reduced-motion and no-JavaScript fallback. The sleeping bag uses a separate twelve-frame cloth-breathing cycle. Motion stops when the scene leaves the viewport or the tab is hidden.
 
