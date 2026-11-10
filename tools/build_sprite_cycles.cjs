@@ -28,11 +28,7 @@ const actions = {
   sleep: { frameMs: 360, bag: true, noRegistration: true, masks: [
     [[.32,.25],[.91,.25],[.91,.70],[.32,.70]],
   ] },
-  family: { frameMs: 350, template: 'assets/family-reading.png', noRegistration: true, masks: [
-    [[.27,.38],[.47,.38],[.47,.55],[.27,.55]],
-    [[.56,.32],[.73,.32],[.73,.55],[.56,.55]],
-    [[.635,.80],[.705,.80],[.705,.90],[.635,.90]],
-  ] },
+  family: { frameMs: 350, authored: true },
 };
 function inside(x, y, polygon) {
   let result = false;
@@ -55,12 +51,11 @@ function bounds(data, width, height, region = [0, 0, 1, 1]) {
   return { left, top, right, bottom, center: (left + right) / 2 };
 }
 async function build(name, action) {
+  if (action.authored) return require('./build_family_cycle.cjs')(sharp, { root, output, frameMs: action.frameMs });
   const source = path.join(root, 'art/cycles/source', `${name}.png`);
   const metadata = await sharp(source).metadata();
   const cellWidth = Math.floor(metadata.width / 4), cellHeight = Math.floor(metadata.height / 3);
-  const template = action.template ? await sharp(path.join(root, action.template)).ensureAlpha().raw().toBuffer({ resolveWithObject: true }) : null;
-  const width = template ? template.info.width : cellWidth;
-  const height = template ? template.info.height : cellHeight;
+  const width = cellWidth, height = cellHeight;
   const raw = [];
   for (let i = 0; i < 12; i++) {
     const cell = await sharp(source).extract({ left: i % 4 * cellWidth, top: Math.floor(i / 4) * cellHeight, width: cellWidth, height: cellHeight }).png().toBuffer();
@@ -72,27 +67,19 @@ async function build(name, action) {
   const standing = name === 'wave' || action.standing;
   const side = standing ? Math.ceil((content.bottom - content.top + 1) * 72 / 44)
     : action.bag ? Math.ceil((content.right - content.left + 1) * 72 / 44) : Math.max(width, height) + 16;
-  const outWidth = template ? width : side, outHeight = template ? height : side;
-  const left = template ? 0 : Math.round(side / 2 - (action.standing ? anchor.center : content.center));
-  const top = template ? 0 : standing ? Math.round(side * 58 / 72 - content.bottom) : Math.round((side - height) / 2);
+  const outWidth = side, outHeight = side;
+  const left = Math.round(side / 2 - (action.standing ? anchor.center : content.center));
+  const top = standing ? Math.round(side * 58 / 72 - content.bottom) : Math.round((side - height) / 2);
   const frames = [], hashes = [];
   for (let i = 0; i < 12; i++) {
     const current = bounds(raw[i], width, height, anchorRegion);
     const dx = action.noRegistration ? 0 : Math.round(current.center - anchor.center);
     const dy = action.noRegistration ? 0 : current.top - anchor.top;
-    const pixels = template ? Buffer.alloc(template.data.length) : Buffer.from(raw[0]);
+    const pixels = Buffer.from(raw[0]);
     for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
       if (!action.masks.some(mask => inside(x / width, y / height, mask))) continue;
       const sx = x + dx, sy = y + dy, destination = (y * width + x) * 4;
       if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
-        if (template) {
-          // Admit only actual pose changes; keep the approved high-resolution art intact.
-          const change = Math.max(...[0, 1, 2, 3].map(c => Math.abs(raw[i][destination + c] - raw[0][destination + c])));
-          if (change < 48 || i === 0) continue;
-          if (template.data[destination + 3] < 128 || raw[0][destination + 3] < 128 || raw[i][destination + 3] < 128) continue;
-          const match = Math.max(...[0, 1, 2].map(c => Math.abs(template.data[destination + c] - raw[0][destination + c])));
-          if (match > 64) continue;
-        }
         raw[i].copy(pixels, destination, (sy * width + sx) * 4, (sy * width + sx) * 4 + 4);
       } else pixels.fill(0, destination, destination + 4);
     }
@@ -105,10 +92,9 @@ async function build(name, action) {
   await sharp({ create: { width: outWidth * 4, height: outHeight * 3, channels: 4, background: '#00000000' } })
     .composite(frames.map((input, i) => ({ input, left: i % 4 * outWidth, top: Math.floor(i / 4) * outHeight })))
     .webp({ lossless: true }).toFile(path.join(output, `${name}.webp`));
-  if (!template) await sharp(frames[0]).webp({ lossless: true }).toFile(path.join(output, `${name}-still.webp`));
+  await sharp(frames[0]).webp({ lossless: true }).toFile(path.join(output, `${name}-still.webp`));
   fs.writeFileSync(path.join(output, `${name}.json`), JSON.stringify({
     image: `${name}.webp`, frames: 12, columns: 4, frameWidth: outWidth, frameHeight: outHeight, frameMs: action.frameMs,
-    base: template ? '../family-reading.webp' : undefined,
   }, null, 2) + '\n');
   console.log(`${name}: twelve distinct frames, ${outWidth}×${outHeight}, ${12 * action.frameMs}ms cycle`);
 }

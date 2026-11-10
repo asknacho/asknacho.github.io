@@ -5,5 +5,25 @@
   "frameWidth": 1388,
   "frameHeight": 999,
   "frameMs": 350,
-  "base": "../family-reading.webp"
+  "base": "../family-reading.webp",
+  "clear": [
+    {
+      "x": 368,
+      "y": 348,
+      "width": 280,
+      "height": 124
+    },
+    {
+      "x": 800,
+      "y": 432,
+      "width": 104,
+      "height": 64
+    },
+    {
+      "x": 880,
+      "y": 800,
+      "width": 104,
+      "height": 112
+    }
+  ]
 }

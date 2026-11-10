@@ -14,23 +14,17 @@ Typing, guitar, piano, greeting, walking, family and sleeping each have twelve d
 
 The greeting plays one complete cycle on arrival, then rests. Walking runs while scrolling and returns to the resting pose when scrolling stops. Typing, instruments, family and sleeping loop while visible. Reduced motion shows the still artwork; scrolling away or hiding the tab pauses playback. The caption follows the walking sprite's scroll position.
 
-Source poses were generated with the built-in imagegen tool from the approved new-style stills. `source/` retains the twelve-pose input atlases. `tools/build_sprite_cycles.cjs` registers each pose using the head and pins the static image to frame 1, admitting redraws only inside the action regions (hands, wrists and sleeves). This keeps faces and the rest of the body stable rather than letting generated frames drift.
+Walking, typing, instrument, greeting and sleeping source poses were generated with the built-in imagegen tool from the approved new-style stills. Family poses are authored directly from the approved artwork by `tools/build_family_cycle.cjs`. `source/` retains the twelve-pose input atlases. `tools/build_sprite_cycles.cjs` registers each pose using the head and pins the static image to frame 1, admitting redraws only inside the action regions (hands, wrists and sleeves). This keeps faces and the rest of the body stable rather than letting generated frames drift.
 
 Run `node tools/build_sprite_cycles.cjs [path-to-sharp]` to rebuild. The script verifies twelve unique frames for every action, preserves native pixel samples, adds consistent transparent margins and writes lossless 4×3 WebP atlases, first-frame stills and JSON timing metadata to `assets/cycles/`. `assets/sprite-cycles.js` validates dimensions and frame counts before enabling playback; the still image remains available if loading fails.
 
-The family cycle keeps the exact approved 1388×999 artwork as its base. Its twelve cells store only changed page, blanket and block pixels, matched to the original colors and restricted to small action regions. Faces, bodies and sofa are untouched. The runtime combines the full-resolution base and a discrete delta cell. This keeps the animation sheet around 57 KB while preserving the original detail. The original image remains the still fallback.
+The family cycle keeps the exact approved 1388×999 artwork as its base. `tools/build_family_cycle.cjs` authors a small page flutter and discrete blanket/hand poses directly from that image. Each cell stores complete replacement rectangles, including their original pixels and transparency. The player clears each old rectangle before drawing its replacement, preventing mixed edges, accumulated layers and patchy pixel noise. Faces, bodies and sofa remain unchanged. The original image remains the still fallback.
 
 `intro-preview.gif` shows the walking, family and sleeping cycles at their individual playback timings. The family and sleeping sheets are loaded only for the active time-of-day scene.
 
+`family-preview.gif` shows the corrected family loop at a closer scale. Run `node tools/check_family_cycle.cjs [path-to-sharp]` to verify twelve distinct poses, original palettes, exact opaque rest-frame pixels, complete replacement rectangles and protected faces. Family frame parameters and pixel-art page geometry are editable in `tools/build_family_cycle.cjs`.
+
 ## Generation prompts
-
-### family
-
-Use case: identity-preserve sprite animation.
-EDIT TARGET: the exact approved family scene in reference. Preserve the faces, hair, clothing, composition, green sofa, book, wife holding the infant, and three-year-old daughter with toy blocks. Exactly 4 people.
-Deliver TWELVE frames as a 4-column × 3-row sprite sheet. Each cell has the SAME 100:72 LANDSCAPE aspect ratio as reference, e.g. 512×368 cells, whole sheet2048×1104. Transparent background, no grid lines, text, numbers or extra objects. Preserve the exact internal positions and proportions from the reference, including transparent padding.
-ONLY TINY REDRAWN PIXEL CHANGES: a gentle small book-page flutter and baby blanket breathing. The daughter may nudge her top yellow toy block by 1–2 logical pixels and return it. Keep all faces, heads, bodies, couch, clothes and feet EXACTLY FIXED. Do not redraw the faces or alter expressions. Frames1–3 quiet hold with slight baby blanket fold change; 4–6 a single thin book page lifts a few pixels; 7–9 page settles and child nudges block; 10–12 blanket and block settle to initial state. All12 frames must have a small distinct localized pixel change and form a subtle seamless loop.
-Traditional game sprite animation with separately drawn frames, NO global rotating, moving or scaling the whole scene; no cinematic motion, morphing, blur or smooth video interpolation. Match source's sharp dark outlines, warm earthy palette and chunky square pixels exactly.
 
 ### sleep
 

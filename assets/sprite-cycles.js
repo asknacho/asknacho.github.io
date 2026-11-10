@@ -70,6 +70,9 @@ export class SpriteCycle {
     const { frameWidth: width, frameHeight: height, columns } = this.sheet;
     this.context.clearRect(0, 0, width, height);
     if (this.base) this.context.drawImage(this.base, 0, 0, width, height);
+    for (const region of this.sheet.clear || []) {
+      this.context.clearRect(region.x, region.y, region.width, region.height);
+    }
     this.context.drawImage(this.image, index % columns * width, Math.floor(index / columns) * height,
       width, height, 0, 0, width, height);
     this.frame = index;
