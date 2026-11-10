@@ -12,7 +12,7 @@ Typing, guitar, piano, greeting, walking and sleeping each have twelve distinct 
 | Family | 130 ms blinks with long still holds | 8.19 s |
 | Sleep | 360 ms | 4.32 s |
 
-The greeting plays one complete cycle on arrival, then rests. Walking runs while scrolling and returns to the resting pose when scrolling stops. Typing, instruments, family and sleeping loop while visible. Reduced motion shows the still artwork; scrolling away or hiding the tab pauses playback. The caption follows the walking sprite's scroll position.
+The greeting plays one complete cycle on arrival, then rests. Walking runs while scrolling and returns to the resting pose when scrolling stops. Typing, instruments, family and sleeping loop while visible. Reduced motion shows the still artwork; scrolling away or hiding the tab pauses playback. The intro poses share the couch scene's floor and caption baseline. The caption stays fixed behind the walking character, which passes in front as the page scrolls.
 
 Walking, typing, instrument, greeting and sleeping source poses were generated with the built-in imagegen tool from the approved new-style stills. Family poses are authored directly from the approved artwork by `tools/build_family_cycle.cjs`. `source/` retains the twelve-pose input atlases. `tools/build_sprite_cycles.cjs` registers each pose using the head and pins the static image to frame 1, admitting redraws only inside the action regions (hands, wrists and sleeves). This keeps faces and the rest of the body stable rather than letting generated frames drift.
 
