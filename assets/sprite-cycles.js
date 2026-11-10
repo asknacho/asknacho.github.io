@@ -35,13 +35,20 @@ export class SpriteCycle {
         }
       }
       if (version !== this.version) return false;
-      if (sheet.frames !== 12 || image.naturalWidth !== sheet.frameWidth * sheet.columns ||
+      if (!Number.isInteger(sheet.frames) || sheet.frames < 1 || image.naturalWidth !== sheet.frameWidth * sheet.columns ||
           image.naturalHeight !== sheet.frameHeight * Math.ceil(sheet.frames / sheet.columns)) {
-        throw new Error(`Invalid 12-frame sheet: ${name}`);
+        throw new Error(`Invalid sprite sheet: ${name}`);
+      }
+      const timeline = sheet.sequence || Array.from({ length: sheet.frames }, (_, frame) => ({ frame, durationMs: sheet.frameMs }));
+      if (!timeline.length || timeline.some(step => !Number.isInteger(step.frame) || step.frame < 0 ||
+          step.frame >= sheet.frames || !Number.isFinite(step.durationMs) || step.durationMs <= 0)) {
+        throw new Error(`Invalid sprite timing: ${name}`);
       }
       this.sheet = sheet;
       this.image = image;
       this.base = base;
+      this.timeline = timeline;
+      this.duration = timeline.reduce((total, step) => total + step.durationMs, 0);
       this.canvas.width = sheet.frameWidth;
       this.canvas.height = sheet.frameHeight;
       this.context.imageSmoothingEnabled = false;
@@ -84,14 +91,20 @@ export class SpriteCycle {
     if (!this.ready || this.complete || !this.allowed()) return this.pause();
     if (this.lastTime !== null) this.elapsed += time - this.lastTime;
     this.lastTime = time;
-    const index = Math.floor(this.elapsed / this.sheet.frameMs);
-    if (this.once && index >= this.sheet.frames) {
+    if (this.once && this.elapsed >= this.duration) {
       this.complete = true;
       this.pause();
       this.onComplete();
       return;
     }
-    this.draw(index % this.sheet.frames);
+    let phase = this.elapsed % this.duration;
+    let pose = this.timeline[0].frame;
+    for (const step of this.timeline) {
+      pose = step.frame;
+      if (phase < step.durationMs) break;
+      phase -= step.durationMs;
+    }
+    this.draw(pose);
     this.request = requestAnimationFrame(this.tick);
   }
 

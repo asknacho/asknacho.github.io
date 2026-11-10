@@ -1,6 +1,6 @@
-# Twelve-frame sprite cycles
+# Sprite cycles
 
-Typing, guitar, piano, greeting, walking, family and sleeping each have twelve distinct raster frames. Playback copies one complete atlas cell at a time, with no tweening, whole-image rotation, scaling, morphing or interpolation.
+Typing, guitar, piano, greeting, walking and sleeping each have twelve distinct raster frames. Family time uses four frames: open eyes and one blink for each of Nacho, his wife and their older daughter. Playback copies one complete atlas cell at a time, with no tweening, whole-image rotation, scaling, morphing or interpolation.
 
 | Cycle | Frame duration | Full cycle |
 | --- | --- | --- |
@@ -9,7 +9,7 @@ Typing, guitar, piano, greeting, walking, family and sleeping each have twelve d
 | Piano | 140 ms | 1.68 s |
 | Wave | 160 ms | 1.92 s |
 | Walk | 100 ms | 1.20 s |
-| Family | 350 ms | 4.20 s |
+| Family | 130 ms blinks with long still holds | 8.19 s |
 | Sleep | 360 ms | 4.32 s |
 
 The greeting plays one complete cycle on arrival, then rests. Walking runs while scrolling and returns to the resting pose when scrolling stops. Typing, instruments, family and sleeping loop while visible. Reduced motion shows the still artwork; scrolling away or hiding the tab pauses playback. The caption follows the walking sprite's scroll position.
@@ -18,11 +18,11 @@ Walking, typing, instrument, greeting and sleeping source poses were generated w
 
 Run `node tools/build_sprite_cycles.cjs [path-to-sharp]` to rebuild. The script verifies twelve unique frames for every action, preserves native pixel samples, adds consistent transparent margins and writes lossless 4×3 WebP atlases, first-frame stills and JSON timing metadata to `assets/cycles/`. `assets/sprite-cycles.js` validates dimensions and frame counts before enabling playback; the still image remains available if loading fails.
 
-The family cycle keeps the exact approved 1388×999 artwork as its base. `tools/build_family_cycle.cjs` authors a small page flutter and discrete blanket/hand poses directly from that image. Each cell stores complete replacement rectangles, including their original pixels and transparency. The player clears each old rectangle before drawing its replacement, preventing mixed edges, accumulated layers and patchy pixel noise. Faces, bodies and sofa remain unchanged. The original image remains the still fallback.
+The family cycle keeps the exact approved 1388×999 artwork as its base. `tools/build_family_cycle.cjs` changes only six small eye rectangles across four states. A timed sequence staggers 130 ms blinks for Nacho, his wife and their older daughter, with 1.9–3.2 second open-eye holds. The baby stays asleep. Book, blanket, hands, blocks, bodies and sofa remain completely still. The player replaces complete eye rectangles and preserves the original image as the reduced-motion fallback.
 
 `intro-preview.gif` shows the walking, family and sleeping cycles at their individual playback timings. The family and sleeping sheets are loaded only for the active time-of-day scene.
 
-`family-preview.gif` shows the corrected family loop at a closer scale. Run `node tools/check_family_cycle.cjs [path-to-sharp]` to verify twelve distinct poses, original palettes, exact opaque rest-frame pixels, complete replacement rectangles and protected faces. Family frame parameters and pixel-art page geometry are editable in `tools/build_family_cycle.cjs`.
+`family-preview.gif` shows the corrected family loop at a closer scale. Run `node tools/check_family_cycle.cjs [path-to-sharp]` to verify four distinct states, unchanged transparency, a stationary scene outside the eyes, and a single blinking member per state. Family frame parameters and eyelid geometry are editable in `tools/build_family_cycle.cjs`.
 
 ## Generation prompts
 

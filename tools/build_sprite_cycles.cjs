@@ -28,7 +28,7 @@ const actions = {
   sleep: { frameMs: 360, bag: true, noRegistration: true, masks: [
     [[.32,.25],[.91,.25],[.91,.70],[.32,.70]],
   ] },
-  family: { frameMs: 350, authored: true },
+  family: { authored: true },
 };
 function inside(x, y, polygon) {
   let result = false;
@@ -51,7 +51,7 @@ function bounds(data, width, height, region = [0, 0, 1, 1]) {
   return { left, top, right, bottom, center: (left + right) / 2 };
 }
 async function build(name, action) {
-  if (action.authored) return require('./build_family_cycle.cjs')(sharp, { root, output, frameMs: action.frameMs });
+  if (action.authored) return require('./build_family_cycle.cjs')(sharp, { root, output });
   const source = path.join(root, 'art/cycles/source', `${name}.png`);
   const metadata = await sharp(source).metadata();
   const cellWidth = Math.floor(metadata.width / 4), cellHeight = Math.floor(metadata.height / 3);
