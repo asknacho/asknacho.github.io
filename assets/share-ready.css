@@ -37,6 +37,7 @@
    The 108px art frame sits in a 72px-high viewport. Native bottom edges are
    Standing and sleeping offsets remove the transparent padding. */
 .sprite--stand .breathe,
+.sprite--stand .wave,
 .sprite--stand .sleep img,
 .sprite--stand .sleep canvas {
   position: absolute;
@@ -45,7 +46,8 @@
   left: calc(-4px * var(--scale));
   object-fit: fill;
 }
-.sprite--stand .breathe { top: calc(-14.985222px * var(--scale)); }
+.sprite--stand .breathe,
+.sprite--stand .wave { top: calc(-14.985222px * var(--scale)); }
 .sprite--stand .sleep img,
 .sprite--stand .sleep canvas { top: calc(3.272727px * var(--scale)); }
 .scene-status {
@@ -59,6 +61,9 @@
   opacity: 0.75;
   z-index: 1;
 }
+.sprite--stand .wave { display: none; image-rendering: pixelated; }
+html[data-activity="active"] .sprite--stand.is-greeting .wave { display: block; }
+html[data-activity="active"] .sprite--stand.is-greeting .breathe { display: none; }
 .music-portrait { display: grid; justify-items: center; gap: 0; }
 .instrument-picker { display: flex; gap: 6px; }
 .instrument-picker button {

@@ -1,4 +1,4 @@
-import { SpriteCycle } from './sprite-cycles.js';
+import { SpriteCycle } from './sprite-cycles.js?v=wave-hd';
 
 (() => {
   'use strict';
@@ -7,6 +7,10 @@ import { SpriteCycle } from './sprite-cycles.js';
   const intro = document.getElementById('intro');
   const status = document.getElementById('scene-status');
   const players = [];
+  let greetingPlayer;
+  let greetingReady = false;
+  let greetingStarted = false;
+  let greetingFinished = false;
   const motionAllowed = () => !reduced.matches && !document.hidden;
   const labels = { active: 'Out and about', reading: 'Family time', sleeping: 'Recharging' };
   const updateStatus = () => {
@@ -70,7 +74,15 @@ import { SpriteCycle } from './sprite-cycles.js';
   function syncMotion() {
     const allowed = motionAllowed();
     root.dataset.motion = allowed ? 'on' : 'off';
+    if (!allowed && greetingStarted) finishGreeting();
     loadIntroAction();
+    if (greetingReady && !greetingStarted && !greetingFinished && allowed &&
+        root.dataset.activity === 'active' && intro.classList.contains('is-on-screen') && scrollY < 40) {
+      greetingStarted = true;
+      intro.classList.add('is-greeting');
+      intro.setAttribute('aria-label', 'Nacho waving hello');
+      greetingPlayer.restart();
+    }
     players.forEach(player => player.sync());
   }
   const visibility = new IntersectionObserver(entries => {
@@ -81,7 +93,30 @@ import { SpriteCycle } from './sprite-cycles.js';
   });
   [intro, document.querySelector('.sprite--code'), portrait].forEach(element => visibility.observe(element));
 
-  addEventListener('nacho-activity-change', syncMotion);
+  const greeting = document.createElement('canvas');
+  greeting.className = 'wave sprite-cycle';
+  greeting.setAttribute('aria-hidden', 'true');
+  intro.append(greeting);
+  greetingPlayer = new SpriteCycle({
+    canvas: greeting, once: true, onComplete: finishGreeting,
+    allowed: () => motionAllowed() && root.dataset.activity === 'active' &&
+      intro.classList.contains('is-greeting') && intro.classList.contains('is-on-screen'),
+  });
+  players.push(greetingPlayer);
+  function finishGreeting() {
+    greetingFinished = true;
+    intro.classList.remove('is-greeting');
+    greetingPlayer?.pause();
+    if (root.dataset.activity === 'active') intro.setAttribute('aria-label', 'Nacho, standing');
+  }
+  if (!reduced.matches && root.dataset.activity === 'active' && scrollY < 40) {
+    greetingPlayer.load('wave-hd').then(loaded => {
+      greetingReady = loaded;
+      syncMotion();
+    });
+  }
+  addEventListener('scroll', finishGreeting, { passive: true });
+  addEventListener('nacho-activity-change', () => { finishGreeting(); syncMotion(); });
   document.addEventListener('visibilitychange', syncMotion);
   reduced.addEventListener('change', syncMotion);
   syncMotion();

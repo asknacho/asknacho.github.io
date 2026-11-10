@@ -1,6 +1,6 @@
 # Sprite cycles
 
-Typing, guitar, piano and sleeping use twelve distinct raster frames. Walking and greeting sheets are retained as source references but are no longer used by the homepage. The daytime hero is a stationary high-resolution standing image. Family time uses four frames: open eyes and one blink for each of Nacho, his wife and their older daughter. Playback copies one complete atlas cell at a time, with no tweening, whole-image rotation, scaling, morphing or interpolation.
+Typing, guitar, piano and sleeping use twelve distinct raster frames. The older walking and greeting sheets are retained as references. The homepage plays the high-resolution arm-only greeting in `wave-hd.json` once, then shows the stationary standing image; walking remains disabled. Family time uses four frames: open eyes and one blink for each of Nacho, his wife and their older daughter. Playback copies one complete atlas cell at a time, with no tweening, whole-image rotation, scaling, morphing or interpolation.
 
 | Cycle | Frame duration | Full cycle |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ Typing, guitar, piano and sleeping use twelve distinct raster frames. Walking an
 | Family | 130 ms blinks with long still holds | 8.19 s |
 | Sleep | 360 ms | 4.32 s |
 
-The daytime hero does not animate, change poses or move relative to its caption when scrolling. Typing, instruments, family and sleeping loop while visible. Reduced motion shows still artwork; hiding the tab or scrolling the animated scenes off screen pauses playback. The intro poses share the couch scene's floor and caption baseline.
+The daytime hero waves once on arrival, then stays still and does not move relative to its caption when scrolling. The high-resolution wave has 12 frames with identical opening and closing rest frames. Typing, instruments, family and sleeping loop while visible. Reduced motion shows still artwork; hiding the tab or scrolling the animated scenes off screen pauses playback. The intro poses share the couch scene's floor and caption baseline.
 
 Walking, typing, instrument, greeting and sleeping source poses were generated with the built-in imagegen tool from the approved new-style stills. Family poses are authored directly from the approved artwork by `tools/build_family_cycle.cjs`. `source/` retains the twelve-pose input atlases. `tools/build_sprite_cycles.cjs` registers each pose using the head and pins the static image to frame 1, admitting redraws only inside the action regions (hands, wrists and sleeves). This keeps faces and the rest of the body stable rather than letting generated frames drift.
 

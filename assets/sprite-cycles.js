@@ -26,11 +26,13 @@ export class SpriteCycle {
       image.src = new URL(sheet.image, response.url).href;
       await image.decode();
       let base = null;
+      const canvasWidth = sheet.canvasWidth || sheet.frameWidth;
+      const canvasHeight = sheet.canvasHeight || sheet.frameHeight;
       if (sheet.base) {
         base = new Image();
         base.src = new URL(sheet.base, response.url).href;
         await base.decode();
-        if (base.naturalWidth !== sheet.frameWidth || base.naturalHeight !== sheet.frameHeight) {
+        if (base.naturalWidth !== canvasWidth || base.naturalHeight !== canvasHeight) {
           throw new Error(`Invalid base image: ${name}`);
         }
       }
@@ -38,6 +40,10 @@ export class SpriteCycle {
       if (!Number.isInteger(sheet.frames) || sheet.frames < 1 || image.naturalWidth !== sheet.frameWidth * sheet.columns ||
           image.naturalHeight !== sheet.frameHeight * Math.ceil(sheet.frames / sheet.columns)) {
         throw new Error(`Invalid sprite sheet: ${name}`);
+      }
+      if (sheet.patch && (!base || sheet.patch.x < 0 || sheet.patch.y < 0 ||
+          sheet.patch.x + sheet.frameWidth > canvasWidth || sheet.patch.y + sheet.frameHeight > canvasHeight)) {
+        throw new Error(`Invalid sprite patch: ${name}`);
       }
       const timeline = sheet.sequence || Array.from({ length: sheet.frames }, (_, frame) => ({ frame, durationMs: sheet.frameMs }));
       if (!timeline.length || timeline.some(step => !Number.isInteger(step.frame) || step.frame < 0 ||
@@ -49,8 +55,8 @@ export class SpriteCycle {
       this.base = base;
       this.timeline = timeline;
       this.duration = timeline.reduce((total, step) => total + step.durationMs, 0);
-      this.canvas.width = sheet.frameWidth;
-      this.canvas.height = sheet.frameHeight;
+      this.canvas.width = canvasWidth;
+      this.canvas.height = canvasHeight;
       this.context.imageSmoothingEnabled = false;
       this.canvas.dataset.cycle = name;
       this.canvas.dataset.frames = sheet.frames;
@@ -74,14 +80,15 @@ export class SpriteCycle {
 
   draw(index) {
     if (index === this.frame) return;
-    const { frameWidth: width, frameHeight: height, columns } = this.sheet;
+    const { frameWidth: frameWidth, frameHeight: frameHeight, columns, patch } = this.sheet;
+    const { width, height } = this.canvas;
     this.context.clearRect(0, 0, width, height);
     if (this.base) this.context.drawImage(this.base, 0, 0, width, height);
     for (const region of this.sheet.clear || []) {
       this.context.clearRect(region.x, region.y, region.width, region.height);
     }
-    this.context.drawImage(this.image, index % columns * width, Math.floor(index / columns) * height,
-      width, height, 0, 0, width, height);
+    this.context.drawImage(this.image, index % columns * frameWidth, Math.floor(index / columns) * frameHeight,
+      frameWidth, frameHeight, patch?.x || 0, patch?.y || 0, frameWidth, frameHeight);
     this.frame = index;
     this.canvas.dataset.frame = index;
   }

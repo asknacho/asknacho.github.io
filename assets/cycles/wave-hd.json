@@ -1,0 +1,73 @@
+{
+  "image": "wave-hd.webp",
+  "frames": 12,
+  "columns": 4,
+  "frameWidth": 386,
+  "frameHeight": 600,
+  "canvasWidth": 2446,
+  "canvasHeight": 2446,
+  "patch": {
+    "x": 783,
+    "y": 910
+  },
+  "base": "../standing-hd.webp",
+  "clear": [
+    {
+      "x": 783,
+      "y": 910,
+      "width": 386,
+      "height": 600
+    }
+  ],
+  "frameMs": 130,
+  "sequence": [
+    {
+      "frame": 0,
+      "durationMs": 180
+    },
+    {
+      "frame": 1,
+      "durationMs": 130
+    },
+    {
+      "frame": 2,
+      "durationMs": 130
+    },
+    {
+      "frame": 3,
+      "durationMs": 130
+    },
+    {
+      "frame": 4,
+      "durationMs": 130
+    },
+    {
+      "frame": 5,
+      "durationMs": 130
+    },
+    {
+      "frame": 6,
+      "durationMs": 130
+    },
+    {
+      "frame": 7,
+      "durationMs": 130
+    },
+    {
+      "frame": 8,
+      "durationMs": 130
+    },
+    {
+      "frame": 9,
+      "durationMs": 160
+    },
+    {
+      "frame": 10,
+      "durationMs": 160
+    },
+    {
+      "frame": 11,
+      "durationMs": 160
+    }
+  ]
+}

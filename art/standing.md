@@ -2,7 +2,7 @@
 
 `assets/standing-hd.webp` is a dedicated static standing pose generated with the built-in imagegen tool, referenced against the existing standing, laptop and family artwork. `art/standing-source.png` preserves its original output.
 
-`node tools/build_standing_sprite.cjs [path-to-sharp]` removes a faint generated halo and pads the native 1485px-tall character onto a 2446px square canvas without resampling. Its feet line up with the existing intro floor. The page uses crisp pixel rendering and no daytime pose switching or scroll transform.
+`node tools/build_standing_sprite.cjs [path-to-sharp]` removes a faint generated halo and pads the native 1485px-tall character onto a 2446px square canvas without resampling. Its feet line up with the existing intro floor. The page uses crisp pixel rendering. A brief 12-frame greeting animates only the right arm on arrival, then returns to this exact standing image. Scroll movement and walking stay disabled. See `art/cycles/wave-hd.md`.
 
 ## Prompt
 
