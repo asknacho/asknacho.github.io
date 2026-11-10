@@ -1,0 +1,87 @@
+/* Keep the native detail in each raster frame. */
+.sprite.sprite--polished img {
+  width: 100%;
+  object-fit: contain;
+  padding: 12%;
+  image-rendering: auto;
+}
+.sprite.sprite--polished { overflow: visible; position: relative; }
+.sprite--polished .sprite-cycle {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 12%;
+}
+.sprite.has-cycle > img { visibility: hidden; }
+.sprite-cycle[hidden], .sprite--stand .wave[hidden] { display: none !important; }
+.sprite--stand .reading { position: relative; }
+.sprite--stand .reading img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+}
+.sprite--stand .reading canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.reading.has-cycle > img, .intro-cycle.has-cycle > img { visibility: hidden; }
+.intro-cycle { position: relative; width: 100%; height: 100%; }
+.sprite--stand .intro-cycle img { width: 100%; height: 100%; object-fit: contain; image-rendering: auto; }
+.intro-cycle canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.intro-cycle canvas[hidden], .reading canvas[hidden] { display: none !important; }
+.scene-status {
+  position: absolute;
+  top: calc(var(--hero-height) / 2 + var(--scale) * 40px);
+  left: 16px;
+  right: 16px;
+  text-align: center;
+  color: var(--muted, var(--ink));
+  font: 13px/1.6 ui-sans-serif, system-ui, sans-serif;
+  opacity: 0.75;
+}
+html[data-activity="reading"] .scene-status {
+  top: calc(var(--hero-height) / 2 + var(--scale) * 54px);
+}
+html[data-activity="active"] .scene-status {
+  top: calc(var(--hero-height) / 2 + var(--scale) * 26px);
+}
+.sprite--stand .wave {
+  display: none;
+  width: 100%;
+  height: 100%;
+  image-rendering: auto;
+}
+html[data-activity="active"] .sprite--stand.is-greeting .wave { display: block; }
+html[data-activity="active"] .sprite--stand.is-greeting .breathe { display: none; }
+.music-portrait { display: grid; justify-items: center; gap: 0; }
+.instrument-picker { display: flex; gap: 6px; }
+.instrument-picker button {
+  color: var(--ink);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  padding: 8px 14px;
+  min-height: 44px;
+  cursor: pointer;
+  font: 13px/1.5 ui-sans-serif, system-ui, sans-serif;
+}
+.instrument-picker button[aria-pressed="true"] {
+  border-color: color-mix(in srgb, var(--ink) 35%, transparent);
+  background: color-mix(in srgb, var(--ink) 6%, transparent);
+}
+.instrument-picker button:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); }
+.instrument-picker button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.sprite--stand .breathe { width: 100%; image-rendering: auto; }
+html[data-motion="on"][data-activity="active"] .sprite--stand.is-on-screen .breathe {
+  animation: idle-breathe 4s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+@keyframes idle-breathe { 50% { transform: scaleY(1.025); } }
+@media (prefers-reduced-motion: reduce) {
+  .sprite--stand .sleep,
+  .sprite--polished img { animation: none !important; }
+}
