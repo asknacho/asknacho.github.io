@@ -114,13 +114,21 @@
       display: block;
       height: calc(var(--hero-height) * 0.8);
       overflow: visible;
+      isolation: isolate;
     }
     .stage {
       height: var(--hero-height);
       display: grid;
       place-items: center;
     }
-    .sprite--stand { will-change: transform; }
+    .sprite.sprite--stand {
+      width: calc(100px * var(--scale));
+      position: relative;
+      top: calc(14px * var(--scale));
+      overflow: hidden;
+      z-index: 2;
+      will-change: transform;
+    }
     /* Character scenes: the character on one side, an RPG-style text box on the other, as if the
        character were talking. Coding: Nacho left, box right. Guitar: box left, Nacho right.
        On narrow screens the box sits under the character. */
@@ -199,11 +207,6 @@
     html[data-activity="reading"] .sprite--stand .walk { display: none; }
     html[data-activity="sleeping"] .sprite--stand .sleep,
     html[data-activity="reading"] .sprite--stand .reading { display: block; }
-    html[data-activity="reading"] .sprite--stand {
-      width: calc(100px * var(--scale));
-      position: relative;
-      top: calc(14px * var(--scale));
-    }
 
     /* Later scenes rise into view. */
     .reveal {
@@ -430,7 +433,6 @@
       // stops. The position is set in the scroll event itself, not a frame later, and kept small: on
       // iPhones the page scrolls on its own fast path, and any lag shows as a stutter on fast flicks.
       var intro = document.getElementById('intro');
-      var introStatus = document.getElementById('scene-status');
       var rest;
       function isActive() {
         return document.documentElement.dataset.activity === 'active';
@@ -438,11 +440,9 @@
       function sink() {
         if (!isActive() || still) {
           intro.style.removeProperty('transform');
-          introStatus.style.removeProperty('transform');
           return;
         }
         intro.style.transform = 'translate3d(0, ' + Math.round(scrollY * 0.2) + 'px, 0)';
-        introStatus.style.transform = intro.style.transform;
       }
       if (!still) {
         addEventListener('scroll', function () {
