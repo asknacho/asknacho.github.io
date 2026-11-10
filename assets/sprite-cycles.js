@@ -25,6 +25,15 @@ export class SpriteCycle {
       const image = new Image();
       image.src = new URL(sheet.image, response.url).href;
       await image.decode();
+      let base = null;
+      if (sheet.base) {
+        base = new Image();
+        base.src = new URL(sheet.base, response.url).href;
+        await base.decode();
+        if (base.naturalWidth !== sheet.frameWidth || base.naturalHeight !== sheet.frameHeight) {
+          throw new Error(`Invalid base image: ${name}`);
+        }
+      }
       if (version !== this.version) return false;
       if (sheet.frames !== 12 || image.naturalWidth !== sheet.frameWidth * sheet.columns ||
           image.naturalHeight !== sheet.frameHeight * Math.ceil(sheet.frames / sheet.columns)) {
@@ -32,6 +41,7 @@ export class SpriteCycle {
       }
       this.sheet = sheet;
       this.image = image;
+      this.base = base;
       this.canvas.width = sheet.frameWidth;
       this.canvas.height = sheet.frameHeight;
       this.context.imageSmoothingEnabled = false;
@@ -59,6 +69,7 @@ export class SpriteCycle {
     if (index === this.frame) return;
     const { frameWidth: width, frameHeight: height, columns } = this.sheet;
     this.context.clearRect(0, 0, width, height);
+    if (this.base) this.context.drawImage(this.base, 0, 0, width, height);
     this.context.drawImage(this.image, index % columns * width, Math.floor(index / columns) * height,
       width, height, 0, 0, width, height);
     this.frame = index;

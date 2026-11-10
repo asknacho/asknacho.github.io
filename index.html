@@ -184,12 +184,8 @@
       height: 100%;
       image-rendering: pixelated;
     }
-    /* Every sheet uses 72x72 frames at 200 ms each. Frames are advanced by script (see the end
-       of the page), not a CSS animation: iOS Safari can run transform animations on the GPU,
-       ignore steps(), and slide the sheet so halves of two frames show at once. */
+    /* A 72px logical viewport; discrete atlas cells are copied by sprite-cycles.js. */
     .sprite { --frame: 72px; }
-    .sprite img[data-frames="13"] { width: 1300%; }
-    .sprite img[data-frames="8"]  { width: 800%; }
 
     /* While the page scrolls he walks; when it stops he breathes again. */
     .sprite--stand .walk, .sprite--stand .sleep, .sprite--stand .reading { display: none; }
@@ -342,8 +338,8 @@
       <div class="stage">
         <div class="sprite sprite--stand" id="intro" role="img" aria-label="Nacho, standing and breathing, walks away as you scroll">
           <img class="breathe" src="assets/cycles/wave-still.webp" alt="" />
-          <img class="walk" src="assets/walk.png" data-frames="8" alt="" />
-          <img class="sleep" src="assets/sleep.png" alt="" />
+          <div class="walk intro-cycle"><img src="assets/cycles/walk-still.webp" alt="" /><canvas id="walk-cycle" hidden aria-hidden="true"></canvas></div>
+          <div class="sleep intro-cycle"><img src="assets/cycles/sleep-still.webp" alt="" /><canvas id="sleep-cycle" hidden aria-hidden="true"></canvas></div>
           <div class="reading"><img src="assets/family-reading.webp" width="1388" height="999" alt="" /><canvas id="family-motion" width="1388" height="999" aria-hidden="true"></canvas></div>
         </div>
         <p class="scene-status" id="scene-status"></p>
@@ -434,6 +430,7 @@
       // stops. The position is set in the scroll event itself, not a frame later, and kept small: on
       // iPhones the page scrolls on its own fast path, and any lag shows as a stutter on fast flicks.
       var intro = document.getElementById('intro');
+      var introStatus = document.getElementById('scene-status');
       var rest;
       function isActive() {
         return document.documentElement.dataset.activity === 'active';
@@ -441,9 +438,11 @@
       function sink() {
         if (!isActive() || still) {
           intro.style.removeProperty('transform');
+          introStatus.style.removeProperty('transform');
           return;
         }
         intro.style.transform = 'translate3d(0, ' + Math.round(scrollY * 0.2) + 'px, 0)';
+        introStatus.style.transform = intro.style.transform;
       }
       if (!still) {
         addEventListener('scroll', function () {
@@ -468,19 +467,6 @@
       }
       addEventListener('nacho-activity-change', updateIntroState);
       updateIntroState();
-
-      // Sprite sheets: show one whole frame every 200 ms by moving the sheet a frame at a time.
-      var sheets = [].slice.call(document.querySelectorAll('.sprite img[data-frames]'));
-      var tick = 0;
-      function step() {
-        sheets.forEach(function (img) {
-          var n = +img.dataset.frames;
-          img.style.transform = 'translateX(' + (-(tick % n) * 100 / n) + '%)';
-        });
-        tick++;
-      }
-      step();
-      if (!still) setInterval(step, 200);
 
       // The last dot blinks twice a second, like the cursor in an old text box.
       var cursor = document.getElementById('cursor');

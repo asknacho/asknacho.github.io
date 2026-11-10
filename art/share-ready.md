@@ -4,9 +4,9 @@ New poses were generated with the built-in imagegen tool, using the existing Nac
 
 Outputs: `assets/stand-polished.webp`, `assets/wave.webp`, `assets/code-polished.webp`, `assets/guitar-polished.webp`, and `assets/piano.webp`.
 
-The original still poses above are retained as art references. Runtime typing, guitar, piano and waving now use twelve-frame sheets in `assets/cycles/`; see `art/cycles/README.md`. Their first frames supply the reduced-motion stills. Walking retains the original frame-by-frame animation. The earlier four-frame greeting and whole-image music/coding sway are no longer used.
+The original still poses above are retained as art references. Runtime typing, guitar, piano, waving, walking, family and sleeping now use twelve-frame sheets in `assets/cycles/`; see `art/cycles/README.md`. Still artwork supplies the reduced-motion fallback. The earlier four-frame greeting and whole-image music/coding sway are no longer used.
 
-The full-resolution family scene is animated directly on a 1388×999 canvas: clipped layers rock the mother and baby, lift the daughter's hand and block, and draw an occasional turning page. The original image is the reduced-motion and no-JavaScript fallback. Motion stops when the scene leaves the viewport or the tab is hidden.
+The full-resolution family scene uses twelve discrete cells with tiny page, blanket and block changes, composited over the unchanged approved artwork on a 1388×999 canvas. Its faces and sofa are untouched. The original image is the reduced-motion and no-JavaScript fallback. The sleeping bag uses a separate twelve-frame cloth-breathing cycle. Motion stops when the scene leaves the viewport or the tab is hidden.
 
 The social card and icons are composed from existing art by `tools/build_share_assets.cjs`, using Node and sharp. Run `node tools/build_share_assets.cjs [path-to-sharp]` to regenerate them. No generation API is needed for these composed assets.
 

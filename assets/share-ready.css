@@ -1,4 +1,4 @@
-/* Keep full-resolution art; the original sheets still drive walking. */
+/* Keep the native detail in each raster frame. */
 .sprite.sprite--polished img {
   width: 100%;
   object-fit: contain;
@@ -28,7 +28,11 @@
   width: 100%;
   height: 100%;
 }
-.reading.is-animated > img { visibility: hidden; }
+.reading.has-cycle > img, .intro-cycle.has-cycle > img { visibility: hidden; }
+.intro-cycle { position: relative; width: 100%; height: 100%; }
+.sprite--stand .intro-cycle img { width: 100%; height: 100%; object-fit: contain; image-rendering: auto; }
+.intro-cycle canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.intro-cycle canvas[hidden], .reading canvas[hidden] { display: none !important; }
 .scene-status {
   position: absolute;
   top: calc(var(--hero-height) / 2 + var(--scale) * 40px);
@@ -71,16 +75,12 @@ html[data-activity="active"] .sprite--stand.is-greeting .breathe { display: none
 }
 .instrument-picker button:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); }
 .instrument-picker button:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
-.sprite--stand .sleep { transform-origin: 50% 72%; }
 .sprite--stand .breathe { width: 100%; image-rendering: auto; }
 html[data-motion="on"][data-activity="active"] .sprite--stand.is-on-screen .breathe {
-  animation: sleep-breathe 4s ease-in-out infinite;
+  animation: idle-breathe 4s ease-in-out infinite;
   transform-origin: 50% 80%;
 }
-html[data-motion="on"][data-activity="sleeping"] .sprite--stand.is-on-screen .sleep {
-  animation: sleep-breathe 5s ease-in-out infinite;
-}
-@keyframes sleep-breathe { 50% { transform: scaleY(1.025); } }
+@keyframes idle-breathe { 50% { transform: scaleY(1.025); } }
 @media (prefers-reduced-motion: reduce) {
   .sprite--stand .sleep,
   .sprite--polished img { animation: none !important; }

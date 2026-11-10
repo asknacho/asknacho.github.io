@@ -1,6 +1,6 @@
 # Twelve-frame sprite cycles
 
-Typing, guitar, piano and greeting each have twelve distinct raster frames. Playback copies one complete atlas cell at a time, with no tweening, whole-image rotation, scaling, morphing or interpolation.
+Typing, guitar, piano, greeting, walking, family and sleeping each have twelve distinct raster frames. Playback copies one complete atlas cell at a time, with no tweening, whole-image rotation, scaling, morphing or interpolation.
 
 | Cycle | Frame duration | Full cycle |
 | --- | --- | --- |
@@ -8,14 +8,46 @@ Typing, guitar, piano and greeting each have twelve distinct raster frames. Play
 | Guitar | 120 ms | 1.44 s |
 | Piano | 140 ms | 1.68 s |
 | Wave | 160 ms | 1.92 s |
+| Walk | 100 ms | 1.20 s |
+| Family | 350 ms | 4.20 s |
+| Sleep | 360 ms | 4.32 s |
 
-The greeting plays one complete cycle on arrival, then rests. Typing and instruments loop while visible. Reduced motion shows frame 1; scrolling away or hiding the tab pauses playback.
+The greeting plays one complete cycle on arrival, then rests. Walking runs while scrolling and returns to the resting pose when scrolling stops. Typing, instruments, family and sleeping loop while visible. Reduced motion shows the still artwork; scrolling away or hiding the tab pauses playback. The caption follows the walking sprite's scroll position.
 
 Source poses were generated with the built-in imagegen tool from the approved new-style stills. `source/` retains the twelve-pose input atlases. `tools/build_sprite_cycles.cjs` registers each pose using the head and pins the static image to frame 1, admitting redraws only inside the action regions (hands, wrists and sleeves). This keeps faces and the rest of the body stable rather than letting generated frames drift.
 
 Run `node tools/build_sprite_cycles.cjs [path-to-sharp]` to rebuild. The script verifies twelve unique frames for every action, preserves native pixel samples, adds consistent transparent margins and writes lossless 4×3 WebP atlases, first-frame stills and JSON timing metadata to `assets/cycles/`. `assets/sprite-cycles.js` validates dimensions and frame counts before enabling playback; the still image remains available if loading fails.
 
+The family cycle keeps the exact approved 1388×999 artwork as its base. Its twelve cells store only changed page, blanket and block pixels, matched to the original colors and restricted to small action regions. Faces, bodies and sofa are untouched. The runtime combines the full-resolution base and a discrete delta cell. This keeps the animation sheet around 57 KB while preserving the original detail. The original image remains the still fallback.
+
+`intro-preview.gif` shows the walking, family and sleeping cycles at their individual playback timings. The family and sleeping sheets are loaded only for the active time-of-day scene.
+
 ## Generation prompts
+
+### family
+
+Use case: identity-preserve sprite animation.
+EDIT TARGET: the exact approved family scene in reference. Preserve the faces, hair, clothing, composition, green sofa, book, wife holding the infant, and three-year-old daughter with toy blocks. Exactly 4 people.
+Deliver TWELVE frames as a 4-column × 3-row sprite sheet. Each cell has the SAME 100:72 LANDSCAPE aspect ratio as reference, e.g. 512×368 cells, whole sheet2048×1104. Transparent background, no grid lines, text, numbers or extra objects. Preserve the exact internal positions and proportions from the reference, including transparent padding.
+ONLY TINY REDRAWN PIXEL CHANGES: a gentle small book-page flutter and baby blanket breathing. The daughter may nudge her top yellow toy block by 1–2 logical pixels and return it. Keep all faces, heads, bodies, couch, clothes and feet EXACTLY FIXED. Do not redraw the faces or alter expressions. Frames1–3 quiet hold with slight baby blanket fold change; 4–6 a single thin book page lifts a few pixels; 7–9 page settles and child nudges block; 10–12 blanket and block settle to initial state. All12 frames must have a small distinct localized pixel change and form a subtle seamless loop.
+Traditional game sprite animation with separately drawn frames, NO global rotating, moving or scaling the whole scene; no cinematic motion, morphing, blur or smooth video interpolation. Match source's sharp dark outlines, warm earthy palette and chunky square pixels exactly.
+
+### sleep
+
+Use case: precise-object-edit sprite animation.
+Reference edit target: the burgundy pixel-art sleeping bag in the supplied image. Preserve exactly its silhouette, dark outlines, zipper on the left, colors, folds, profile and orientation.
+Make a TWELVE-FRAME subtle sleeping/breathing animation sprite sheet, 4 columns × 3 rows, 12 equal SQUARE cells in row-major order. Transparent background.
+The person remains entirely inside the closed bag. Small motion only: frames 1–6 the chest cloth near the upper middle rises by 1–2 logical pixel steps and the fold highlights gently change; frames 7–12 the cloth settles back, returning smoothly to frame 1. The bag's base, foot end, left zipper pull and the overall location remain EXACTLY fixed in every frame. Redraw the little cloth contours and fold pixels separately per frame. No entire-bag scaling, stretching, rocking, rotation, sliding, warping or blur. No Z symbols, person sticking out, text, pillows or new objects.
+Crisp warm burgundy square pixel clusters with dark brown outlines matching the source. Same size in all 12 cells. Center each whole bag at the same coordinates, with identical generous transparent padding. Target 2048×1536, cells512×512. No cell borders or numbers.
+
+### walk
+
+Use case: identity-preserve sprite animation.
+Reference: the exact new-style standing Nacho sprite. Preserve face, hair, beard, jacket, colors and small adult proportions.
+Create a TWELVE-FRAME classic RPG WALK CYCLE, 4 columns × 3 rows, exactly 12 equal SQUARE cells in row-major order, transparent background. Full-body FRONT view walking toward the viewer in place, matching the reference's standing orientation. Never turn sideways.
+Frame 1 left foot contact, right arm forward; 2 left weight transfer; 3 right foot passing; 4 right knee forward; 5 right foot extends; 6 right foot approaches ground; 7 right foot contact, left arm forward; 8 right weight transfer; 9 left foot passing; 10 left knee forward; 11 left foot extends; 12 left foot approaches contact for a clean loop to 1.
+Legs, knees, shoe silhouettes and opposing arms must be separately redrawn in EVERY frame; clear contact/passing poses. No whole-image sliding, rotating, warping, zooming, motion blur or AI video interpolation. Head/face stay at the SAME coordinates and the character scale is IDENTICAL in every cell. Feet touch a consistent floor baseline, no drawn floor or shadows.
+Burgundy open jacket, olive straps, black V shirt, blue jeans and gray sneakers, same warm earthy square pixel clusters and dark outlines as reference. Leave equal generous transparent padding around all poses. Source style is authoritative. Target 2048×1536 with 512×512 cells. No numbering, dividers, text or extraneous props.
 
 ### piano
 

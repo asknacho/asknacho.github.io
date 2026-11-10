@@ -1,0 +1,8 @@
+{
+  "image": "sleep.webp",
+  "frames": 12,
+  "columns": 4,
+  "frameWidth": 506,
+  "frameHeight": 506,
+  "frameMs": 360
+}
