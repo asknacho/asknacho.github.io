@@ -19,9 +19,13 @@ import { SpriteCycle } from './sprite-cycles.js?v=wave-hd';
   addEventListener('nacho-clock-change', updateStatus);
   updateStatus();
 
-  // Instrument choice changes the art, not the time-based intro schedule.
+  // Choose once per page load; keep the still and animation on the same instrument.
   const portrait = document.getElementById('music-portrait');
   const instrumentImage = portrait.querySelector('img');
+  const instrument = Math.random() < 0.5 ? 'guitar' : 'piano';
+  instrumentImage.src = `assets/cycles/${instrument}-still.webp`;
+  instrumentImage.alt = instrument === 'piano' ? 'Nacho practising digital piano' : 'Nacho playing acoustic guitar';
+  portrait.dataset.instrument = instrument;
   const codeHost = document.querySelector('.sprite--code');
   const codePlayer = new SpriteCycle({
     canvas: document.getElementById('code-cycle'), host: codeHost,
@@ -33,20 +37,7 @@ import { SpriteCycle } from './sprite-cycles.js?v=wave-hd';
   });
   players.push(codePlayer, musicPlayer);
   codePlayer.load('code');
-  musicPlayer.load('guitar');
-  document.querySelectorAll('[data-instrument]').forEach(button => {
-    if (button.tagName !== 'BUTTON') return;
-    button.addEventListener('click', () => {
-      const instrument = button.dataset.instrument;
-      instrumentImage.src = `assets/cycles/${instrument}-still.webp`;
-      instrumentImage.alt = instrument === 'piano' ? 'Nacho practising digital piano' : 'Nacho playing acoustic guitar';
-      portrait.dataset.instrument = instrument;
-      musicPlayer.load(instrument);
-      document.querySelectorAll('button[data-instrument]').forEach(other => {
-        other.setAttribute('aria-pressed', String(other === button));
-      });
-    });
-  });
+  musicPlayer.load(instrument);
 
   // Family blinking and sleeping use discrete sprite frames.
   const introAllowed = activity => motionAllowed() && root.dataset.activity === activity &&
