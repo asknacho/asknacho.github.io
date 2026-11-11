@@ -9,12 +9,12 @@ module.exports = async function buildFamily(sharp, { root, output }) {
     .ensureAlpha().raw().toBuffer({ resolveWithObject: true });
   const { width, height } = info;
   const eyes = [
-    { member: 1, x: 439, y: 186, width: 42, height: 25, skinY: 208, line: [443,196,32,6], ink: [450,195] },
-    { member: 1, x: 523, y: 186, width: 42, height: 29, skinY: 214, line: [527,199,32,6], ink: [535,197] },
-    { member: 2, x: 763, y: 245, width: 34, height: 27, skinY: 241, line: [766,257,27,6], ink: [783,255] },
-    { member: 2, x: 829, y: 231, width: 49, height: 34, skinY: 227, line: [833,245,39,6], ink: [847,246] },
-    { member: 3, x: 963, y: 718, width: 34, height: 28, skinY: 714, line: [969,731,23,5], ink: [982,730] },
-    { member: 3, x: 1021, y: 721, width: 45, height: 30, skinY: 716, line: [1026,739,33,5], ink: [1040,735] },
+    { member: 1, x: 437, y: 183, width: 37, height: 21, skinY: 207, line: [440,194,31,5], ink: [450,191] },
+    { member: 1, x: 521, y: 184, width: 36, height: 24, skinY: 211, line: [524,196,29,5], ink: [535,192] },
+    { member: 2, x: 755, y: 239, width: 33, height: 25, skinY: 267, line: [759,251,26,5], ink: [770,249] },
+    { member: 2, x: 823, y: 222, width: 46, height: 31, skinY: 257, line: [827,238,36,5], ink: [840,232] },
+    { member: 3, x: 955, y: 707, width: 30, height: 24, skinY: 735, line: [959,720,22,5], ink: [973,719] },
+    { member: 3, x: 1016, y: 709, width: 38, height: 27, skinY: 738, line: [1020,724,30,5], ink: [1030,720] },
   ];
   const regions = eyes.map(({ x,y,width,height }) => ({ x,y,width,height }));
   const offset = (x, y) => (y * width + x) * 4;
@@ -44,8 +44,8 @@ module.exports = async function buildFamily(sharp, { root, output }) {
     .composite(frames.map((input, i) => ({ input, left: i * width, top: 0 })))
     .webp({ lossless: true }).toFile(path.join(output, 'family.webp'));
   fs.writeFileSync(path.join(output, 'family.json'), JSON.stringify({
-    image: 'family.webp', frames: 4, columns: 4, frameWidth: width, frameHeight: height,
-    frameMs: 130, base: '../family-reading.webp', clear: regions,
+    image: 'family.webp?v=short-curls', frames: 4, columns: 4, frameWidth: width, frameHeight: height,
+    frameMs: 130, base: '../family-reading.webp?v=short-curls', clear: regions,
     sequence: [
       { frame: 0, durationMs: 3200 }, { frame: 1, durationMs: 130 },
       { frame: 0, durationMs: 1900 }, { frame: 2, durationMs: 130 },

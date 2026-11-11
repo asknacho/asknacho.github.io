@@ -1,4 +1,4 @@
-import { SpriteCycle } from './sprite-cycles.js?v=wave-hd';
+import { SpriteCycle } from './sprite-cycles.js?v=short-curls';
 
 (() => {
   'use strict';

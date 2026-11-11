@@ -19,7 +19,7 @@ export class SpriteCycle {
     this.ready = false;
     this.pause();
     try {
-      const response = await fetch(new URL(`./cycles/${name}.json`, import.meta.url));
+      const response = await fetch(new URL(`./cycles/${name}.json?v=short-curls`, import.meta.url));
       if (!response.ok) throw new Error(`Could not load ${name} animation`);
       const sheet = await response.json();
       const image = new Image();

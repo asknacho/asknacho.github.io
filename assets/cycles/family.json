@@ -1,47 +1,47 @@
 {
-  "image": "family.webp",
+  "image": "family.webp?v=short-curls",
   "frames": 4,
   "columns": 4,
   "frameWidth": 1388,
   "frameHeight": 999,
   "frameMs": 130,
-  "base": "../family-reading.webp",
+  "base": "../family-reading.webp?v=short-curls",
   "clear": [
     {
-      "x": 439,
-      "y": 186,
-      "width": 42,
+      "x": 437,
+      "y": 183,
+      "width": 37,
+      "height": 21
+    },
+    {
+      "x": 521,
+      "y": 184,
+      "width": 36,
+      "height": 24
+    },
+    {
+      "x": 755,
+      "y": 239,
+      "width": 33,
       "height": 25
     },
     {
-      "x": 523,
-      "y": 186,
-      "width": 42,
-      "height": 29
+      "x": 823,
+      "y": 222,
+      "width": 46,
+      "height": 31
     },
     {
-      "x": 763,
-      "y": 245,
-      "width": 34,
+      "x": 955,
+      "y": 707,
+      "width": 30,
+      "height": 24
+    },
+    {
+      "x": 1016,
+      "y": 709,
+      "width": 38,
       "height": 27
-    },
-    {
-      "x": 829,
-      "y": 231,
-      "width": 49,
-      "height": 34
-    },
-    {
-      "x": 963,
-      "y": 718,
-      "width": 34,
-      "height": 28
-    },
-    {
-      "x": 1021,
-      "y": 721,
-      "width": 45,
-      "height": 30
     }
   ],
   "sequence": [
