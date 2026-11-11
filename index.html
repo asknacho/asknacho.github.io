@@ -167,6 +167,12 @@
     .highlights { padding-left: 20px; margin-bottom: 20px; }
     .highlights li + li { margin-top: 8px; }
     .career { margin-bottom: 22px; }
+    .profile-highlights { margin: 24px 0; padding: 16px; border: 1px solid color-mix(in oklab, var(--ink) 22%, transparent); border-radius: 10px; background: color-mix(in oklab, var(--bg) 72%, var(--ink) 5%); }
+    .profile-highlights h3 { margin: 0 0 12px; font: 10px/1.6 'Press Start 2P', ui-monospace, monospace; }
+    .strength-list, .credential-list { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+    .strength-list { margin-bottom: 16px; }
+    .strength-list li, .credential-list li { border: 1px solid color-mix(in oklab, var(--ink) 24%, transparent); border-radius: 999px; padding: 4px 10px; font-size: 13px; line-height: 1.5; }
+    .credential-list a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
     .career summary { cursor: pointer; padding: 8px 0; text-decoration: underline; text-underline-offset: 4px; }
     .career summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
     .career[open] summary { margin-bottom: 12px; }
@@ -397,8 +403,19 @@
             </li>
           </ol>
         </details>
-        <p class="quest-what">Strengths: developing people · delegation · clear communication · prioritisation · technical depth · AI-native engineering.</p>
-        <p class="quest-what">AWS certified · Rails Girls Summer of Code coach · BSc Computer Science.</p>
+        <aside class="profile-highlights" aria-label="Strengths and credentials">
+          <h3>Strengths</h3>
+          <ul class="strength-list">
+            <li>Developing people</li><li>Delegation</li><li>Clear communication</li>
+            <li>Prioritisation</li><li>Technical depth</li><li>AI-native engineering</li>
+          </ul>
+          <h3>Credentials &amp; community</h3>
+          <ul class="credential-list">
+            <li>AWS certified</li>
+            <li>Rails Girls Summer of Code coach</li>
+            <li>BSc Computer Science</li>
+          </ul>
+        </aside>
         <a class="panel-link" href="https://www.linkedin.com/in/ignaciomoralesm" target="_blank" rel="noopener">Let’s connect →</a>
       </article>
     </section>
