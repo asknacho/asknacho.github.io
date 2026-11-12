@@ -1,6 +1,11 @@
 (() => {
   const section = document.querySelector('[data-mcp-base]');
   if (!section) return;
+  for (const link of document.querySelectorAll('[data-open-agent]')) {
+    link.addEventListener('click', () => {
+      section.open = true;
+    });
+  }
   const base = section.dataset.mcpBase;
   if (base) {
     section.querySelector('#mcp-endpoint').value = `${base}/mcp`;
