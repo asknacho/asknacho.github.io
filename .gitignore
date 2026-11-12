@@ -1,0 +1,5 @@
+node_modules/
+.vercel/
+mcp/public/
+mcp/content/corpus.json
+_site/

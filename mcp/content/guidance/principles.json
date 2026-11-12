@@ -1,0 +1,246 @@
+{
+  "version": "2.1",
+  "as_of": "2026-11-12",
+  "rules": [
+    {
+      "id": "P01",
+      "title": "Keep each change focused and reviewable",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Separate unrelated changes and risky refactors. Keep related changes together when they form one complete behavior. Establish coverage before refactoring critical paths.",
+      "example": "First add coverage for a critical request handler. Then refactor the handler in a separate change while keeping its behavior the same. A cosmetic rename can be a follow-up.",
+      "limits": "Do not request a stack solely because a diff is large. Explain the independent behaviors or release dependencies that justify splitting it."
+    },
+    {
+      "id": "P02",
+      "title": "Solve current needs with proportionate complexity",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Require a concrete use case for new options, services, abstractions and dependencies. Reuse established solutions when they preserve the required behavior. Assess the full cost of a solution, including review, rework, latency, operation and future maintenance.",
+      "example": "Start with one scheduled job for a periodic import. Add a separate service only when independent scaling, ownership or reliability requirements justify it.",
+      "limits": "Several concrete cases can justify an abstraction. Simplicity is assessed through behavior and operating cost, rather than file count or line count."
+    },
+    {
+      "id": "P03",
+      "title": "Give each component a clear responsibility",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Keep transport, parsing, domain decisions, persistence and presentation responsibilities explicit. Put a decision with the component that owns its meaning.",
+      "example": "Split downloading from parsing. A title helper returns a title; the caller assigns it. A reusable timer accepts a reporting callback instead of knowing a particular storage backend.",
+      "limits": "Extract responsibilities when doing so makes ownership or dependencies clearer. Extra forwarding functions can also obscure the flow."
+    },
+    {
+      "id": "P04",
+      "title": "Make inputs and dependencies visible",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Prefer explicit parameters and return values over hidden instance-variable assignments or configuration reads buried inside reusable functions. Expose dependencies where this improves testing.",
+      "example": "A file parser receives its input path. An external client receives its connection settings. Tests can supply controlled inputs without changing hidden global state.",
+      "limits": "Use ordinary framework conventions where appropriate. A dependency-injection framework is not implied by this preference."
+    },
+    {
+      "id": "P05",
+      "title": "Use names that explain the actual behavior",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Use consistent domain vocabulary, language conventions and meaningful names for important literals. A name should distinguish what the function actually does.",
+      "example": "Use a name such as prioritize_items when a function changes ordering. A name such as filter_items would imply that it removes results. Name a business threshold so its purpose is visible.",
+      "limits": "Naming and constant extraction are usually suggestions. Escalate only when ambiguity causes a concrete incorrect use or contract mismatch."
+    },
+    {
+      "id": "P06",
+      "title": "Keep control flow easy to follow",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Use guard clauses, pattern matching and small cohesive operations to reduce nesting and the state a reader must remember. Remove redundant transformations or checks.",
+      "example": "Return early for an irrelevant event. Match active, inactive and invalid mapping results directly instead of routing through several opaque forwarding helpers.",
+      "limits": "Choose the clearest local expression. Neither more helpers nor fewer helpers is an absolute rule."
+    },
+    {
+      "id": "P07",
+      "title": "Preserve one coherent contract across layers",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Reuse the existing canonical mapping or shared interface. Keep provider-specific interpretation in the provider layer. Check that wrappers preserve the full meaning of their inputs and outputs.",
+      "example": "An error adapter preserves code, message, recovery, retry and selected-resource context. A provider-specific classifier delegates through that contract without adding a competing normalization layer.",
+      "limits": "Local adaptation can be appropriate when sharing would create deployment coupling. Document the reuse choice and preserve the relevant contract tests."
+    },
+    {
+      "id": "P08",
+      "title": "Keep failures distinguishable and actionable",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Distinguish intentional no-ops, invalid input, permanent failures and temporary failures. Preserve useful failure context and recovery instructions through dispatch and telemetry. In partial batches, retain successful items while exposing the failed items clearly.",
+      "example": "Missing required configuration produces a failure with a useful reason. An event outside the supported scope can produce a documented no-op. Keep these outcomes distinct.",
+      "limits": "Do not turn every exception into a retry. Classification must match the actual failure and provider contract."
+    },
+    {
+      "id": "P09",
+      "title": "Reconcile uncertain writes before retrying",
+      "confidence": "strong",
+      "scope": "external mutations",
+      "guideline": "A timeout, exception or malformed success response can leave the external result unknown. Preserve the selected resource and tell the caller how to discover current state before repeating a write.",
+      "example": "An external service returns a success status with an unreadable body. Record the outcome as uncertain and check the resource state before submitting the update again.",
+      "limits": "Keep supported validate-only behavior intact. Validation success and an applied mutation are different states."
+    },
+    {
+      "id": "P10",
+      "title": "Make state transitions recoverable and consistent",
+      "confidence": "strong",
+      "scope": "stateful workflows",
+      "guideline": "Mark work complete after the required operation succeeds. Use transactions for database changes that must succeed together. Consider replay, interrupted runs and concurrent state changes.",
+      "example": "Persist a state change and its required background job in one transaction. Consider what happens if a user reverses the state change while the job is still running.",
+      "limits": "A status check alone does not prove atomic ownership or exactly-once delivery. Identify the actual coordination mechanism when concurrency matters."
+    },
+    {
+      "id": "P11",
+      "title": "Bound work and measure the real bottleneck",
+      "confidence": "strong",
+      "scope": "data and background processing",
+      "guideline": "Check realistic data volumes, query plans, batch sizes, paging termination, timeouts and total concurrency. Move long operations off interactive paths where necessary.",
+      "example": "A cleanup can grow from hundreds to millions of rows. Bound each batch. If three tasks each launch four requests, account for twelve concurrent requests.",
+      "limits": "Propose optimization with a concrete workload or measurement. Choose batch sizes and concurrency limits for the actual system."
+    },
+    {
+      "id": "P12",
+      "title": "Make production behavior observable without creating noise",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Capture identifiers, causes and useful state transitions. Verify that errors actually reach the monitoring system with usable severity and context. Choose alerts around operational or business impact.",
+      "example": "Report a mismatch that would otherwise drop valid records silently. Include enough context to identify the failed operation. Sample repetitive events when recording all of them would hide useful signals.",
+      "limits": "Protect credentials and personal data. Optional analytics should not take down a business operation; mandatory audit behavior follows the applicable requirements."
+    },
+    {
+      "id": "P13",
+      "title": "Test the behavior through the boundary where it can fail",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Exercise the complete relevant scenario and assert meaningful outcomes. Cover missing inputs, ordering, filters, paging and errors where those behaviors matter. Validate adapters together when the defect crosses their boundary. External-response fixtures must reflect the actual provider contract; repeating an invented response shape in both code and test proves little. Use independent checks of requirements and domain rules when implementation and tests could share the same assumption.",
+      "example": "Pagination tests fetch page two and verify its contents and ordering. An uncertain-write regression sends an actual mocked HTTP 200 malformed response through the provider and tool path.",
+      "limits": "Use the cheapest test layer that catches the failure. Extra end-to-end machinery should demonstrate distinct value."
+    },
+    {
+      "id": "P14",
+      "title": "Keep test setup small and explicit",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Show the data that matters near the test. Avoid broad conditional setup, unnecessary inserted rows and factories that hide business behavior. Name scenarios so a reader can follow the state changes.",
+      "example": "Create only the fields needed for a filter test. Label deletion and update events clearly in a batch. Build a value without inserting it when persistence is irrelevant.",
+      "limits": "Shared setup remains useful for common infrastructure and cleanup. Do not enforce a universal ban on setup, mocks, or multiple assertions."
+    },
+    {
+      "id": "P15",
+      "title": "Isolate tests and restore shared state",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Keep test databases, topics and object-storage data isolated from development or live resources. Restore global configuration, including whether a key originally existed.",
+      "example": "Tests use a dedicated data namespace. A test that changes shared configuration records its original state and restores the value or removes the key afterward.",
+      "limits": "Infrastructure can be shared when the data namespaces remain isolated. Apply stricter offline guards to tests that hold live provider credentials."
+    },
+    {
+      "id": "P16",
+      "title": "Check the running path and deployment configuration",
+      "confidence": "strong",
+      "scope": "runtime and integration changes",
+      "guideline": "Trace the feature through registration, configuration, supervision, serialization and the consumer-facing interface. Compare environments when a configuration change is involved. Distinguish implementation completion, deployment and release to users; verify the intended outcome at the relevant stage.",
+      "example": "A new handler also needs registration in the interface that exposes it. A worker-only process should not require web authentication settings or fail when an unrelated web component stops.",
+      "limits": "Release-binary tests can find wiring failures, but test harness cost still needs justification through meaningful scenarios."
+    },
+    {
+      "id": "P17",
+      "title": "Preserve domain meaning and consumer compatibility",
+      "confidence": "strong",
+      "scope": "data and public interfaces",
+      "guideline": "Check the meanings of nulls, timestamps, identifiers, sorting, units and aggregation grain. Verify the impact on existing consumers before changing a shared default.",
+      "example": "Changing a default sort order affects existing clients. Distinguish source timestamps from ingestion timestamps. Preserve the difference between an unknown measurement and zero.",
+      "limits": "A migration can intentionally change a contract, but the change and affected consumers must be explicit."
+    },
+    {
+      "id": "P18",
+      "title": "Remove obsolete code as part of finishing work",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Remove unused code, obsolete implementations, commented-out configuration and stale fixtures when they are safely within scope. Reduce lint exclusions when practical. Keep tests, documentation, prompts, repository instructions and automation workflows aligned with the system. Remove generated artifacts that no longer provide value.",
+      "example": "After replacing processors, delete the old processors and related code. Update fixtures when the upstream fields they contain no longer exist.",
+      "limits": "Keep risky or unrelated cleanup in a separate change. Do not use cleanup as a reason to expand every PR."
+    },
+    {
+      "id": "P19",
+      "title": "Explain changes and tradeoffs in simple language",
+      "confidence": "strong",
+      "scope": "general",
+      "guideline": "Explain what changed, why it matters and any non-obvious choice. Describe workflows in order. Keep review and PR text short, concrete and easy to act on.",
+      "example": "Read data \u2192 check completeness \u2192 save a timestamped result. A review finding names the trigger, incorrect outcome, affected line and smallest useful fix.",
+      "limits": "Keep routine explanations concise. Add detail when a consequential decision, limitation or verification result needs it."
+    },
+    {
+      "id": "P20",
+      "title": "Keep the review focused and calibrated",
+      "confidence": "strong",
+      "scope": "review process",
+      "guideline": "Check explicit requirements and changed behavior. Read enough surrounding code to trace the issue. Avoid duplicate comments and unrelated historical issues. Supply a concrete fix for a finding.",
+      "example": "A pre-existing deployment smoke-test URL can be a follow-up. A naming improvement remains a suggestion when behavior is clear. A lost recovery contract warrants a required change.",
+      "limits": "Respect the requested review mode: architecture review may examine proposed boundaries; PR review should anchor findings to the changed behavior. Existing automated convention checks should not be repeated."
+    },
+    {
+      "id": "P21",
+      "title": "Match architecture effort to release impact and reversibility",
+      "confidence": "contextual",
+      "scope": "architecture review",
+      "guideline": "Assess user and business impact, sensitive data, irreversible changes, failure isolation, monitoring and rollback. Prefer a design the owner can explain, including its failure points. Consider data integrity, privacy and consent requirements when choosing safeguards. Make material limitations visible to affected users.",
+      "example": "A small reversible internal release can use a simple design and follow-up review. A migration affecting important persisted data needs earlier design and release planning.",
+      "limits": "Agree on rollback and validation requirements for the actual release. Timing thresholds depend on impact and operating constraints."
+    },
+    {
+      "id": "P22",
+      "title": "Treat agent-facing descriptions as executable contracts",
+      "confidence": "contextual",
+      "scope": "agent interfaces and automation",
+      "guideline": "Descriptions, annotations and errors must match actual capabilities, write scope and recovery behavior. Verify provider-specific semantics and money units against the relevant version before making factual claims.",
+      "example": "A validate-only response does not prove an applied after-state. A status update changes only status. An annotation declaring a write read-only can mislead the caller.",
+      "limits": "Verify capabilities and interface details against the version used in the supplied system. A generic example does not establish the behavior of any particular dependency."
+    },
+    {
+      "id": "P23",
+      "title": "Measure outcomes and keep feedback cycles sustainable",
+      "confidence": "stated",
+      "scope": "planning and delivery",
+      "guideline": "Define the user or business outcome before implementation. Validate valuable assumptions early, reassess direction as evidence changes, and stop work that no longer delivers enough value. Limit parallel work to what can be integrated, reviewed and operated responsibly.",
+      "example": "Before expanding an import workflow, verify that users need the additional data. Finish and validate one useful slice before opening several dependent changes that nobody can review.",
+      "limits": "Code volume, generated changes and automation activity are not sufficient measures of success. Choose feedback and concurrency limits for the actual team and work; no fixed threshold is implied."
+    },
+    {
+      "id": "P24",
+      "title": "Keep ownership and shared capabilities clear",
+      "confidence": "stated",
+      "scope": "architecture and delivery",
+      "guideline": "Keep an accountable engineer or team for each change, including delegated work. Consider effects on other teams, make dependencies visible and reuse supported shared capabilities where they meet the need. Document deliberate exceptions and keep setup, interfaces and knowledge maintainable by others.",
+      "example": "A new import uses a maintained connector when it fits. If it needs a different approach, record the missing capability and tradeoff. Identify who will support the result after release.",
+      "limits": "Shared infrastructure is useful when it fits the requirements. This preference does not require a central service for every capability or a new approval gate for routine implementation choices."
+    },
+    {
+      "id": "P25",
+      "title": "Choose automation deliberately and bound its authority",
+      "confidence": "stated",
+      "scope": "automation and agents",
+      "guideline": "Use deterministic automation for known rules and agents where interpretation or exploration adds value. Give agents clear goals, appropriate data and tools, bounded access, action limits, time and cost budgets, and defined stop or human-review conditions. Scale autonomy to failure impact and reversibility, and preserve useful evidence of important actions.",
+      "example": "A scheduled import with fixed transformations uses an ordinary job. An agent investigating unfamiliar failures receives read-only access and a bounded investigation budget; any live write needs the authority required for that action.",
+      "limits": "Apply these checks to the automation being designed or changed. Use the current task authority and applicable requirements; do not add approval prompts for already authorized routine work or impose arbitrary budget values."
+    },
+    {
+      "id": "P26",
+      "title": "Evaluate agent behavior and protect user trust",
+      "confidence": "stated",
+      "scope": "products using agents or generated outputs",
+      "guideline": "Evaluate representative tasks, failure cases and harmful or misleading inputs. Reassess behavior after changes to models, prompts, tools or data. Protect data integrity, privacy and consent requirements, make decision-relevant uncertainty visible, and provide a practical way to stop or recover from unacceptable behavior.",
+      "example": "After changing an assistant prompt, check an ordinary request, missing information, a misleading retrieved instruction and an unavailable tool. Verify that unsupported claims remain qualified and that the workflow can stop safely.",
+      "limits": "Choose evaluations and safeguards for the actual product risks. Apply behavioral evaluation to changed agent behavior; conventional software does not require an agent-specific evaluation suite merely because development used an agent."
+    }
+  ],
+  "usage": "Self-contained guidance. Examples are fictional and do not identify external code, repositories or requirements.",
+  "support_labels": {
+    "strong": "Recurring observed preference with corroborating evidence.",
+    "contextual": "Preference whose application depends on the current situation.",
+    "stated": "Explicitly supplied guidance; not a claim of formally adopted organizational policy."
+  }
+}
