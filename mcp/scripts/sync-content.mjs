@@ -11,6 +11,8 @@ if (!work.includes('View career history') || !work.includes('Thoughtworks')) {
   throw new Error('Website career structure changed; review the extraction before updating the snapshot.');
 }
 const text = work
+  // Connection UI can sit inside the career section without becoming CV source data.
+  .replace(/<details\b[^>]*\bdata-mcp-base="[^"]*"[^>]*>[\s\S]*?<\/details>/g, '')
   .replace(/<!--[\s\S]*?-->/g, '')
   .replace(/<canvas\b[^>]*>[\s\S]*?<\/canvas>/g, '')
   .replace(/<h[23][^>]*>/g, '\n\n## ')

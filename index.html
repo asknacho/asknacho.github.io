@@ -22,7 +22,7 @@
   <meta name="twitter:image" content="https://asknacho.to/assets/social-card.png?v=short-curls" />
   <meta name="twitter:image:alt" content="Pixel art of Nacho reading with his family; engineering manager in Barcelona" />
   <link rel="stylesheet" href="assets/share-ready.css?v=random-instrument" />
-  <link rel="stylesheet" href="assets/mcp.css" />
+  <link rel="stylesheet" href="assets/mcp.css?v=compact-invitation" />
   <script src="assets/mcp.js?v=mcp-path" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -362,6 +362,23 @@
           <p>“Spotting blockers, cutting through communication, adding value to the product… Now I know what to look for in my next lead: a Nacho.”</p>
           <footer>— an engineer on my team</footer>
         </blockquote>
+        <details class="agent-connect" id="ask-your-agent" data-mcp-base="https://mcp.asknacho.to">
+          <summary><strong>Tired of reading?</strong> Ask your agent.</summary>
+          <div class="agent-connect-body">
+            <p>Ask your agent whether my experience and engineering approach fit your role or project.</p>
+            <p>Add this URL as a custom MCP connector first. No sign-in required.</p>
+            <label for="mcp-endpoint">MCP endpoint</label>
+            <input id="mcp-endpoint" readonly value="https://mcp.asknacho.to/mcp" />
+            <button type="button" data-copy="mcp-endpoint">Copy endpoint</button>
+            <label for="mcp-prompt">Then ask your agent</label>
+            <textarea id="mcp-prompt" readonly rows="7">Compare Nacho’s experience and working approach with the requirements below. Cite the supporting sources, identify strengths and gaps in the evidence, and suggest questions for our first conversation. Distinguish career claims, stated preferences, and fictional examples.
+
+[Paste your role or project requirements]</textarea>
+            <button type="button" data-copy="mcp-prompt">Copy prompt</button>
+            <p><a class="panel-link" data-mcp-document href="https://mcp.asknacho.to/documents/profile.md">Read the profile as Markdown</a></p>
+            <p class="agent-status" role="status" aria-live="polite"></p>
+          </div>
+        </details>
         <p>Leading engineering teams in Barcelona since 2021. Hands-on, people first.</p>
         <ul class="highlights">
           <li>Leading three teams at G2: 13 people working on Marketing Technology, Centralized API, and MCPs.</li>
@@ -418,28 +435,6 @@
             </li>
           </ol>
         </details>
-      </article>
-    </section>
-    <section class="agent-section" id="ask-your-agent" aria-labelledby="agent-title" data-mcp-base="https://mcp.asknacho.to">
-      <article class="panel agent-panel">
-        <p class="panel-tag">Meet through your agent</p>
-        <h2 id="agent-title">Would we work well together?</h2>
-        <p>Point your agent to my MCP and ask whether I’m a good fit for your role or project. It can explore my experience and engineering approach, identify gaps, and suggest what we should discuss.</p>
-        <details class="agent-connect">
-          <summary>Connect your agent</summary>
-          <p>Add this URL to an MCP client that supports Streamable HTTP. No sign-in is required.</p>
-          <label for="mcp-endpoint">MCP endpoint</label>
-          <input id="mcp-endpoint" readonly value="https://mcp.asknacho.to/mcp" />
-          <button type="button" data-copy="mcp-endpoint">Copy endpoint</button>
-          <label for="mcp-prompt">Then ask your agent</label>
-          <textarea id="mcp-prompt" readonly rows="7">Compare Nacho’s experience and working approach with the requirements below. Cite the supporting sources, identify strengths and gaps in the evidence, and suggest questions for our first conversation. Distinguish career claims, stated preferences, and fictional examples.
-
-[Paste your role or project requirements]</textarea>
-          <button type="button" data-copy="mcp-prompt">Copy prompt</button>
-          <p><a class="panel-link" data-mcp-document href="https://mcp.asknacho.to/documents/profile.md">Read the profile as Markdown</a></p>
-          <p class="agent-status" role="status" aria-live="polite"></p>
-        </details>
-        <p class="agent-evidence-note">Based on my CV and published engineering principles. Your agent makes its own assessment and can point out unanswered questions.</p>
       </article>
     </section>
     <section class="scene scene--guitar">
