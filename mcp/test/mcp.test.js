@@ -11,7 +11,7 @@ before(async () => {
   await new Promise(resolve => listener.once('listening', resolve));
   origin = `http://127.0.0.1:${listener.address().port}`;
   client = new Client({name: 'nacho-integration-test', version: '1.0.0'});
-  await client.connect(new StreamableHTTPClientTransport(new URL('/api/mcp', origin)));
+  await client.connect(new StreamableHTTPClientTransport(new URL('/mcp', origin)));
 });
 after(async () => {
   await client?.close();
@@ -42,6 +42,22 @@ test('all allowlisted sources are readable over MCP and plain HTTP', async () =>
     const plain = await fetch(new URL(entry.path, origin));
     assert.equal(plain.status, 200);
     assert.equal(await plain.text(), original.content);
+  }
+});
+
+test('published source data has only public personal links and no credential or internal-ticket patterns', () => {
+  const publicHosts = new Set(['asknacho.to', 'scorepace.com', 'tonelab.asknacho.to']);
+  for (const doc of documents) {
+    for (const match of doc.content.matchAll(/https?:\/\/[^\s)>"'`]+/g)) {
+      assert.ok(publicHosts.has(new URL(match[0]).hostname), `Unreviewed source URL in ${doc.id}`);
+    }
+    assert.doesNotMatch(doc.content, /-----BEGIN (?:[A-Z]+ )?PRIVATE KEY-----|\bgh[pousr]_[A-Za-z0-9]{20,}|\bAKIA[A-Z0-9]{16}\b/, `Credential pattern in ${doc.id}`);
+    assert.doesNotMatch(doc.content, /[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i, `Personal or company email in ${doc.id}`);
+    assert.doesNotMatch(doc.content, /\b[A-Z][A-Z0-9]{1,9}-\d{2,}\b/, `Possible internal ticket in ${doc.id}`);
+  }
+  // The guidance must stay generic; approved employer names belong in the CV/profile.
+  for (const doc of documents.filter(d => d.sourceFile.includes('/guidance/'))) {
+    assert.doesNotMatch(doc.content, /\b(?:G2|Gartner|Thoughtworks|Chalk)\b/);
   }
 });
 
@@ -81,13 +97,17 @@ test('MCP metadata and discovery are reachable without serving the website', asy
   const root = await fetch(origin);
   assert.match(root.headers.get('content-type'), /application\/json/);
   const info = await root.json();
-  assert.equal(info.endpoint, '/api/mcp');
+  assert.equal(info.endpoint, '/mcp');
   assert.equal(info.website, 'https://asknacho.to/');
   for (const path of ['/index.html', '/assets/mcp.js', '/assets/favicon.png']) {
     assert.equal((await fetch(new URL(path, origin))).status, 404);
   }
-  assert.match(await (await fetch(new URL('/llms.txt', origin))).text(), /\/api\/mcp/);
-  const get = await fetch(new URL('/api/mcp', origin));
+  assert.match(await (await fetch(new URL('/llms.txt', origin))).text(), /Read-only MCP: \/mcp/);
+  const get = await fetch(new URL('/mcp', origin));
   assert.equal(get.status, 405);
   assert.equal(get.headers.get('allow'), 'POST');
+  const oldEndpoint = await fetch(new URL('/api/mcp', origin), {
+    method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{}',
+  });
+  assert.equal(oldEndpoint.status, 404);
 });

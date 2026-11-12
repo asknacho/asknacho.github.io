@@ -5,7 +5,7 @@ Public, read-only career and engineering reference material. The visitor’s own
 ## Hosting boundaries
 
 - Website: **https://asknacho.to/**, served by GitHub Pages from the root HTML and assets.
-- MCP: **https://mcp.asknacho.to/api/mcp**, served by the separate Vercel project `nacho-mcp` in `ignaciomaldonados-projects`.
+- MCP: **https://mcp.asknacho.to/mcp**, served by the separate Vercel project `nacho-mcp` in `ignaciomaldonados-projects`.
 - The MCP domain root returns JSON connection metadata. It does not host the website.
 - The Vercel build generates only the document corpus, public Markdown/JSON documents, and `/llms.txt`. It never copies the website or assets. Generated `public/` is cleared each build and excluded from CLI uploads.
 - GitHub Pages excludes `mcp/`. Deploying the MCP does not publish website changes; publishing the website does not deploy the MCP. Git auto-deployment for Vercel is not configured.
@@ -22,14 +22,14 @@ npm test
 npm run dev
 ```
 
-Local endpoint: http://127.0.0.1:3100/api/mcp. The root and `/health` return JSON; no local website preview is served by this process.
+Local endpoint: http://127.0.0.1:3100/mcp. The root and `/health` return JSON; no local website preview is served by this process.
 
 Streamable HTTP client configuration:
 
 ```json
 {
   "mcpServers": {
-    "nacho": { "url": "https://mcp.asknacho.to/api/mcp" }
+    "nacho": { "url": "https://mcp.asknacho.to/mcp" }
   }
 }
 ```
@@ -47,6 +47,12 @@ A browser GET to the endpoint returns 405 intentionally; connect using an MCP cl
 Tools: `get_profile`, `list_documents`, `read_document`, `search_documents`. Every tool is read-only. Ten resources expose the same documents; `assess_fit` is an optional prompt. Text fallback: `/llms.txt`, `/documents/index.json`, and `/documents/profile.md`.
 
 Add sources explicitly to the source list in `scripts/build.mjs`.
+
+### Public-data review
+
+All ten published documents were reviewed on 2026-11-12 for confidential company information. The guidance contains generic principles and explicitly fictional examples, without internal links, ticket IDs, credentials, customer records, or identifiable employee records. Employer names, roles, career dates, team scope, and the anonymous testimonial are approved CV material, as confirmed by Nacho.
+
+Only the explicit source list is published. Raw workplace documents, original review discussions, and hidden research archives are not included. Integration checks also scan the published corpus for unexpected links, email addresses, credential formats, ticket identifiers, and employer names inside the generic guidance. These checks supplement content review; review any new or changed source before publication.
 
 ## Deploy and verify
 

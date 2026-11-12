@@ -32,7 +32,7 @@ async function authenticatedFetch(input, init = {}) {
 }
 const client = new Client({name: 'nacho-preview-smoke', version: '1.0.0'});
 try {
-  await client.connect(new StreamableHTTPClientTransport(new URL('/api/mcp', deployment), protectedPreview ? {fetch: authenticatedFetch} : {}));
+  await client.connect(new StreamableHTTPClientTransport(new URL('/mcp', deployment), protectedPreview ? {fetch: authenticatedFetch} : {}));
   const tools = await client.listTools();
   assert.equal(tools.tools.length, 4);
   const profile = JSON.parse((await client.callTool({name: 'get_profile', arguments: {}})).content[0].text);

@@ -47,13 +47,13 @@ app.disable('x-powered-by');
 app.use(express.json({limit: '64kb'}));
 app.get('/', (_req, res) => res.json({
   name: 'Nacho professional MCP',
-  endpoint: '/api/mcp',
+  endpoint: '/mcp',
   transport: 'Streamable HTTP',
   website: 'https://asknacho.to/',
   documents: '/documents/index.json',
 }));
 app.get('/health', (_req, res) => res.json({status: 'ok', version: '0.1.0', documents: documents.length}));
-app.post('/api/mcp', async (req, res) => {
+app.post('/mcp', async (req, res) => {
   // Each request gets its own transport: no session store, shared mutable client state, or database.
   const server = createServer();
   const transport = new StreamableHTTPServerTransport({sessionIdGenerator: undefined, enableJsonResponse: true});
@@ -66,7 +66,7 @@ app.post('/api/mcp', async (req, res) => {
     if (!res.headersSent) res.status(500).json({jsonrpc: '2.0', id: null, error: {code: -32603, message: 'Unable to complete this request.'}});
   }
 });
-app.all('/api/mcp', (_req, res) => {
+app.all('/mcp', (_req, res) => {
   res.set('Allow', 'POST').status(405).json({jsonrpc: '2.0', id: null, error: {code: -32000, message: 'Use an MCP client with Streamable HTTP (POST). Documentation: /llms.txt'}});
 });
 app.get('/llms.txt', (_req, res) => res.sendFile(fileURLToPath(new URL('../public/llms.txt', import.meta.url))));

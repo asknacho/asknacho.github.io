@@ -3,7 +3,7 @@
   if (!section) return;
   const base = section.dataset.mcpBase;
   if (base) {
-    section.querySelector('#mcp-endpoint').value = `${base}/api/mcp`;
+    section.querySelector('#mcp-endpoint').value = `${base}/mcp`;
     section.querySelector('[data-copy="mcp-endpoint"]').disabled = false;
     section.querySelector('[data-mcp-document]').href = `${base}/documents/profile.md`;
   }
