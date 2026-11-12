@@ -1,0 +1,14 @@
+.agent-section { padding: 30px max(16px, 6vw) 50px; }
+.agent-panel { max-width: 46rem; margin: 0 auto; padding: clamp(20px, 4vw, 36px); border: 1px solid color-mix(in oklab, var(--ink) 24%, transparent); border-radius: 12px; }
+.agent-panel .agent-evidence-note { font-size: 14px; color: var(--muted); }
+.agent-panel .agent-evidence-note { margin: 22px 0 0; }
+.agent-connect summary { cursor: pointer; text-decoration: underline; text-underline-offset: 4px; padding: 8px 0; }
+.agent-connect[open] summary { margin-bottom: 14px; }
+.agent-connect label { display: block; font-size: 14px; font-weight: 650; margin: 18px 0 6px; }
+.agent-connect input, .agent-connect textarea { display: block; width: 100%; min-width: 0; border: 1px solid color-mix(in oklab, var(--ink) 35%, transparent); border-radius: 6px; background: var(--bg); color: var(--ink); padding: 12px; font: 14px/1.6 ui-monospace, monospace; }
+.agent-connect textarea { resize: vertical; min-height: 12rem; }
+.agent-connect button { display: inline-block; cursor: pointer; padding: 8px 12px; margin: 10px 0 18px; border: 1px solid currentColor; border-radius: 5px; color: var(--ink); background: transparent; font: inherit; font-size: 14px; }
+.agent-connect button:hover { background: color-mix(in oklab, var(--ink) 8%, var(--bg)); }
+.agent-connect button:disabled { cursor: default; opacity: .5; }
+.agent-connect :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+.agent-status:empty { display: none; }

@@ -38,7 +38,7 @@ jobs:
       - name: Assemble site
         run: |
           mkdir _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='.claude' --exclude='_site' --exclude='scene' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='.claude' --exclude='.vercel' --exclude='.tmp' --exclude='node_modules' --exclude='_site' --exclude='scene' --exclude='mcp' ./ _site/
           cp -r scene/dist _site/scene
 
       - uses: actions/configure-pages@v5
