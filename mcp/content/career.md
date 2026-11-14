@@ -96,7 +96,7 @@ An app to learn how audio effects work together: chain them up and hear what eac
 
 Try ToneLab → (https://tonelab.asknacho.to)
 
-## Linehaus
+## Linehaus Beta
 
 A puzzle game about drawing one line through a building. Trace a single continuous stroke from start to finish across the floor plan, using the stairs to move between floors. A staircase on the plan can make your line look like it doubles back on itself. Hit a wall or a gap, or lift your finger, and the level starts over.
 
