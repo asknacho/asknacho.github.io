@@ -98,8 +98,6 @@ Try ToneLab → (https://tonelab.asknacho.to)
 
 ## Linehaus Beta
 
-A puzzle game about drawing one line through a building. Trace a single continuous stroke from start to finish across the floor plan, using the stairs to move between floors. A staircase on the plan can make your line look like it doubles back on itself. Hit a wall or a gap, or lift your finger, and the level starts over.
-
-The puzzles are set in real historic buildings, starting with the White House, Palladio's Villa La Rotonda and Monticello. You can rotate the plan into 3D to see the building's floors. It's made for phones: a web demo now, with iOS and Android apps planned.
+A puzzle game for phones: draw one unbroken line through historic buildings, using the stairs to change floors.
 
 Play Linehaus → (https://linehaus.asknacho.to)
