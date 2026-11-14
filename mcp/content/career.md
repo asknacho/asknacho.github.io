@@ -95,3 +95,11 @@ Try ScorePace → (https://scorepace.com)
 An app to learn how audio effects work together: chain them up and hear what each one does to the sound.
 
 Try ToneLab → (https://tonelab.asknacho.to)
+
+## Linehaus
+
+A puzzle game about drawing one line through a building. Trace a single continuous stroke from start to finish across the floor plan, using the stairs to move between floors. A staircase on the plan can make your line look like it doubles back on itself. Hit a wall or a gap, or lift your finger, and the level starts over.
+
+The puzzles are set in real historic buildings, starting with the White House, Palladio's Villa La Rotonda and Monticello. You can rotate the plan into 3D to see the building's floors. It's made for phones: a web demo now, with iOS and Android apps planned.
+
+Play Linehaus → (https://linehaus.asknacho.to)

@@ -46,7 +46,7 @@ test('all allowlisted sources are readable over MCP and plain HTTP', async () =>
 });
 
 test('published source data has only public personal links and no credential or internal-ticket patterns', () => {
-  const publicHosts = new Set(['asknacho.to', 'scorepace.com', 'tonelab.asknacho.to']);
+  const publicHosts = new Set(['asknacho.to', 'scorepace.com', 'tonelab.asknacho.to', 'linehaus.asknacho.to']);
   for (const doc of documents) {
     for (const match of doc.content.matchAll(/https?:\/\/[^\s)>"'`]+/g)) {
       assert.ok(publicHosts.has(new URL(match[0]).hostname), `Unreviewed source URL in ${doc.id}`);

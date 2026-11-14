@@ -18,7 +18,7 @@ const documents = await Promise.all(sources.map(async ([id, file, title, evidenc
   const content = await readFile(new URL(`content/${file}`, root), 'utf8');
   return { id, title, evidenceType, content, sourceFile: `mcp/content/${file}`,
     source: id === 'career' ? 'https://asknacho.to/#work' : 'Material supplied by Nacho',
-    contentAsOf: '2026-11-12', sha256: createHash('sha256').update(content).digest('hex'),
+    contentAsOf: id === 'career' ? '2026-11-14' : '2026-11-12', sha256: createHash('sha256').update(content).digest('hex'),
     mimeType: file.endsWith('.json') ? 'application/json' : 'text/markdown' };
 }));
 await writeFile(new URL('content/corpus.json', root), JSON.stringify(documents, null, 2) + '\n');
