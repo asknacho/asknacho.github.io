@@ -22,8 +22,8 @@
   <meta name="twitter:image" content="https://asknacho.to/assets/social-card.png?v=short-curls" />
   <meta name="twitter:image:alt" content="Pixel art of Nacho reading with his family; engineering manager in Barcelona" />
   <link rel="stylesheet" href="assets/share-ready.css?v=random-instrument" />
-  <link rel="stylesheet" href="assets/mcp.css?v=compact-invitation" />
-  <script src="assets/mcp.js?v=agent-quick-link" defer></script>
+  <link rel="stylesheet" href="assets/mcp.css?v=connector-guide" />
+  <script src="assets/mcp.js?v=connector-guide" defer></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
@@ -367,15 +367,25 @@
           <summary><strong>Tired of reading?</strong> Ask your agent.</summary>
           <div class="agent-connect-body">
             <p>Ask your agent whether my experience and engineering approach fit your role or project.</p>
-            <p>Add this URL as a custom MCP connector first. No sign-in required.</p>
-            <label for="mcp-endpoint">MCP endpoint</label>
-            <input id="mcp-endpoint" readonly value="https://mcp.asknacho.to/mcp" />
-            <button type="button" data-copy="mcp-endpoint">Copy endpoint</button>
-            <label for="mcp-prompt">Then ask your agent</label>
-            <textarea id="mcp-prompt" readonly rows="7">Compare Nacho’s experience and working approach with the requirements below. Cite the supporting sources, identify strengths and gaps in the evidence, and suggest questions for our first conversation. Distinguish career claims, stated preferences, and fictional examples.
+            <p><strong>Just want to ask ChatGPT or Claude?</strong> Copy the prompt below, paste it into a chat, and add your role or project. No setup needed.</p>
+            <label for="mcp-prompt">Your prompt</label>
+            <textarea id="mcp-prompt" readonly rows="8">Read https://mcp.asknacho.to/documents/profile.md and https://mcp.asknacho.to/documents/career.md. Compare Nacho’s experience and working approach with the requirements below. Cite the supporting sources, identify strengths and gaps in the evidence, and suggest questions for our first conversation. Distinguish career claims, stated preferences, and fictional examples. If you cannot access the links, tell me.
 
 [Paste your role or project requirements]</textarea>
             <button type="button" data-copy="mcp-prompt">Copy prompt</button>
+            <section class="agent-setup" aria-labelledby="claude-setup-title">
+              <h3 id="claude-setup-title">Connect Claude to more of my work</h3>
+              <p>For ongoing access to my career and engineering documents, add this free, read-only connector to Claude. No download or sign-in to my site is needed.</p>
+              <ol>
+                <li>In Claude, open <strong>Customize → Connectors</strong>, then choose <strong>+ Add → Add custom connector</strong>.</li>
+                <li>Name it <strong>Ask Nacho</strong> and paste the connection address below. Choose <strong>No sign in</strong> if asked, then add it.</li>
+                <li>In a chat, choose <strong>+ → Connectors</strong> and turn on Ask Nacho. Then ask your question and include your requirements.</li>
+              </ol>
+              <label for="mcp-endpoint">Connection address (for connector settings, not chat)</label>
+              <input id="mcp-endpoint" readonly value="https://mcp.asknacho.to/mcp" />
+              <button type="button" data-copy="mcp-endpoint">Copy connection address</button>
+              <p>On a work or school account, an administrator may need to add it. <a href="https://support.claude.com/en/articles/11175166-get-started-with-custom-connectors-using-remote-mcp">Claude’s setup guide</a></p>
+            </section>
             <p><a class="panel-link" data-mcp-document href="https://mcp.asknacho.to/documents/profile.md">Read the profile as Markdown</a></p>
             <p class="agent-status" role="status" aria-live="polite"></p>
           </div>

@@ -9,5 +9,10 @@
 .agent-connect button { display: inline-block; cursor: pointer; padding: 8px 12px; margin: 10px 0 12px; border: 1px solid currentColor; border-radius: 5px; color: var(--ink); background: transparent; font: inherit; font-size: 14px; }
 .agent-connect button:hover { background: color-mix(in oklab, var(--ink) 8%, var(--bg)); }
 .agent-connect button:disabled { cursor: default; opacity: .5; }
+.agent-setup { margin: 12px 0 18px; }
+.agent-setup h3 { font-size: 16px; font-weight: 650; margin: 0 0 8px; }
+.agent-setup p, .agent-setup ol { font-size: 15px; }
+.agent-setup ol { padding-left: 22px; }
+.agent-setup li { margin-bottom: 8px; }
 .agent-connect :focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
 .agent-status:empty { display: none; }

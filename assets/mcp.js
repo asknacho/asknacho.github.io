@@ -18,7 +18,7 @@
       const status = section.querySelector('[role="status"]');
       try {
         await navigator.clipboard.writeText(field.value);
-        status.textContent = button.dataset.copy === 'mcp-endpoint' ? 'Endpoint copied.' : 'Prompt copied.';
+        status.textContent = button.dataset.copy === 'mcp-endpoint' ? 'Connection address copied. Paste it in Claude’s connector settings.' : 'Prompt copied. Paste it into your chat and add your requirements.';
       } catch {
         field.focus();
         field.select();
