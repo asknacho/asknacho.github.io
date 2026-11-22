@@ -1,0 +1,16 @@
+{
+  "manifest_version": "0.3",
+  "name": "ask-nacho",
+  "display_name": "Ask Nacho",
+  "version": "1.0.0",
+  "description": "Connect Claude to Nacho's read-only career and engineering documents.",
+  "author": { "name": "Ignacio Morales", "url": "https://asknacho.to" },
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"]
+    }
+  }
+}

@@ -36,6 +36,8 @@ Streamable HTTP client configuration:
 
 A browser GET to the endpoint returns 405 intentionally; connect using an MCP client. This server supports stateless Streamable HTTP with JSON responses, not legacy SSE sessions.
 
+The website also offers a Claude Desktop MCPB at `assets/downloads/ask-nacho.mcpb`. Its source is `tools/claude-connector/`; it bridges Claude Desktop's local stdio connection to the same public endpoint and needs internet access. Rebuild the downloadable archive from the repository root with `python3 tools/claude-connector/build.py`. The download is published with the website, separately from the MCP deployment.
+
 ## Content and provenance
 
 - `content/career.md` is a snapshot of work and side-project content in the root `index.html`. Run `npm run sync` after editing that content and inspect the diff. Deployment uses this snapshot and needs no website files.
